@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CNK Señalización Vial — Acceso al Sistema</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --azul:       #0B2545;
+      --azul-medio: #0d2d56;
+      --amarillo:   #F5A623;
+      --amarillo-bg: rgba(245,166,35,.10);
+      --amarillo-bd: rgba(245,166,35,.30);
+      --texto-claro: #a8c0d8;
+      --texto-opaco: #5a7a99;
+      --blanco:     #ffffff;
+      --gris-bg:    #f4f6f9;
+      --gris-bd:    #dde3ea;
+      --error:      #E24B4A;
+      --error-bg:   #FCEBEB;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--azul);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── FONDO CON LÍNEAS DECORATIVAS ── */
+    .bg-lines {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 0; overflow: hidden;
+    }
+    .bg-lines svg { width: 100%; height: 100%; }
+
+    /* ── LAYOUT PRINCIPAL ── */
+    .page {
+      position: relative; z-index: 1;
+      display: flex; flex: 1;
+      min-height: 100vh;
+    }
+
+    /* ── PANEL IZQUIERDO (branding) ── */
+    .panel-left {
+      width: 45%;
+      background: var(--azul-medio);
+      border-right: 1px solid rgba(255,255,255,.06);
+      display: flex; flex-direction: column;
+      padding: 48px 52px;
+      position: relative; overflow: hidden;
+    }
+    .panel-left-bg {
+      position: absolute; right: -40px; bottom: -40px;
+      width: 320px; opacity: .04; pointer-events: none;
+    }
+
+    .logo-area { display: flex; align-items: center; gap: 14px; margin-bottom: 64px; }
+    .logo-box {
+      width: 46px; height: 46px; background: var(--amarillo);
+      border-radius: 8px; display: flex; align-items: center;
+      justify-content: center; font-weight: 800; font-size: 14px; color: var(--azul);
+      flex-shrink: 0;
+    }
+    .brand-name { color: var(--blanco); font-size: 16px; font-weight: 700; }
+    .brand-name span { color: var(--amarillo); }
+    .brand-sub { color: var(--texto-opaco); font-size: 9px; letter-spacing: .9px; text-transform: uppercase; margin-top: 3px; }
+
+    .panel-tagline { position: relative; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+    .panel-tagline h1 {
+      color: var(--blanco); font-size: 34px; font-weight: 800;
+      line-height: 1.2; margin-bottom: 18px;
+    }
+    .panel-tagline h1 em { color: var(--amarillo); font-style: normal; display: block; }
+    .panel-tagline p {
+      color: var(--texto-claro); font-size: 13px; line-height: 1.75;
+      max-width: 320px; margin-bottom: 36px;
+    }
+
+    .feature-list { display: flex; flex-direction: column; gap: 14px; }
+    .feature-item { display: flex; align-items: flex-start; gap: 12px; }
+    .feature-dot {
+      width: 28px; height: 28px; border-radius: 6px;
+      background: var(--amarillo-bg); border: 1px solid var(--amarillo-bd);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; flex-shrink: 0; margin-top: 1px;
+    }
+    .feature-text strong {
+      display: block; font-size: 12px; font-weight: 600; color: var(--blanco); margin-bottom: 2px;
+    }
+    .feature-text span { font-size: 11px; color: var(--texto-claro); line-height: 1.5; }
+
+    .panel-footer {
+      margin-top: 48px;
+      font-size: 10px; color: var(--texto-opaco);
+      border-top: 1px solid rgba(255,255,255,.06); padding-top: 16px;
+    }
+
+    /* ── PANEL DERECHO (formulario) ── */
+    .panel-right {
+      flex: 1;
+      display: flex; align-items: center; justify-content: center;
+      padding: 48px 40px;
+    }
+
+    .login-box {
+      background: var(--blanco);
+      border-radius: 16px;
+      padding: 40px 44px;
+      width: 100%; max-width: 400px;
+      box-shadow: 0 24px 64px rgba(0,0,0,.3);
+    }
+
+    .login-box-header { margin-bottom: 32px; }
+    .login-eyebrow {
+      font-size: 10px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--amarillo);
+      margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
+    }
+    .login-eyebrow::before {
+      content: ''; width: 20px; height: 2px; background: var(--amarillo);
+    }
+    .login-box-header h2 {
+      font-size: 22px; font-weight: 800; color: var(--azul); margin-bottom: 6px;
+    }
+    .login-box-header p { font-size: 12px; color: #778899; line-height: 1.6; }
+
+    /* ── FORMULARIO ── */
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block; font-size: 11px; font-weight: 600;
+      color: var(--azul); margin-bottom: 7px; letter-spacing: .2px;
+    }
+    .input-wrap { position: relative; }
+    .input-icon {
+      position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+      font-size: 15px; pointer-events: none; opacity: .5;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 11px 14px 11px 40px;
+      border: 1.5px solid var(--gris-bd);
+      border-radius: 8px;
+      font-size: 13px; font-family: 'Inter', sans-serif;
+      color: var(--azul); background: var(--gris-bg);
+      transition: border-color .2s, background .2s, box-shadow .2s;
+      outline: none;
+    }
+    .form-group input:focus {
+      border-color: var(--azul);
+      background: var(--blanco);
+      box-shadow: 0 0 0 3px rgba(11,37,69,.08);
+    }
+    .form-group input.error {
+      border-color: var(--error);
+      background: var(--error-bg);
+    }
+
+    .pass-toggle {
+      position: absolute; right: 13px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer;
+      font-size: 15px; opacity: .4; transition: opacity .2s; padding: 0;
+    }
+    .pass-toggle:hover { opacity: .8; }
+
+    .form-options {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .remember { display: flex; align-items: center; gap: 7px; cursor: pointer; }
+    .remember input[type="checkbox"] {
+      width: 15px; height: 15px; accent-color: var(--azul);
+      border-radius: 3px; cursor: pointer;
+      padding: 0;
+    }
+    .remember span { font-size: 11px; color: #667788; }
+    .forgot {
+      font-size: 11px; color: var(--texto-opaco);
+      text-decoration: none; font-weight: 500;
+      transition: color .15s;
+    }
+    .forgot:hover { color: var(--azul); }
+
+    /* ── MENSAJE DE ERROR ── */
+    .error-msg {
+      display: none; align-items: center; gap: 8px;
+      background: var(--error-bg); border: 1px solid #F09595;
+      border-radius: 7px; padding: 10px 14px;
+      margin-bottom: 18px;
+    }
+    .error-msg.visible { display: flex; }
+    .error-msg span { font-size: 11px; color: #A32D2D; line-height: 1.5; }
+
+    /* ── BOTÓN LOGIN ── */
+    .btn-login {
+      width: 100%; padding: 13px;
+      background: var(--azul); color: var(--blanco);
+      border: none; border-radius: 8px;
+      font-size: 13px; font-weight: 700; font-family: 'Inter', sans-serif;
+      letter-spacing: .3px; cursor: pointer;
+      transition: background .2s, transform .15s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-login:hover { background: var(--azul-medio); }
+    .btn-login:active { transform: scale(.98); }
+    .btn-login.loading { opacity: .7; pointer-events: none; }
+
+    .btn-loader {
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: var(--blanco);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      display: none;
+    }
+    .btn-login.loading .btn-loader { display: block; }
+    .btn-login.loading .btn-text { opacity: .6; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── DIVISOR ── */
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 22px 0; color: #aabbcc; font-size: 10px;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--gris-bd);
+    }
+
+    /* ── ACCESO RÁPIDO (roles demo) ── */
+    .roles-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .role-btn {
+      padding: 9px 10px;
+      border: 1px solid var(--gris-bd);
+      border-radius: 7px; background: var(--gris-bg);
+      cursor: pointer; text-align: left;
+      transition: border-color .15s, background .15s;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .role-btn:hover { border-color: var(--amarillo); background: #fffbf5; }
+    .role-icon { font-size: 16px; flex-shrink: 0; }
+    .role-name { font-size: 10px; font-weight: 600; color: var(--azul); display: block; }
+    .role-desc { font-size: 9px; color: #889; display: block; margin-top: 1px; }
+
+    /* ── FOOTER LOGIN ── */
+    .login-footer {
+      margin-top: 28px; text-align: center;
+      font-size: 10px; color: #aabbcc;
+      border-top: 1px solid var(--gris-bd); padding-top: 18px;
+    }
+    .login-footer a { color: var(--texto-opaco); text-decoration: none; }
+    .login-footer a:hover { color: var(--azul); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .panel-left { display: none; }
+      .panel-right { padding: 32px 20px; }
+      .login-box { padding: 32px 28px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LÍNEAS DE FONDO -->
+  <div class="bg-lines">
+    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <line x1="0" y1="0" x2="1440" y2="900" stroke="#fff" stroke-width="1" opacity=".04"/>
+      <line x1="200" y1="0" x2="1440" y2="700" stroke="#fff" stroke-width="1" opacity=".03"/>
+      <line x1="400" y1="0" x2="1440" y2="500" stroke="#fff" stroke-width="1" opacity=".03"/>
+      <line x1="600" y1="0" x2="1440" y2="300" stroke="#fff" stroke-width="1" opacity=".03"/>
+      <line x1="800" y1="0" x2="1440" y2="100" stroke="#fff" stroke-width="1" opacity=".02"/>
+      <line x1="0" y1="200" x2="800" y2="900" stroke="#F5A623" stroke-width="1" opacity=".03"/>
+      <line x1="0" y1="500" x2="500" y2="900" stroke="#F5A623" stroke-width="1" opacity=".02"/>
+    </svg>
+  </div>
+
+  <div class="page">
+
+    <!-- PANEL IZQUIERDO -->
+    <div class="panel-left">
+      <svg class="panel-left-bg" viewBox="0 0 300 300" aria-hidden="true">
+        <circle cx="150" cy="150" r="140" fill="none" stroke="#fff" stroke-width="1"/>
+        <circle cx="150" cy="150" r="100" fill="none" stroke="#fff" stroke-width="1"/>
+        <circle cx="150" cy="150" r="60" fill="none" stroke="#F5A623" stroke-width="1"/>
+        <line x1="10" y1="150" x2="290" y2="150" stroke="#fff" stroke-width=".5"/>
+        <line x1="150" y1="10" x2="150" y2="290" stroke="#fff" stroke-width=".5"/>
+      </svg>
+
+      <div class="logo-area">
+        <div class="logo-box">CNK</div>
+        <div>
+          <div class="brand-name"><span>CNK</span> Señalización Vial</div>
+          <div class="brand-sub">Sistema de Gestión de Proyectos</div>
+        </div>
+      </div>
+
+      <div class="panel-tagline">
+        <h1>Gestión técnica<br><em>señalización vial</em></h1>
+        <p>Plataforma centralizada para fichas técnicas, análisis de costos, formularios de campo y control de proyectos viales en Guatemala.</p>
+
+        <div class="feature-list">
+          <div class="feature-item">
+            <div class="feature-dot">📐</div>
+            <div class="feature-text">
+              <strong>Fichas Técnicas</strong>
+              <span>Señalización vertical, horizontal y dispositivos preventivos</span>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-dot">💰</div>
+            <div class="feature-text">
+              <strong>APU — Análisis de Precios Unitarios</strong>
+              <span>Costos desglosados para presupuestos y licitaciones</span>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-dot">📋</div>
+            <div class="feature-text">
+              <strong>Formularios de Campo</strong>
+              <span>Registro e inspección de señales en sitio</span>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-dot">📚</div>
+            <div class="feature-text">
+              <strong>Normativa Aplicada</strong>
+              <span>Manuales y reglamentos SIECA, MINTRANS y OPS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-footer">
+        © 2025 CNK Señalización Vial · Guatemala · Operaciones &amp; Costos · v1.0
+      </div>
+    </div>
+
+    <!-- PANEL DERECHO -->
+    <div class="panel-right">
+      <div class="login-box">
+
+        <div class="login-box-header">
+          <div class="login-eyebrow">Acceso al sistema</div>
+          <h2>Bienvenido de vuelta</h2>
+          <p>Ingresa tus credenciales para acceder al sistema de gestión CNK.</p>
+        </div>
+
+        <!-- MENSAJE DE ERROR -->
+        <div class="error-msg" id="errorMsg">
+          <span>⚠️</span>
+          <span>Usuario o contraseña incorrectos. Verifica tus datos e intenta de nuevo.</span>
+        </div>
+
+        <!-- FORMULARIO -->
+        <div class="form-group">
+          <label for="usuario">Usuario</label>
+          <div class="input-wrap">
+            <span class="input-icon">👤</span>
+            <input type="text" id="usuario" placeholder="tu.usuario@cnk.com" autocomplete="username" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" />
+            <button class="pass-toggle" id="passToggle" type="button" aria-label="Mostrar contraseña" onclick="togglePass()">👁️</button>
+          </div>
+        </div>
+
+        <div class="form-options">
+          <label class="remember">
+            <input type="checkbox" id="remember" />
+            <span>Recordar sesión</span>
+          </label>
+          <a href="#" class="forgot">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <button class="btn-login" id="btnLogin" onclick="handleLogin()">
+          <div class="btn-loader" id="loader"></div>
+          <span class="btn-text">Ingresar al sistema</span>
+        </button>
+
+        <div class="divider">o acceso rápido por rol</div>
+
+        <div class="roles-grid">
+          <button class="role-btn" onclick="quickLogin('admin','admin123')">
+            <span class="role-icon">🛡️</span>
+            <div>
+              <span class="role-name">Administrador</span>
+              <span class="role-desc">Acceso completo</span>
+            </div>
+          </button>
+          <button class="role-btn" onclick="quickLogin('tecnico','tec123')">
+            <span class="role-icon">👷</span>
+            <div>
+              <span class="role-name">Técnico de campo</span>
+              <span class="role-desc">Formularios y fichas</span>
+            </div>
+          </button>
+          <button class="role-btn" onclick="quickLogin('costos','cos123')">
+            <span class="role-icon">💼</span>
+            <div>
+              <span class="role-name">Costos y APU</span>
+              <span class="role-desc">Precios unitarios</span>
+            </div>
+          </button>
+          <button class="role-btn" onclick="quickLogin('gerencia','ger123')">
+            <span class="role-icon">📊</span>
+            <div>
+              <span class="role-name">Gerencia</span>
+              <span class="role-desc">Dashboard ejecutivo</span>
+            </div>
+          </button>
+        </div>
+
+        <div class="login-footer">
+          ¿Necesitas acceso? <a href="mailto:admin@cnk.com">Contacta al administrador</a>
+          <br><br>
+          CNK Señalización Vial · <a href="#">Política de privacidad</a>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    /* ── CREDENCIALES DE DEMO ── */
+    const USERS = {
+      'admin':   { pass: 'admin123', rol: 'Administrador',    redirect: 'index.html' },
+      'tecnico': { pass: 'tec123',   rol: 'Técnico de campo', redirect: 'index.html' },
+      'costos':  { pass: 'cos123',   rol: 'Costos y APU',     redirect: 'index.html' },
+      'gerencia':{ pass: 'ger123',   rol: 'Gerencia',         redirect: 'index.html' },
+    };
+
+    function togglePass() {
+      const inp = document.getElementById('password');
+      const btn = document.getElementById('passToggle');
+      if (inp.type === 'password') {
+        inp.type = 'text'; btn.textContent = '🙈';
+      } else {
+        inp.type = 'password'; btn.textContent = '👁️';
+      }
+    }
+
+    function showError() {
+      document.getElementById('errorMsg').classList.add('visible');
+      document.getElementById('usuario').classList.add('error');
+      document.getElementById('password').classList.add('error');
+    }
+
+    function clearError() {
+      document.getElementById('errorMsg').classList.remove('visible');
+      document.getElementById('usuario').classList.remove('error');
+      document.getElementById('password').classList.remove('error');
+    }
+
+    function setLoading(on) {
+      const btn = document.getElementById('btnLogin');
+      btn.classList.toggle('loading', on);
+    }
+
+    function handleLogin() {
+      clearError();
+      const user = document.getElementById('usuario').value.trim().toLowerCase();
+      const pass = document.getElementById('password').value;
+
+      if (!user || !pass) { showError(); return; }
+
+      setLoading(true);
+      setTimeout(() => {
+        const found = Object.entries(USERS).find(([u, d]) =>
+          (user === u || user === u + '@cnk.com') && pass === d.pass
+        );
+        if (found) {
+          window.location.href = found[1].redirect;
+        } else {
+          setLoading(false);
+          showError();
+        }
+      }, 900);
+    }
+
+    function quickLogin(user, pass) {
+      document.getElementById('usuario').value = user;
+      document.getElementById('password').value = pass;
+      clearError();
+      handleLogin();
+    }
+
+    /* Enter para hacer login */
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleLogin();
+    });
+
+    /* Limpiar error al escribir */
+    ['usuario','password'].forEach(id => {
+      document.getElementById(id).addEventListener('input', clearError);
+    });
+  </script>
+
+</body>
+</html>
