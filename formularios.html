@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formularios de Campo — CNK Señalización Vial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --azul:        #0B2545;
+  --azul-medio:  #0d2d56;
+  --amarillo:    #F5A623;
+  --amarillo-bg: rgba(245,166,35,.10);
+  --amarillo-bd: rgba(245,166,35,.30);
+  --texto-claro: #a8c0d8;
+  --texto-opaco: #5a7a99;
+  --blanco:      #ffffff;
+  --gris-bg:     #f4f6f9;
+  --gris-bd:     #dde3ea;
+}
+
+body { font-family: 'Inter', sans-serif; background: var(--gris-bg); color: var(--azul); min-height: 100vh; }
+
+/* ── TOPBAR ── */
+.topbar {
+  background: var(--azul); padding: 10px 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,.25);
+}
+.logo-area { display: flex; align-items: center; gap: 12px; }
+.logo-box {
+  width: 36px; height: 36px; background: var(--amarillo);
+  border-radius: 5px; display: flex; align-items: center;
+  justify-content: center; font-weight: 800; font-size: 12px; color: var(--azul);
+}
+.brand-name { color: var(--blanco); font-size: 14px; font-weight: 700; }
+.brand-name span { color: var(--amarillo); }
+.brand-sub { color: var(--texto-opaco); font-size: 8px; letter-spacing: .9px; text-transform: uppercase; margin-top: 2px; }
+.topbar-right { display: flex; align-items: center; gap: 14px; }
+.pais { color: var(--texto-opaco); font-size: 10px; }
+.avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--amarillo); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; color: var(--azul); }
+
+/* ── MEGAMENÚ ── */
+.megamenu {
+  background: var(--azul-medio); border-bottom: 2px solid var(--amarillo);
+  padding: 0 28px; display: flex; overflow-x: auto;
+}
+.megamenu::-webkit-scrollbar { height: 0; }
+.mm-item {
+  padding: 9px 16px; color: var(--texto-claro); font-size: 11px; font-weight: 500;
+  cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px;
+  white-space: nowrap; display: flex; align-items: center; gap: 5px;
+  text-decoration: none; transition: color .15s;
+}
+.mm-item:hover { color: var(--blanco); }
+.mm-item.active { color: var(--amarillo); border-bottom: 2px solid var(--amarillo); background: var(--amarillo-bg); }
+
+/* ── HERO COMPACTO ── */
+.hero-sm {
+  background: var(--azul); padding: 18px 28px 22px;
+  border-bottom: 3px solid var(--amarillo);
+}
+.breadcrumb { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+.breadcrumb a { font-size: 9px; color: var(--texto-opaco); text-decoration: none; }
+.breadcrumb a:hover { color: var(--amarillo); }
+.breadcrumb .sep { color: var(--texto-opaco); font-size: 9px; }
+.breadcrumb .cur { font-size: 9px; color: var(--amarillo); }
+.hero-sm h1 { color: var(--blanco); font-size: 18px; font-weight: 800; }
+.hero-sm h1 em { color: var(--amarillo); font-style: normal; }
+.hero-sm p { color: var(--texto-claro); font-size: 11px; margin-top: 5px; }
+
+/* ── SELECTOR DE FORMULARIOS ── */
+.form-selector {
+  background: var(--blanco); border-bottom: 1px solid var(--gris-bd);
+  padding: 14px 28px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.form-selector label { font-size: 11px; font-weight: 600; color: var(--texto-opaco); white-space: nowrap; }
+.form-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.form-tab {
+  padding: 7px 14px; border: 1px solid var(--gris-bd);
+  border-radius: 6px; font-size: 11px; font-weight: 500;
+  cursor: pointer; background: var(--gris-bg); color: #667;
+  font-family: 'Inter', sans-serif; transition: all .15s;
+}
+.form-tab:hover { border-color: var(--azul); color: var(--azul); }
+.form-tab.active { background: var(--azul); color: var(--amarillo); border-color: var(--azul); font-weight: 700; }
+
+/* ── CONTENEDOR FORMULARIO ── */
+.form-wrap { padding: 20px 28px; max-width: 780px; margin: 0 auto; }
+
+/* ── ESTILOS ORIGINALES BITÁCORA ── */
+.app { background: var(--blanco); border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 6px rgba(0,0,0,.08); }
+.form-header { border-bottom: 1px solid var(--gris-bd); padding-bottom: 1rem; margin-bottom: 1.5rem; }
+.form-ref { font-size: 11px; color: var(--texto-opaco); margin-bottom: 4px; }
+.form-titulo { font-size: 18px; font-weight: 700; color: var(--azul); }
+.form-subtipo { font-size: 12px; color: #889; margin-top: 3px; }
+
+.nav-tabs { display: flex; gap: 4px; margin-bottom: 1.5rem; border-bottom: 1px solid var(--gris-bd); }
+.nav-tab {
+  font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
+  color: #666; background: none; border: none;
+  border-bottom: 2px solid transparent; padding: 8px 14px;
+  cursor: pointer; margin-bottom: -1px; transition: all .15s;
+}
+.nav-tab.active { color: var(--azul); border-bottom-color: var(--amarillo); }
+.nav-tab:hover:not(.active) { color: var(--azul); }
+.view { display: none; } .view.active { display: block; }
+
+.sec { margin-bottom: 1.25rem; background: var(--blanco); border: 1px solid var(--gris-bd); border-radius: 12px; padding: 1.25rem; }
+.sec-title { font-size: 11px; font-weight: 700; color: var(--texto-opaco); text-transform: uppercase; letter-spacing: .7px; margin-bottom: 1rem; display: flex; align-items: center; gap: 6px; }
+.row { display: grid; gap: 10px; margin-bottom: 10px; }
+.r2 { grid-template-columns: 1fr 1fr; }
+.r3 { grid-template-columns: 1fr 1fr 1fr; }
+.r4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+@media(max-width:520px){ .r2,.r3,.r4 { grid-template-columns: 1fr 1fr; } .r4 { grid-template-columns: 1fr 1fr; } }
+@media(max-width:380px){ .r2,.r3,.r4 { grid-template-columns: 1fr; } }
+
+.field { display: flex; flex-direction: column; gap: 4px; }
+label { font-size: 12px; color: #667; font-weight: 500; }
+input, select, textarea {
+  font-family: 'Inter', sans-serif; font-size: 14px; color: var(--azul);
+  background: var(--gris-bg); border: 1px solid var(--gris-bd);
+  border-radius: 8px; padding: 8px 10px; width: 100%; outline: none; transition: border-color .15s;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--azul); background: var(--blanco); }
+textarea { resize: vertical; min-height: 60px; }
+
+.frente-block { border: 1px solid var(--gris-bd); border-radius: 10px; padding: 1rem; margin-bottom: 10px; background: var(--gris-bg); }
+.frente-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.frente-num { font-size: 11px; font-weight: 700; color: var(--texto-opaco); text-transform: uppercase; letter-spacing: .5px; }
+.btn-rm { background: none; border: none; cursor: pointer; color: #aaa; font-size: 16px; padding: 2px 5px; border-radius: 4px; }
+.btn-rm:hover { color: #c0392b; background: #fdf0ef; }
+
+.prod-subblock { background: var(--blanco); border: 1px solid var(--gris-bd); border-radius: 8px; padding: 10px; margin-top: 8px; }
+.prod-sublabel { font-size: 11px; font-weight: 700; color: var(--texto-opaco); letter-spacing: .4px; margin-bottom: 8px; text-transform: uppercase; }
+.mat-row { display: grid; grid-template-columns: minmax(0,1fr) 70px 60px 28px; gap: 6px; align-items: center; margin-bottom: 5px; }
+.mat-row select, .mat-row input { padding: 5px 7px; font-size: 12px; }
+
+.btn-add {
+  display: flex; align-items: center; gap: 5px;
+  font-family: 'Inter', sans-serif; font-size: 12px; color: #889;
+  background: none; border: 1px dashed var(--gris-bd); border-radius: 8px;
+  padding: 7px 12px; cursor: pointer; width: 100%; justify-content: center; margin-top: 6px; transition: all .15s;
+}
+.btn-add:hover { background: var(--gris-bg); border-color: var(--azul); color: var(--azul); }
+
+.btn-primary {
+  font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700;
+  background: var(--azul); color: var(--blanco); border: none;
+  border-radius: 8px; padding: 11px 22px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 7px; transition: opacity .15s;
+}
+.btn-primary:hover { opacity: .88; }
+.btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+
+.btn-sec {
+  font-family: 'Inter', sans-serif; font-size: 13px;
+  background: none; border: 1px solid var(--gris-bd); border-radius: 8px;
+  padding: 10px 16px; cursor: pointer; color: var(--azul);
+  display: inline-flex; align-items: center; gap: 6px; transition: background .15s;
+}
+.btn-sec:hover { background: var(--gris-bg); }
+
+.clima-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 5px; margin-bottom: 10px; }
+@media(max-width:420px){ .clima-grid { grid-template-columns: repeat(2,1fr); } }
+.clima-btn {
+  border: 1px solid var(--gris-bd); border-radius: 8px; padding: 8px 4px;
+  font-size: 12px; cursor: pointer; text-align: center;
+  background: var(--blanco); color: var(--azul); font-family: 'Inter', sans-serif;
+  line-height: 1.4; transition: all .12s;
+}
+.clima-btn.on { background: #e1f5ee; border-color: #1d9e75; color: #085041; font-weight: 600; }
+
+.pav-row { display: flex; gap: 6px; margin-top: 6px; }
+.pav-btn {
+  flex: 1; border: 1px solid var(--gris-bd); border-radius: 8px; padding: 7px;
+  font-size: 13px; cursor: pointer; text-align: center;
+  background: var(--blanco); color: var(--azul); font-family: 'Inter', sans-serif; transition: all .12s;
+}
+.pav-btn.on { background: #E6F1FB; border-color: #378add; color: #0c447c; font-weight: 600; }
+
+.confirm-chk {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 12px; background: var(--gris-bg); border-radius: 8px;
+  font-size: 13px; cursor: pointer; color: var(--azul); border: 1px solid transparent;
+}
+.confirm-chk input { accent-color: var(--amarillo); margin-top: 2px; flex-shrink: 0; width: 16px; height: 16px; }
+
+.tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; margin-bottom: 6px; }
+.tb { background: #e8f4fd; color: #0c447c; }
+.ty { background: #faeeda; color: #633806; }
+.td { background: #ede8fd; color: #3c3489; }
+.tm { background: #e1f5ee; color: #085041; }
+
+.personal-tbl { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+.personal-tbl th { font-size: 11px; font-weight: 700; color: var(--texto-opaco); text-transform: uppercase; letter-spacing: .4px; padding: 0 6px 8px 0; border-bottom: 1px solid var(--gris-bd); text-align: left; }
+.personal-tbl td { padding: 5px 6px 5px 0; vertical-align: middle; border-bottom: 1px solid #f0f0ec; }
+.personal-tbl input { padding: 5px 8px; font-size: 13px; }
+
+.mat-item { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+.mat-item input { flex: 1; font-size: 13px; padding: 6px 8px; }
+.mat-item .unit-sel { width: 72px; font-size: 12px; padding: 6px; }
+.mat-item .btn-del { background: none; border: none; cursor: pointer; color: #aaa; font-size: 15px; padding: 2px 5px; flex-shrink: 0; }
+.mat-item .btn-del:hover { color: #c0392b; }
+
+.sep { height: 1px; background: var(--gris-bd); margin: 12px 0; }
+
+.step-bar { display: flex; gap: 4px; margin-bottom: 1.5rem; }
+.step-dot { height: 4px; border-radius: 2px; background: var(--gris-bd); flex: 1; transition: background .2s; }
+.step-dot.done { background: #1d9e75; }
+.step-dot.cur { background: var(--amarillo); }
+
+.admin-lock { text-align: center; padding: 2.5rem 1rem; }
+.admin-lock .lock-icon { font-size: 36px; color: #aaa; display: block; margin-bottom: 14px; }
+
+.status-box { border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-top: 12px; display: flex; align-items: center; gap: 8px; }
+.status-ok { background: #e1f5ee; color: #085041; border: 1px solid #5dcaa5; }
+.status-err { background: #fdf0ef; color: #7b1c1c; border: 1px solid #f09595; }
+.status-loading { background: var(--gris-bg); color: #666; border: 1px solid var(--gris-bd); }
+
+.spinner { width: 14px; height: 14px; border: 2px solid var(--gris-bd); border-top-color: var(--amarillo); border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.msg-err { color: #c0392b; font-size: 12px; margin-top: 6px; }
+
+/* ── PLACEHOLDER PRÓXIMO FORMULARIO ── */
+.coming-soon {
+  text-align: center; padding: 48px 24px;
+  border: 2px dashed var(--gris-bd); border-radius: 12px;
+  background: var(--blanco);
+}
+.coming-soon .cs-icon { font-size: 40px; margin-bottom: 14px; }
+.coming-soon h3 { font-size: 16px; font-weight: 700; color: var(--azul); margin-bottom: 8px; }
+.coming-soon p { font-size: 12px; color: #889; line-height: 1.6; }
+.cs-badge { display: inline-block; margin-top: 14px; font-size: 10px; font-weight: 700; padding: 4px 12px; border-radius: 20px; background: var(--amarillo-bg); color: #854F0B; border: 1px solid var(--amarillo-bd); }
+
+/* ── FOOTER ── */
+.footer { background: var(--azul); padding: 12px 28px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+.footer p { color: var(--texto-opaco); font-size: 9px; }
+.footer span { color: var(--amarillo); font-size: 9px; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="logo-area">
+    <div class="logo-box">CNK</div>
+    <div>
+      <div class="brand-name"><span>CNK</span> Señalización Vial</div>
+      <div class="brand-sub">Sistema de Gestión de Proyectos</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <span class="pais">🇬🇹 Guatemala</span>
+    <div class="avatar">GT</div>
+  </div>
+</header>
+
+<!-- MEGAMENÚ -->
+<nav class="megamenu">
+  <a href="https://cnkvial2026.github.io/CNK-VIAL/index.html" class="mm-item">🏠 Inicio</a>
+  <a href="https://cnkvial2026.github.io/CNK-VIAL/fichas-tecnicas.html" class="mm-item">📐 Fichas Técnicas</a>
+  <a href="https://cnkvial2026.github.io/CNK-VIAL/apu.html" class="mm-item">💰 APU</a>
+  <a href="https://cnkvial2026.github.io/CNK-VIAL/formularios.html" class="mm-item active">📋 Formularios</a>
+  <a href="https://cnkvial2026.github.io/CNK-VIAL/dashboard.html" class="mm-item">📊 Dashboard</a>
+</nav>
+
+<!-- HERO COMPACTO -->
+<div class="hero-sm">
+  <div class="breadcrumb">
+    <a href="https://cnkvial2026.github.io/CNK-VIAL/index.html">Inicio</a>
+    <span class="sep">›</span>
+    <span class="cur">Formularios de Campo</span>
+  </div>
+  <h1>Formularios de <em>Campo e Inspección</em></h1>
+  <p>Registro diario de actividades, inspección de señales y levantamiento de inventario en sitio.</p>
+</div>
+
+<!-- SELECTOR DE FORMULARIO -->
+<div class="form-selector">
+  <label>Seleccionar formulario:</label>
+  <div class="form-tabs">
+    <button class="form-tab active" onclick="switchForm('bitacora', this)">📋 Bitácora Diaria — Señ. Horizontal</button>
+    <button class="form-tab" onclick="switchForm('inspeccion', this)">🔍 Inspección de Señales</button>
+    <button class="form-tab" onclick="switchForm('inventario', this)">📦 Levantamiento de Inventario</button>
+    <button class="form-tab" onclick="switchForm('danos', this)">⚠️ Reporte de Daños</button>
+  </div>
+</div>
+
+<!-- CONTENEDOR -->
+<div class="form-wrap">
+
+  <!-- FORMULARIO 1: BITÁCORA DIARIA -->
+  <div id="form-bitacora" class="form-view">
+    <div class="app">
+      <div class="form-header">
+        <div class="form-ref">CNK Señalización Vial · MAD-AEPQ-SEV-2026-001</div>
+        <div class="form-titulo">Bitácora diaria — Señalización horizontal</div>
+        <div class="form-subtipo">Registro de producción, materiales y personal en campo</div>
+      </div>
+
+      <div class="nav-tabs">
+        <button class="nav-tab active" onclick="showView('v-reporte',this)">📄 Reporte diario</button>
+        <button class="nav-tab" onclick="showView('v-admin',this)">⚙️ Administración</button>
+      </div>
+
+      <!-- REPORTE -->
+      <div id="v-reporte" class="view active">
+        <div id="step-bar" class="step-bar"></div>
+
+        <div class="sec">
+          <div class="sec-title">🏗️ Proyecto y actividad</div>
+          <div class="row r3">
+            <div class="field">
+              <label>Proyecto</label>
+              <select id="r-proyecto">
+                <option value="">Seleccionar...</option>
+                <option value="MAD-AEPQ">MAD-AEPQ — Autopista Puerto Quetzal</option>
+                <option value="CAR-XOCHI">CAR-XOCHI — Corredor de las Flores</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Tipo de actividad</label>
+              <select id="r-tipo">
+                <option value="HOR">HOR — Señalización Horizontal</option>
+                <option value="VER">VER — Señalización Vertical</option>
+                <option value="DIS">DIS — Dispositivos de Contención</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>N° de Reporte</label>
+              <input type="text" id="r-numreporte" placeholder="Se genera automáticamente" readonly style="background:#f0f4f8;color:#5a7a99;font-weight:600;cursor:not-allowed;">
+            </div>
+          </div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-title">👤 Información general</div>
+          <div class="row r2">
+            <div class="field"><label>Nombre de quien llena</label><input type="text" id="r-nombre" placeholder="Nombre completo"></div>
+            <div class="field"><label>Puesto / Rol</label>
+              <select id="r-rol">
+                <option value="">Seleccionar...</option>
+                <option>Supervisor</option><option>Encargado</option>
+              </select>
+            </div>
+          </div>
+          <div class="row r3">
+            <div class="field"><label>Fecha</label><input type="date" id="r-fecha"></div>
+            <div class="field"><label>Hora inicio</label><input type="time" id="r-hinicio"></div>
+            <div class="field"><label>Hora fin</label><input type="time" id="r-hfin"></div>
+          </div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-title">🚧 Frentes de trabajo</div>
+          <div id="frentes-wrap"></div>
+          <button class="btn-add" id="btn-add-frente" onclick="addFrente()">+ Agregar frente (máx. 6)</button>
+        </div>
+
+        <div class="sec">
+          <div class="sec-title">👥 Personal en esta actividad</div>
+          <div class="field" style="margin-bottom:10px;max-width:140px">
+            <label>Total personas</label>
+            <input type="number" id="r-totpers" placeholder="0" min="0">
+          </div>
+          <table class="personal-tbl">
+            <thead><tr><th style="width:36%">Rol</th><th>Nombre</th><th style="width:52px;text-align:center">Pres.</th></tr></thead>
+            <tbody id="personal-body"></tbody>
+          </table>
+          <button class="btn-add" style="margin-top:8px" onclick="addPersonRow()">+ Agregar persona</button>
+        </div>
+
+        <div class="sec">
+          <div class="sec-title">⛅ Tiempo y clima</div>
+          <label style="font-size:12px;color:#667;font-weight:500;display:block;margin-bottom:6px">Condiciones durante la jornada</label>
+          <div class="clima-grid">
+            <button class="clima-btn" onclick="toggleC(this,'Soleado')">☀️ Soleado</button>
+            <button class="clima-btn" onclick="toggleC(this,'Nublado')">🌁 Nublado</button>
+            <button class="clima-btn" onclick="toggleC(this,'Parcialmente nublado')">⛅ Parcial</button>
+            <button class="clima-btn" onclick="toggleC(this,'Lluvia ligera')">🌦 Lluvia ligera</button>
+            <button class="clima-btn" onclick="toggleC(this,'Lluvia fuerte')">🌧 Lluvia fuerte</button>
+            <button class="clima-btn" onclick="toggleC(this,'Neblina')">🌫 Neblina</button>
+            <button class="clima-btn" onclick="toggleC(this,'Viento fuerte')">💨 Viento fuerte</button>
+            <button class="clima-btn" onclick="toggleC(this,'Otro')">+ Otro</button>
+          </div>
+          <div class="row r3">
+            <div class="field"><label>¿Interrupción por clima?</label><select id="r-intclima"><option>No</option><option>Sí</option></select></div>
+            <div class="field"><label>Min. interrupción clima</label><input type="number" placeholder="0" id="r-minclima" min="0"></div>
+            <div class="field"><label>Min. interrupción pavimento</label><input type="number" placeholder="0" id="r-minpav" min="0"></div>
+          </div>
+          <div class="field" style="margin-bottom:8px">
+            <label>Rango horario de clima (si aplica)</label>
+            <input type="text" id="r-rangoclima" placeholder="Soleado 07:00-12:00, Lluvia ligera 12:00-14:00">
+          </div>
+          <div class="field">
+            <label>Condición de superficie / pavimento</label>
+            <div class="pav-row">
+              <button class="pav-btn on" onclick="setPav(this,'Seco')">Seco</button>
+              <button class="pav-btn" onclick="setPav(this,'Húmedo')">Húmedo</button>
+              <button class="pav-btn" onclick="setPav(this,'Mojado')">Mojado</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-title">⚠️ Novedades e imprevistos</div>
+          <div class="field"><label>Descripción</label><textarea id="r-novedades" placeholder="Accidentes viales, bloqueos, fallas de equipo, condiciones extremas..."></textarea></div>
+          <div class="field" style="margin-top:8px">
+            <label>Evidencia fotográfica (nombres de archivos)</label>
+            <input type="text" id="r-evidencia" placeholder="foto1_km91.jpg, foto2_cebra.jpg">
+          </div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-title">✅ Confirmación y envío</div>
+          <label class="confirm-chk" id="confirm-lbl">
+            <input type="checkbox" id="r-confirmado">
+            Confirmo que la información ingresada es verídica y ha sido revisada
+          </label>
+          <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+            <button class="btn-primary" id="btn-enviar" onclick="enviar()">📨 Enviar reporte</button>
+            <button class="btn-sec" onclick="soloCSV()">📊 Solo exportar CSV</button>
+          </div>
+          <div id="r-msg"></div>
+        </div>
+      </div>
+
+      <!-- ADMIN -->
+      <div id="v-admin" class="view">
+        <div class="sec" id="admin-locked">
+          <div class="admin-lock">
+            <span class="lock-icon">🔒</span>
+            <div style="font-size:15px;font-weight:700;margin-bottom:8px;color:var(--azul)">Panel de administración</div>
+            <p style="font-size:13px;color:#667;margin-bottom:18px">Ingresa la contraseña para gestionar el catálogo de materiales y personal</p>
+            <div style="display:flex;gap:8px;justify-content:center;max-width:280px;margin:0 auto">
+              <input type="password" id="admin-pw" placeholder="Contraseña" style="flex:1" onkeydown="if(event.key==='Enter')checkPw()">
+              <button class="btn-primary" onclick="checkPw()">Entrar</button>
+            </div>
+            <div id="pw-err" class="msg-err" style="text-align:center;margin-top:8px"></div>
+          </div>
+        </div>
+
+        <div id="admin-open" style="display:none">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+            <div style="font-size:14px;font-weight:700;color:#1d9e75">✓ Administración activa</div>
+            <button class="btn-sec" onclick="lockAdmin()" style="font-size:12px;padding:6px 12px">🔒 Cerrar sesión</button>
+          </div>
+          <div class="sec">
+            <div class="sec-title">🔧 Catálogo de materiales</div>
+            <p style="font-size:12px;color:#889;margin-bottom:14px">Estos materiales aparecen como opciones en los frentes de trabajo</p>
+            <div><span class="tag tb">⬜ Blanco</span><div id="cat-blanco"></div><button class="btn-add" onclick="addCatItem('blanco')">+ Agregar material</button></div>
+            <div class="sep"></div>
+            <div><span class="tag ty">🟡 Amarillo</span><div id="cat-amarillo"></div><button class="btn-add" onclick="addCatItem('amarillo')">+ Agregar material</button></div>
+            <div class="sep"></div>
+            <div><span class="tag td">🔵 Dispositivos</span><div id="cat-dispositivos"></div><button class="btn-add" onclick="addCatItem('dispositivos')">+ Agregar material</button></div>
+            <div class="sep"></div>
+            <div><span class="tag tm">🟢 Marcas/Símbolos</span><div id="cat-marcas"></div><button class="btn-add" onclick="addCatItem('marcas')">+ Agregar material</button></div>
+            <div style="margin-top:14px;display:flex;align-items:center;gap:10px">
+              <button class="btn-primary" onclick="saveCatalogo()">💾 Guardar catálogo</button>
+              <span id="cat-saved" style="font-size:12px;color:#1d9e75;display:none">✓ Guardado</span>
+            </div>
+          </div>
+          <div class="sec">
+            <div class="sec-title">👥 Catálogo de personal</div>
+            <div id="cat-personal"></div>
+            <button class="btn-add" style="margin-top:6px" onclick="addPersonCat()">+ Agregar persona</button>
+            <div style="margin-top:14px;display:flex;align-items:center;gap:10px">
+              <button class="btn-primary" onclick="savePersonal()">💾 Guardar personal</button>
+              <span id="pers-saved" style="font-size:12px;color:#1d9e75;display:none">✓ Guardado</span>
+            </div>
+          </div>
+          <div class="sec">
+            <div class="sec-title">🔑 Cambiar contraseña</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <input type="password" id="new-pw1" placeholder="Nueva contraseña" style="max-width:200px">
+              <input type="password" id="new-pw2" placeholder="Confirmar" style="max-width:200px">
+              <button class="btn-primary" onclick="changePw()">Cambiar</button>
+            </div>
+            <div id="pw-change-msg" style="font-size:12px;margin-top:6px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORMULARIO 2: INSPECCIÓN (próximamente) -->
+  <div id="form-inspeccion" class="form-view" style="display:none">
+    <div class="coming-soon">
+      <div class="cs-icon">🔍</div>
+      <h3>Formulario de Inspección de Señales</h3>
+      <p>Registro del estado físico de señales verticales, horizontales y dispositivos en campo.<br>Incluirá checklist de condiciones, nivel de reflectividad y recomendaciones de mantenimiento.</p>
+      <span class="cs-badge">Próximamente disponible</span>
+    </div>
+  </div>
+
+  <!-- FORMULARIO 3: INVENTARIO (próximamente) -->
+  <div id="form-inventario" class="form-view" style="display:none">
+    <div class="coming-soon">
+      <div class="cs-icon">📦</div>
+      <h3>Formulario de Levantamiento de Inventario</h3>
+      <p>Conteo y georreferenciación de señales existentes en campo.<br>Compatible con exportación a CSV para integración con el módulo de inventario (Fase 2).</p>
+      <span class="cs-badge">Próximamente disponible</span>
+    </div>
+  </div>
+
+  <!-- FORMULARIO 4: DAÑOS (próximamente) -->
+  <div id="form-danos" class="form-view" style="display:none">
+    <div class="coming-soon">
+      <div class="cs-icon">⚠️</div>
+      <h3>Reporte de Daños y Vandalismo</h3>
+      <p>Registro fotográfico y descriptivo de señales dañadas, vandalizadas o faltantes.<br>Genera reporte PDF para trámites de reposición y seguros.</p>
+      <span class="cs-badge">Próximamente disponible</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p>© 2025 CNK Señalización Vial — Todos los derechos reservados</p>
+  <span>Guatemala · Operaciones &amp; Costos · v1.0</span>
+</footer>
+
+<script>
+var WEBAPP_URL='https://script.google.com/macros/s/AKfycbzr028IJBJlaa4r5S467IZbwDDxBlo_91FGuCA6BJ9sftsqgZcuiD0yCaJ-pEwX_U1E/exec';
+var ADMIN_PW='CNK2026';
+var climasSel=[];
+var pavSel='Seco';
+var frenteCnt=0;
+
+var catalogoDefault={
+  blanco:[{n:'Pintura blanca',u:'gal'},{n:'Microesfera',u:'kg'},{n:'Thinner',u:'gal'},{n:'Solvente',u:'gal'}],
+  amarillo:[{n:'Pintura amarilla',u:'gal'},{n:'Microesfera',u:'kg'},{n:'Thinner',u:'gal'}],
+  dispositivos:[{n:'Vialeta blanca bidireccional',u:'unidad'},{n:'Vialeta amarilla unidireccional',u:'unidad'},{n:'Boya plástica',u:'unidad'},{n:'Boya metálica',u:'unidad'},{n:'Adhesivo epóxico',u:'kg'},{n:'Solvente',u:'gal'}],
+  marcas:[{n:'Pintura termoplástica blanca',u:'kg'},{n:'Pintura termoplástica amarilla',u:'kg'},{n:'Microesfera',u:'kg'},{n:'Thinner',u:'gal'}]
+};
+
+var personalDefault=[
+  {rol:'SSO',nombre:''},{rol:'Supervisor',nombre:''},{rol:'Encargado de grupo',nombre:''},
+  {rol:'Piloto',nombre:''},{rol:'Operador/Técnico aplicador',nombre:''},
+  {rol:'Calderero',nombre:''},{rol:'Ayudante',nombre:''}
+];
+
+var tiposLinea=['Continua','Discontinua','Guión','Transversal','Cebra'];
+var unidades=['gal','kg','lt','lb','m²','unidad','ml'];
+
+function switchForm(id, btn){
+  document.querySelectorAll('.form-view').forEach(function(v){v.style.display='none';});
+  document.querySelectorAll('.form-tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('form-'+id).style.display='block';
+  btn.classList.add('active');
+}
+
+function loadState(){
+  try{
+    var c=localStorage.getItem('cnk_catalogo'); if(c) catalogoDefault=JSON.parse(c);
+    var p=localStorage.getItem('cnk_personal'); if(p) personalDefault=JSON.parse(p);
+    var pw=localStorage.getItem('cnk_pw'); if(pw) ADMIN_PW=pw;
+  }catch(e){}
+}
+
+function saveToLS(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function getMats(cat){return catalogoDefault[cat]||[];}
+
+function addFrente(){
+  if(frenteCnt>=6)return;
+  frenteCnt++;
+  var n=frenteCnt;
+  var div=document.createElement('div');
+  div.className='frente-block'; div.id='frente-'+n;
+  div.innerHTML=
+    '<div class="frente-header">'+
+      '<span class="frente-num">Frente '+n+'</span>'+
+      (n>1?'<button class="btn-rm" onclick="removeFrente('+n+')">✕</button>':'')+
+    '</div>'+
+    '<div class="row r2">'+
+      '<div class="field"><label>Tramo / Ubicación</label><input type="text" id="f'+n+'-tramo" placeholder="Autopista km 91+100"></div>'+
+      '<div class="field"><label>Tipo de actividad</label><select id="f'+n+'-tipo"><option>Premarcado</option><option>Aplicación</option><option>Premarcado + Aplicación</option><option>Dispositivos</option><option>Marcas/Símbolos</option></select></div>'+
+    '</div>'+
+    '<div class="row r4">'+
+      '<div class="field"><label>Est. inicio</label><input type="text" id="f'+n+'-einicio" placeholder="91+144"></div>'+
+      '<div class="field"><label>Est. fin</label><input type="text" id="f'+n+'-efin" placeholder="94+252"></div>'+
+      '<div class="field"><label>Hora inicio</label><input type="time" id="f'+n+'-hinicio"></div>'+
+      '<div class="field"><label>Hora fin</label><input type="time" id="f'+n+'-hfin"></div>'+
+    '</div>'+
+    bloque(n,'blanco','⬜ Blanco','tb','mlbt','mlbp','mlba','lblanco','ablanco')+
+    bloque(n,'amarillo','🟡 Amarillo','ty','mlyt','mlyp','mlya','lamarillo','aamarillo')+
+    bloqueDisp(n)+bloqueMarc(n);
+  document.getElementById('frentes-wrap').appendChild(div);
+  if(frenteCnt>=6) document.getElementById('btn-add-frente').style.display='none';
+  updateBar();
+}
+
+function bloque(n,cat,label,cls,t,p,a,l,aw){
+  var tOpts=tiposLinea.map(function(x){return '<option>'+x+'</option>';}).join('');
+  return '<div class="prod-subblock">'+
+    '<div class="prod-sublabel"><span class="tag '+cls+'" style="margin:0 6px 0 0">'+label+'</span> metros lineales</div>'+
+    '<div class="row r3">'+
+      '<div class="field"><label>Total ML</label><input type="number" id="f'+n+'-'+t+'" placeholder="0" min="0"></div>'+
+      '<div class="field"><label>ML premarcado</label><input type="number" id="f'+n+'-'+p+'" placeholder="0" min="0"></div>'+
+      '<div class="field"><label>ML aplicado</label><input type="number" id="f'+n+'-'+a+'" placeholder="0" min="0"></div>'+
+    '</div>'+
+    '<div class="row r2">'+
+      '<div class="field"><label>Tipo de línea</label><select id="f'+n+'-'+l+'"><option value="">— Seleccionar —</option>'+tOpts+'</select></div>'+
+      '<div class="field"><label>Ancho (cm)</label><input type="number" id="f'+n+'-'+aw+'" placeholder="15" min="1"></div>'+
+    '</div>'+
+    '<div class="prod-sublabel" style="margin-top:8px">Materiales — '+label+'</div>'+
+    '<div id="f'+n+'-mats-'+cat+'"></div>'+
+    '<button class="btn-add" onclick="addMatRow('+n+',\''+cat+'\')">+ Agregar material</button>'+
+  '</div>';
+}
+
+function bloqueDisp(n){
+  return '<div class="prod-subblock" style="margin-top:8px">'+
+    '<div class="prod-sublabel"><span class="tag td" style="margin:0 6px 0 0">🔵 Dispositivos</span></div>'+
+    '<div class="row r2">'+
+      '<div class="field"><label>Total dispositivos</label><input type="number" id="f'+n+'-dispt" placeholder="0" min="0"></div>'+
+      '<div class="field"><label>Descripción</label><input type="text" id="f'+n+'-dispdet" placeholder="Vialeta blanca bidir. 45 und."></div>'+
+    '</div>'+
+    '<div class="prod-sublabel" style="margin-top:6px">Materiales — Dispositivos</div>'+
+    '<div id="f'+n+'-mats-dispositivos"></div>'+
+    '<button class="btn-add" onclick="addMatRow('+n+',\'dispositivos\')">+ Agregar material</button>'+
+  '</div>';
+}
+
+function bloqueMarc(n){
+  return '<div class="prod-subblock" style="margin-top:8px">'+
+    '<div class="prod-sublabel"><span class="tag tm" style="margin:0 6px 0 0">🟢 Marcas/Símbolos</span></div>'+
+    '<div class="row r2">'+
+      '<div class="field"><label>Total marcas/símbolos</label><input type="number" id="f'+n+'-marcat" placeholder="0" min="0"></div>'+
+      '<div class="field"><label>Descripción</label><input type="text" id="f'+n+'-marcadet" placeholder="ALTO/PARE 8 und. 30cm"></div>'+
+    '</div>'+
+    '<div class="prod-sublabel" style="margin-top:6px">Materiales — Marcas</div>'+
+    '<div id="f'+n+'-mats-marcas"></div>'+
+    '<button class="btn-add" onclick="addMatRow('+n+',\'marcas\')">+ Agregar material</button>'+
+  '</div>';
+}
+
+function removeFrente(n){
+  var el=document.getElementById('frente-'+n);
+  if(el) el.remove();
+  frenteCnt--;
+  document.getElementById('btn-add-frente').style.display='';
+  updateBar();
+}
+
+function addMatRow(fn,cat){
+  var container=document.getElementById('f'+fn+'-mats-'+cat);
+  if(!container) return;
+  var mats=getMats(cat);
+  var opts='<option value="">— Material —</option>'+mats.map(function(m){return '<option value="'+m.n+'|'+m.u+'">'+m.n+'</option>';}).join('');
+  var row=document.createElement('div'); row.className='mat-row';
+  row.innerHTML=
+    '<select onchange="autoUnit(this)">'+opts+'</select>'+
+    '<input type="number" placeholder="Cant." min="0" style="font-size:12px;padding:5px 7px">'+
+    '<select class="unit-sel" style="font-size:12px;padding:5px 6px;width:64px">'+unidades.map(function(u){return '<option>'+u+'</option>';}).join('')+'</select>'+
+    '<button onclick="this.closest(\'.mat-row\').remove()" class="btn-rm" style="font-size:14px">✕</button>';
+  container.appendChild(row);
+}
+
+function autoUnit(sel){
+  var val=sel.value; if(!val) return;
+  var unit=val.split('|')[1]||'';
+  var us=sel.parentElement.querySelector('.unit-sel');
+  if(us&&unit){for(var i=0;i<us.options.length;i++){if(us.options[i].value===unit){us.selectedIndex=i;break;}}}
+}
+
+function toggleC(btn,val){
+  btn.classList.toggle('on');
+  var idx=climasSel.indexOf(val);
+  if(idx>-1) climasSel.splice(idx,1); else climasSel.push(val);
+}
+
+function setPav(btn,val){
+  pavSel=val;
+  document.querySelectorAll('.pav-btn').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+}
+
+function initPersonal(){
+  var tbody=document.getElementById('personal-body'); tbody.innerHTML='';
+  personalDefault.forEach(function(p){
+    var tr=document.createElement('tr');
+    tr.innerHTML=
+      '<td style="font-size:12px;color:#667;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:6px">'+p.rol+'</td>'+
+      '<td><input type="text" placeholder="Nombre" value="'+(p.nombre||'')+'" style="font-size:13px;padding:5px 8px"></td>'+
+      '<td style="text-align:center"><input type="checkbox" style="width:16px;height:16px;accent-color:var(--amarillo)"></td>';
+    tbody.appendChild(tr);
+  });
+}
+
+function addPersonRow(){
+  var tbody=document.getElementById('personal-body');
+  var tr=document.createElement('tr');
+  tr.innerHTML=
+    '<td><input type="text" placeholder="Rol" style="font-size:13px;padding:5px 8px"></td>'+
+    '<td><input type="text" placeholder="Nombre" style="font-size:13px;padding:5px 8px"></td>'+
+    '<td style="text-align:center"><input type="checkbox" style="width:16px;height:16px;accent-color:var(--amarillo)"></td>';
+  tbody.appendChild(tr);
+}
+
+function updateBar(){
+  var bar=document.getElementById('step-bar');
+  var ids=['r-nombre','r-fecha','frentes-wrap','personal-body','r-novedades'];
+  bar.innerHTML='';
+  ids.forEach(function(id){
+    var dot=document.createElement('div'); dot.className='step-dot';
+    var el=document.getElementById(id);
+    if(el){
+      var inputs=el.querySelectorAll?el.querySelectorAll('input:not([type=checkbox]):not([type=time])'):[];
+      var filled=(el.value&&el.value.trim())||Array.from(inputs).some(function(i){return i.value.trim()!=='';});
+      if(filled) dot.classList.add('done');
+    }
+    bar.appendChild(dot);
+  });
+}
+
+function showView(id,tab){
+  document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});
+  document.querySelectorAll('.nav-tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById(id).classList.add('active');
+  if(tab) tab.classList.add('active');
+}
+
+function checkPw(){
+  var pw=document.getElementById('admin-pw').value;
+  if(pw===ADMIN_PW){
+    document.getElementById('admin-locked').style.display='none';
+    document.getElementById('admin-open').style.display='block';
+    initAdminCatalogo(); initAdminPersonal();
+  }else{
+    document.getElementById('pw-err').textContent='Contraseña incorrecta';
+    document.getElementById('admin-pw').value='';
+  }
+}
+
+function lockAdmin(){
+  document.getElementById('admin-locked').style.display='';
+  document.getElementById('admin-open').style.display='none';
+  document.getElementById('admin-pw').value='';
+  document.getElementById('pw-err').textContent='';
+}
+
+function initAdminCatalogo(){
+  ['blanco','amarillo','dispositivos','marcas'].forEach(function(cat){
+    var cont=document.getElementById('cat-'+cat); cont.innerHTML='';
+    (catalogoDefault[cat]||[]).forEach(function(m){addCatItemEl(cat,m.n,m.u);});
+  });
+}
+
+function addCatItem(cat){addCatItemEl(cat,'','gal');}
+
+function addCatItemEl(cat,nombre,unidad){
+  var cont=document.getElementById('cat-'+cat);
+  var row=document.createElement('div'); row.className='mat-item';
+  row.innerHTML=
+    '<input type="text" placeholder="Nombre del material" value="'+nombre+'" style="flex:1;font-size:13px;padding:6px 8px">'+
+    '<select class="unit-sel" style="width:72px;font-size:12px;padding:6px">'+
+      unidades.map(function(u){return '<option'+(u===unidad?' selected':'')+'>'+u+'</option>';}).join('')+
+    '</select>'+
+    '<button class="btn-del" onclick="this.closest(\'.mat-item\').remove()">🗑️</button>';
+  cont.appendChild(row);
+}
+
+function saveCatalogo(){
+  ['blanco','amarillo','dispositivos','marcas'].forEach(function(cat){
+    var items=[];
+    document.querySelectorAll('#cat-'+cat+' .mat-item').forEach(function(row){
+      var n=row.querySelector('input').value.trim();
+      var u=row.querySelector('select').value;
+      if(n) items.push({n:n,u:u});
+    });
+    catalogoDefault[cat]=items;
+  });
+  saveToLS('cnk_catalogo',catalogoDefault);
+  var msg=document.getElementById('cat-saved');
+  msg.style.display='inline'; setTimeout(function(){msg.style.display='none';},2500);
+}
+
+function initAdminPersonal(){
+  var cont=document.getElementById('cat-personal'); cont.innerHTML='';
+  personalDefault.forEach(function(p){addPersonCatEl(p.rol,p.nombre);});
+}
+
+function addPersonCat(){addPersonCatEl('','');}
+
+function addPersonCatEl(rol,nombre){
+  var cont=document.getElementById('cat-personal');
+  var row=document.createElement('div'); row.className='mat-item';
+  row.innerHTML=
+    '<input type="text" placeholder="Rol" value="'+rol+'" style="width:150px;font-size:13px;padding:6px 8px;flex-shrink:0">'+
+    '<input type="text" placeholder="Nombre (opcional)" value="'+nombre+'" style="flex:1;font-size:13px;padding:6px 8px">'+
+    '<button class="btn-del" onclick="this.closest(\'.mat-item\').remove()">🗑️</button>';
+  cont.appendChild(row);
+}
+
+function savePersonal(){
+  var items=[];
+  document.querySelectorAll('#cat-personal .mat-item').forEach(function(row){
+    var inputs=row.querySelectorAll('input');
+    var rol=inputs[0].value.trim(); var nombre=inputs[1].value.trim();
+    if(rol) items.push({rol:rol,nombre:nombre});
+  });
+  personalDefault=items;
+  saveToLS('cnk_personal',personalDefault);
+  initPersonal();
+  var msg=document.getElementById('pers-saved');
+  msg.style.display='inline'; setTimeout(function(){msg.style.display='none';},2500);
+}
+
+function changePw(){
+  var p1=document.getElementById('new-pw1').value;
+  var p2=document.getElementById('new-pw2').value;
+  var msg=document.getElementById('pw-change-msg');
+  if(!p1||p1.length<4){msg.style.color='#c0392b';msg.textContent='Mínimo 4 caracteres';return;}
+  if(p1!==p2){msg.style.color='#c0392b';msg.textContent='Las contraseñas no coinciden';return;}
+  ADMIN_PW=p1; try{localStorage.setItem('cnk_pw',p1);}catch(e){}
+  msg.style.color='#1d9e75'; msg.textContent='Contraseña actualizada correctamente';
+  document.getElementById('new-pw1').value=''; document.getElementById('new-pw2').value='';
+}
+
+function recopilar(){
+  var proyecto = document.getElementById('r-proyecto').value;
+  var tipo     = document.getElementById('r-tipo').value;
+  var anio     = new Date().getFullYear();
+  var d={};
+  d.proyecto        = proyecto;
+  d.tipo_actividad  = tipo;
+  d.contrato        = proyecto + '-SEV-' + anio;
+  d.nombre=document.getElementById('r-nombre').value;
+  d.rol=document.getElementById('r-rol').value;
+  d.fecha=document.getElementById('r-fecha').value;
+  d.hinicio=document.getElementById('r-hinicio').value;
+  d.hfin=document.getElementById('r-hfin').value;
+  d.total_personas=document.getElementById('r-totpers').value;
+  d.clima=climasSel.join(', ');
+  d.pavimento=pavSel;
+  d.int_clima=document.getElementById('r-intclima').value;
+  d.min_clima=document.getElementById('r-minclima').value;
+  d.min_pav=document.getElementById('r-minpav').value;
+  d.rango_clima=document.getElementById('r-rangoclima').value;
+  d.novedades=document.getElementById('r-novedades').value;
+  d.evidencia=document.getElementById('r-evidencia').value;
+
+  var personal=[];
+  document.querySelectorAll('#personal-body tr').forEach(function(tr){
+    var tds=tr.querySelectorAll('td');
+    var rolEl=tds[0].querySelector('input')||{value:tds[0].textContent.trim()};
+    var nomEl=tds[1].querySelector('input');
+    var presEl=tds[2].querySelector('input[type=checkbox]');
+    personal.push({rol:rolEl.value||tds[0].textContent.trim(),nombre:nomEl?nomEl.value:'',presente:presEl?presEl.checked:false});
+  });
+  d.personal=personal;
+
+  var frentes=[];
+  document.querySelectorAll('.frente-block').forEach(function(f,fi){
+    var fn=f.id.replace('frente-','');
+    function gv(id){var el=f.querySelector('#'+id);return el?el.value:'';}
+    function getMC(cid){
+      var cont=f.querySelector('#'+cid); if(!cont) return [];
+      var rows=[];
+      cont.querySelectorAll('.mat-row').forEach(function(row){
+        var sel=row.querySelector('select');
+        var qty=row.querySelector('input[type=number]');
+        var unit=row.querySelector('.unit-sel');
+        var mn=sel&&sel.value?sel.value.split('|')[0]:'';
+        if(mn) rows.push({material:mn,cantidad:qty?qty.value:'',unidad:unit?unit.value:''});
+      });
+      return rows;
+    }
+    frentes.push({
+      num:fi+1, tramo:gv('f'+fn+'-tramo'), tipo:gv('f'+fn+'-tipo'),
+      est_inicio:gv('f'+fn+'-einicio'), est_fin:gv('f'+fn+'-efin'),
+      hinicio:gv('f'+fn+'-hinicio'), hfin:gv('f'+fn+'-hfin'),
+      blanco:{mlt:gv('f'+fn+'-mlbt'),mlp:gv('f'+fn+'-mlbp'),mla:gv('f'+fn+'-mlba'),linea:gv('f'+fn+'-lblanco'),ancho:gv('f'+fn+'-ablanco')},
+      amarillo:{mlt:gv('f'+fn+'-mlyt'),mlp:gv('f'+fn+'-mlyp'),mla:gv('f'+fn+'-mlya'),linea:gv('f'+fn+'-lamarillo'),ancho:gv('f'+fn+'-aamarillo')},
+      dispositivos:{total:gv('f'+fn+'-dispt'),det:gv('f'+fn+'-dispdet')},
+      marcas:{total:gv('f'+fn+'-marcat'),det:gv('f'+fn+'-marcadet')},
+      mats_blanco:getMC('f'+fn+'-mats-blanco'),
+      mats_amarillo:getMC('f'+fn+'-mats-amarillo'),
+      mats_dispositivos:getMC('f'+fn+'-mats-dispositivos'),
+      mats_marcas:getMC('f'+fn+'-mats-marcas')
+    });
+  });
+  d.frentes=frentes;
+  return d;
+}
+
+function setMsg(html){document.getElementById('r-msg').innerHTML=html;}
+
+function enviar(){
+  if(!document.getElementById('r-confirmado').checked){
+    document.getElementById('confirm-lbl').style.outline='2px solid #c0392b';
+    setMsg('<p class="msg-err">Debes confirmar que la información es verídica.</p>');
+    return;
+  }
+  document.getElementById('confirm-lbl').style.outline='';
+  var d=recopilar();
+  if(!d.proyecto){
+    setMsg('<p class="msg-err">Selecciona el proyecto antes de enviar.</p>');
+    return;
+  }
+  if(!d.nombre||!d.fecha){
+    setMsg('<p class="msg-err">Completa al menos el nombre y la fecha antes de enviar.</p>');
+    return;
+  }
+  var btn=document.getElementById('btn-enviar');
+  btn.disabled=true;
+  btn.innerHTML='<div class="spinner"></div> Enviando...';
+  setMsg('<div class="status-box status-loading"><div class="spinner"></div> Enviando reporte a Google Sheets...</div>');
+  fetch(WEBAPP_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)})
+  .then(function(){
+    btn.disabled=false; btn.innerHTML='📨 Enviar reporte';
+    // Actualizar campo número de reporte visualmente
+    var proyecto = d.proyecto;
+    var tipo     = d.tipo_actividad;
+    var anio     = new Date().getFullYear();
+    document.getElementById('r-numreporte').value = proyecto+'-'+tipo+'-'+anio+'-✓';
+    setMsg('<div class="status-box status-ok">✓ Reporte enviado a Google Sheets. El número de reporte fue generado automáticamente. Descargando CSV de respaldo...</div>');
+    exportCSV(d);
+  })
+  .catch(function(){
+    btn.disabled=false; btn.innerHTML='📨 Enviar reporte';
+    setMsg('<div class="status-box status-err">⚠️ Error de conexión. Se descargó el CSV de respaldo. Verifica tu internet e intenta de nuevo.</div>');
+    exportCSV(d);
+  });
+}
+
+function soloCSV(){exportCSV(recopilar());}
+
+function exportCSV(d){
+  if(!d) d=recopilar();
+  var rows=[
+    ['BITÁCORA DIARIA — SEÑALIZACIÓN HORIZONTAL'],
+    ['CNK Señalización Vial | Contrato MAD-AEPQ-SEV-2026-001'],[''],
+    ['Campo','Valor'],
+    ['Nombre',d.nombre],['Rol',d.rol],['Fecha',d.fecha],['Hora inicio',d.hinicio],['Hora fin',d.hfin],
+    ['Total personas',d.total_personas],['Clima',d.clima],['Pavimento',d.pavimento],
+    ['Interrupción clima',d.int_clima],['Min. int. clima',d.min_clima],['Min. int. pavimento',d.min_pav],
+    ['Rango clima',d.rango_clima],['Novedades',d.novedades],['Evidencia',d.evidencia],
+    [''],['FRENTES DE TRABAJO'],
+    ['#','Tramo','Actividad','Est. Inicio','Est. Fin','H. Inicio','H. Fin',
+     'ML Bl. Total','ML Bl. Premar.','ML Bl. Apl.','Línea Blanca','Ancho Blanca(cm)',
+     'ML Am. Total','ML Am. Premar.','ML Am. Apl.','Línea Amarilla','Ancho Amarilla(cm)',
+     'Disp. Total','Det. Dispositivos','Marcas Total','Det. Marcas']
+  ];
+  d.frentes.forEach(function(f){
+    rows.push([f.num,f.tramo,f.tipo,f.est_inicio,f.est_fin,f.hinicio,f.hfin,
+      f.blanco.mlt,f.blanco.mlp,f.blanco.mla,f.blanco.linea,f.blanco.ancho,
+      f.amarillo.mlt,f.amarillo.mlp,f.amarillo.mla,f.amarillo.linea,f.amarillo.ancho,
+      f.dispositivos.total,f.dispositivos.det,f.marcas.total,f.marcas.det]);
+  });
+  rows.push([''],['MATERIALES POR FRENTE'],['Frente','Categoría','Material','Cantidad','Unidad']);
+  d.frentes.forEach(function(f){
+    var cats={'Blanco':f.mats_blanco,'Amarillo':f.mats_amarillo,'Dispositivos':f.mats_dispositivos,'Marcas':f.mats_marcas};
+    Object.keys(cats).forEach(function(cat){(cats[cat]||[]).forEach(function(m){rows.push([f.num,cat,m.material,m.cantidad,m.unidad]);});});
+  });
+  rows.push([''],['PERSONAL'],['Rol','Nombre','Presente']);
+  d.personal.forEach(function(p){rows.push([p.rol,p.nombre,p.presente?'Sí':'No']);});
+
+  var csv=rows.map(function(r){return r.map(function(c){var s=String(c||'').replace(/"/g,'""');return(s.indexOf(',')>-1||s.indexOf('"')>-1||s.indexOf('\n')>-1)?'"'+s+'"':s;}).join(',');}).join('\n');
+  var blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url; a.download='bitacora_'+(d.fecha||'sin_fecha')+'_'+(d.nombre||'sin_nombre').replace(/\s+/g,'_')+'.csv';
+  a.click(); URL.revokeObjectURL(url);
+}
+
+document.querySelectorAll('#v-reporte input,#v-reporte select,#v-reporte textarea').forEach(function(el){
+  el.addEventListener('input',updateBar); el.addEventListener('change',updateBar);
+});
+
+loadState();
+initPersonal();
+addFrente();
+document.getElementById('r-fecha').valueAsDate=new Date();
+updateBar();
+</script>
+</body>
+</html>
