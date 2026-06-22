@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proyectos — CNK Señalización Vial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Google Sign-In -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<!-- SheetJS para generar Excel en el navegador -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+/* ── RESET & VARIABLES ─────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --negro:       #111111;
+  --negro-medio: #1a1a1a;
+  --amarillo:    #F5A623;
+  --amarillo-bg: rgba(245,166,35,.10);
+  --amarillo-bd: rgba(245,166,35,.30);
+  --texto-claro: #a8c0d8;
+  --texto-opaco: #5a7a99;
+  --blanco:      #ffffff;
+  --gris-bg:     #f4f6f9;
+  --gris-bd:     #dde3ea;
+  --verde:       #1d9e75;
+  --azul-link:   #378add;
+  --rojo:        #c0392b;
+  --morado:      #7c5cdb;
+}
+
+/* ── AUTH GATE ─────────────────────────────────────────────────────────────── */
+body.cnk-auth-pending #cnk-app { display: none; }
+.auth-gate {
+  position: fixed; inset: 0; background: var(--negro);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999; flex-direction: column; gap: 16px;
+}
+body:not(.cnk-auth-pending) .auth-gate { display: none; }
+.auth-gate .gate-logo {
+  width: 56px; height: 56px; background: var(--amarillo); border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 18px; color: var(--negro); margin-bottom: 8px;
+}
+.auth-gate p { color: #aaa; font-family: 'Inter', sans-serif; font-size: 13px; }
+.auth-gate .gate-title { color: #fff; font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; }
+.auth-spinner {
+  width: 24px; height: 24px; border: 3px solid #333;
+  border-top-color: var(--amarillo); border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+body { font-family: 'Inter', sans-serif; background: var(--gris-bg); color: var(--negro); min-height: 100vh; }
+
+/* ── TOPBAR ─────────────────────────────────────────────────────────────────── */
+.topbar {
+  background: var(--negro); padding: 10px 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,.4);
+}
+.logo-area { display: flex; align-items: center; gap: 12px; }
+.logo-box {
+  width: 36px; height: 36px; background: var(--amarillo); border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 12px; color: var(--negro);
+}
+.brand-name { color: var(--blanco); font-size: 14px; font-weight: 700; }
+.brand-name span { color: var(--amarillo); }
+.brand-sub { color: var(--texto-opaco); font-size: 8px; letter-spacing: .9px; text-transform: uppercase; margin-top: 2px; }
+.topbar-right { display: flex; align-items: center; gap: 14px; }
+.user-block { display: flex; align-items: center; gap: 8px; }
+.user-info { text-align: right; }
+.user-name { color: var(--blanco); font-size: 11px; font-weight: 600; }
+.user-role { color: var(--texto-opaco); font-size: 9px; }
+.user-avatar {
+  width: 28px; height: 28px; border-radius: 50%; background: var(--amarillo);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 800; color: var(--negro);
+}
+.btn-logout {
+  font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600;
+  background: none; border: 1px solid #333; border-radius: 6px;
+  padding: 5px 10px; cursor: pointer; color: #aaa;
+}
+.btn-logout:hover { border-color: var(--rojo); color: var(--rojo); }
+
+/* ── MEGAMENÚ ───────────────────────────────────────────────────────────────── */
+.megamenu {
+  background: var(--negro-medio); border-bottom: 2px solid var(--amarillo);
+  padding: 0 28px; display: flex; overflow-x: auto;
+}
+.megamenu::-webkit-scrollbar { height: 0; }
+.mm-item {
+  padding: 9px 16px; color: var(--texto-claro); font-size: 11px; font-weight: 500;
+  cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px;
+  white-space: nowrap; display: flex; align-items: center; gap: 5px;
+  text-decoration: none; transition: color .15s;
+}
+.mm-item:hover { color: var(--blanco); }
+.mm-item.active { color: var(--amarillo); border-bottom: 2px solid var(--amarillo); background: var(--amarillo-bg); }
+.mm-item[data-roles] { display: none; }
+.mm-item[data-roles].visible { display: flex; }
+
+/* ── HERO ───────────────────────────────────────────────────────────────────── */
+.hero-sm {
+  background: var(--negro); padding: 18px 28px 22px;
+  border-bottom: 3px solid var(--amarillo);
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.hero-l .breadcrumb { font-size: 9px; color: var(--texto-opaco); margin-bottom: 8px; }
+.hero-l .breadcrumb a { color: var(--texto-opaco); text-decoration: none; }
+.hero-l .breadcrumb a:hover { color: var(--amarillo); }
+.hero-l .breadcrumb .sep { margin: 0 5px; }
+.hero-l .breadcrumb .cur { color: var(--amarillo); }
+.hero-l h1 { color: var(--blanco); font-size: 18px; font-weight: 800; }
+.hero-l h1 em { color: var(--amarillo); font-style: normal; }
+.hero-l p { color: var(--texto-claro); font-size: 11px; margin-top: 5px; }
+.btn-admin {
+  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700;
+  background: var(--amarillo); color: var(--negro); border: none;
+  border-radius: 8px; padding: 10px 18px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  flex-shrink: 0;
+}
+.btn-admin[data-roles] { display: none; }
+.btn-admin[data-roles].visible { display: inline-flex; }
+
+/* ── WRAP ───────────────────────────────────────────────────────────────────── */
+.wrap { padding: 24px 28px; max-width: 1200px; margin: 0 auto; }
+
+/* ── STATS STRIP ────────────────────────────────────────────────────────────── */
+.stats { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; margin-bottom: 24px; }
+.stat-box { background: var(--blanco); border: 1px solid var(--gris-bd); border-radius: 10px; padding: 12px 14px; }
+.stat-label { font-size: 10.5px; color: var(--texto-opaco); font-weight: 600; text-transform: uppercase; letter-spacing: .4px; }
+.stat-value { font-size: 22px; font-weight: 800; margin-top: 4px; }
+.stat-sub { font-size: 10px; color: #aaa; margin-top: 2px; }
+@media(max-width:700px){ .stats { grid-template-columns: repeat(3,1fr); } }
+
+/* ── PANEL GENÉRICO ─────────────────────────────────────────────────────────── */
+.panel {
+  background: var(--blanco); border: 1px solid var(--gris-bd);
+  border-radius: 12px; padding: 18px 20px; margin-bottom: 16px;
+}
+.panel-title {
+  font-size: 11px; font-weight: 700; color: var(--texto-opaco);
+  text-transform: uppercase; letter-spacing: .6px; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 6px;
+}
+
+/* ── FILTROS ────────────────────────────────────────────────────────────────── */
+.filters-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 12px; align-items: end; }
+@media(max-width:900px){ .filters-row { grid-template-columns: 1fr 1fr; } }
+.f-field label { font-size: 11px; font-weight: 700; color: var(--texto-opaco); display: block; margin-bottom: 6px; }
+.f-field select, .f-field input {
+  width: 100%; padding: 9px 11px; border: 1px solid var(--gris-bd); border-radius: 8px;
+  font-family: 'Inter', sans-serif; font-size: 12.5px; color: var(--negro); background: var(--gris-bg);
+}
+.f-field select:focus, .f-field input:focus { outline: none; border-color: var(--negro); background: var(--blanco); }
+.f-actions { display: flex; gap: 8px; }
+.btn-icon {
+  width: 38px; height: 38px; border-radius: 8px; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; font-size: 14px;
+}
+.btn-buscar { background: var(--verde); color: var(--blanco); }
+.btn-limpiar { background: var(--rojo); color: var(--blanco); }
+
+/* ── TABLA ──────────────────────────────────────────────────────────────────── */
+.table-panel { background: var(--blanco); border: 1px solid var(--gris-bd); border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
+.table-controls {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px; border-bottom: 1px solid var(--gris-bd); gap: 12px; flex-wrap: wrap;
+}
+.entries-sel { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--texto-opaco); }
+.entries-sel select { padding: 5px 8px; border: 1px solid var(--gris-bd); border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 12px; }
+.search-input { padding: 7px 12px; border: 1px solid var(--gris-bd); border-radius: 7px; font-family: 'Inter', sans-serif; font-size: 12px; width: 200px; }
+.search-input:focus { outline: none; border-color: var(--negro); }
+
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  font-size: 10.5px; font-weight: 700; color: var(--texto-opaco); text-transform: uppercase;
+  letter-spacing: .5px; text-align: left; padding: 10px 16px;
+  background: var(--gris-bg); border-bottom: 1px solid var(--gris-bd);
+  white-space: nowrap;
+}
+th.sortable { cursor: pointer; user-select: none; }
+th.sortable:hover { color: var(--negro); }
+.sort-ic { margin-left: 4px; font-size: 9px; color: #c4ccd4; }
+.sort-ic.asc::after { content: '▲'; color: var(--negro); }
+.sort-ic.desc::after { content: '▼'; color: var(--negro); }
+.sort-ic:not(.asc):not(.desc)::after { content: '▲▼'; }
+
+tbody td { padding: 11px 16px; font-size: 12.5px; border-bottom: 1px solid #f0f0ec; }
+tbody tr:hover td { background: #fafbfc; }
+tbody tr:last-child td { border-bottom: none; }
+
+.reporte-id {
+  display: inline-block; font-size: 11px; font-weight: 700; color: var(--negro);
+  border: 1px solid var(--negro); border-radius: 6px; padding: 3px 10px;
+  white-space: nowrap;
+}
+.badge { font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 10px; }
+.b-hor { background: #e8f4fd; color: #0c447c; }
+.b-ver { background: var(--amarillo-bg); color: #854F0B; }
+.b-dis { background: #ede8fd; color: #3c3489; }
+
+.accion-btns { display: flex; gap: 5px; }
+.abtn {
+  width: 30px; height: 30px; border-radius: 7px; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; color: var(--blanco); transition: opacity .15s;
+}
+.abtn:hover { opacity: .85; }
+.abtn-ver  { background: var(--verde); }
+.abtn-desc { background: var(--azul-link); }
+.abtn-edit { background: var(--amarillo); color: var(--negro); }
+.abtn-del  { background: var(--rojo); }
+.admin-only { display: none; }
+.admin-only.visible { display: flex; }
+
+.table-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 20px; font-size: 12px; color: var(--texto-opaco);
+  border-top: 1px solid var(--gris-bd);
+}
+.pagi { display: flex; gap: 5px; }
+.pagi-btn {
+  width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+  border-radius: 6px; background: var(--gris-bg); font-size: 12px; cursor: pointer;
+  border: 1px solid var(--gris-bd); font-family: 'Inter', sans-serif;
+}
+.pagi-btn.on { background: var(--negro); color: var(--blanco); border-color: var(--negro); }
+.pagi-btn:hover:not(.on) { border-color: var(--negro); }
+
+.no-results { text-align: center; padding: 40px 20px; color: var(--texto-opaco); font-size: 13px; }
+
+/* ── MODAL DETALLE SOLO LECTURA ──────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(17,17,17,.6);
+  display: none; align-items: center; justify-content: center;
+  z-index: 200; padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal-box { background: var(--blanco); border-radius: 14px; max-width: 460px; width: 100%; overflow: hidden; }
+.modal-head {
+  background: var(--negro); padding: 16px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-head h3 { color: var(--blanco); font-size: 14px; }
+.readonly-tag {
+  font-size: 9px; font-weight: 700; background: var(--amarillo);
+  color: var(--negro); padding: 3px 9px; border-radius: 10px;
+}
+.modal-body { padding: 18px 20px; max-height: 60vh; overflow-y: auto; }
+.mrow {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding: 8px 0; border-bottom: 1px solid #f0f0ec; font-size: 12.5px; gap: 12px;
+}
+.mrow:last-child { border-bottom: none; }
+.mrow span:first-child { color: #889; flex-shrink: 0; }
+.mrow span:last-child { font-weight: 600; text-align: right; }
+.modal-foot { padding: 14px 20px; border-top: 1px solid var(--gris-bd); display: flex; gap: 8px; justify-content: flex-end; }
+.btn-cerrar {
+  font-family: 'Inter', sans-serif; font-size: 12px; background: var(--gris-bg);
+  border: 1px solid var(--gris-bd); border-radius: 8px; padding: 8px 16px; cursor: pointer;
+}
+
+/* ── MODAL GESTIONAR PROYECTO ────────────────────────────────────────────────── */
+.modal-modo-btns { display: flex; gap: 8px; margin-bottom: 14px; }
+.modal-modo-btn {
+  flex: 1; font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 600;
+  background: var(--gris-bg); border: 1px solid var(--gris-bd); border-radius: 8px;
+  padding: 9px; cursor: pointer; color: var(--negro);
+}
+.modal-modo-btn.on { background: var(--negro); color: var(--blanco); border-color: var(--negro); }
+.modal-form { display: none; }
+.modal-form.open { display: block; }
+.mf-field { margin-bottom: 12px; }
+.mf-field label { font-size: 11px; font-weight: 700; color: var(--texto-opaco); display: block; margin-bottom: 5px; }
+.mf-field input, .mf-field select {
+  width: 100%; padding: 9px 11px; border: 1px solid var(--gris-bd); border-radius: 8px;
+  font-family: 'Inter', sans-serif; font-size: 13px; color: var(--negro); background: var(--gris-bg);
+}
+.btn-primary {
+  font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700;
+  background: var(--negro); color: var(--blanco); border: none;
+  border-radius: 8px; padding: 10px 20px; cursor: pointer; width: 100%;
+}
+.btn-primary:hover { opacity: .85; }
+.modal-err { color: var(--rojo); font-size: 12px; margin-top: 8px; text-align: center; }
+.modal-ok { color: var(--verde); font-size: 12px; margin-top: 8px; text-align: center; }
+
+/* ── PANEL HORAS TRABAJADAS ──────────────────────────────────────────────────── */
+.horas-panel { background: var(--blanco); border: 1px solid var(--gris-bd); border-radius: 12px; padding: 20px 22px; margin-bottom: 24px; }
+.horas-head { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+.horas-head h3 { font-size: 14px; font-weight: 800; }
+.horas-filtros { display: grid; grid-template-columns: 1.3fr 1fr 1fr auto; gap: 12px; align-items: end; margin-bottom: 20px; }
+@media(max-width:700px){ .horas-filtros { grid-template-columns: 1fr 1fr; } }
+.btn-calcular {
+  font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 700;
+  background: var(--negro); color: var(--blanco); border: none;
+  border-radius: 8px; padding: 10px 16px; cursor: pointer; white-space: nowrap;
+  display: flex; align-items: center; gap: 6px;
+}
+.horas-resultado {
+  background: var(--gris-bg); border-radius: 10px; padding: 18px 20px;
+  display: flex; align-items: center; gap: 28px; flex-wrap: wrap;
+}
+.horas-total { text-align: left; }
+.horas-total .ht-num { font-size: 32px; font-weight: 800; color: var(--negro); line-height: 1; }
+.horas-total .ht-lbl { font-size: 11px; color: var(--texto-opaco); margin-top: 4px; }
+.horas-total .ht-rango { font-size: 10.5px; color: #aaa; margin-top: 2px; }
+.horas-desglose { flex: 1; display: flex; gap: 14px; flex-wrap: wrap; }
+.hd-item { background: var(--blanco); border: 1px solid var(--gris-bd); border-radius: 9px; padding: 10px 16px; min-width: 110px; }
+.hd-item .hd-num { font-size: 18px; font-weight: 800; margin-top: 4px; }
+.btn-desc-horas {
+  font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 700;
+  background: var(--verde); color: var(--blanco); border: none;
+  border-radius: 8px; padding: 10px 18px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 7px; margin-left: auto;
+}
+.horas-loading { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--texto-opaco); }
+.spinner { width: 16px; height: 16px; border: 2px solid var(--gris-bd); border-top-color: var(--amarillo); border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
+.status-box { border-radius: 8px; padding: 10px 14px; font-size: 12.5px; display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+.status-ok  { background: #e1f5ee; color: #085041; border: 1px solid #5dcaa5; }
+.status-err { background: #fdf0ef; color: #7b1c1c; border: 1px solid #f09595; }
+.status-warn{ background: var(--amarillo-bg); color: #854F0B; border: 1px solid var(--amarillo-bd); }
+
+/* ── FOOTER ──────────────────────────────────────────────────────────────────── */
+.footer {
+  background: var(--negro); padding: 12px 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 8px; margin-top: 8px;
+}
+.footer p { color: var(--texto-opaco); font-size: 9px; }
+.footer span { color: var(--amarillo); font-size: 9px; font-weight: 600; }
+</style>
+</head>
+
+<body class="cnk-auth-pending">
+
+<!-- ── AUTH GATE ───────────────────────────────────────────────────────────── -->
+<div class="auth-gate">
+  <div class="gate-logo">CNK</div>
+  <p class="gate-title">CNK Señalización Vial</p>
+  <div class="auth-spinner"></div>
+  <p>Verificando acceso...</p>
+</div>
+
+<!-- ── APP ────────────────────────────────────────────────────────────────── -->
+<div id="cnk-app">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="logo-area">
+      <div class="logo-box">CNK</div>
+      <div>
+        <div class="brand-name"><span>CNK</span> Señalización Vial</div>
+        <div class="brand-sub">Sistema de Gestión de Proyectos</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="user-block">
+        <div class="user-info">
+          <div class="user-name" id="topbar-nombre">—</div>
+          <div class="user-role" id="topbar-rol">—</div>
+        </div>
+        <div class="user-avatar" id="topbar-avatar">?</div>
+      </div>
+      <button class="btn-logout" onclick="CNKAuth.logout(); window.location.href='login.html';">Salir</button>
+    </div>
+  </header>
+
+  <!-- MEGAMENÚ -->
+  <nav class="megamenu">
+    <a href="index.html" class="mm-item">🏠 Inicio</a>
+    <a href="reportes.html" class="mm-item" data-roles="admin,gerencia,costos,tecnico">📋 Reportes</a>
+    <a href="proyectos.html" class="mm-item active" data-roles="admin,gerencia,costos">📁 Proyectos</a>
+    <a href="gantt.html" class="mm-item" data-roles="admin,gerencia,costos">📊 Gantt</a>
+    <a href="fichas-tecnicas.html" class="mm-item" data-roles="admin,gerencia,costos,tecnico">📐 Fichas Técnicas</a>
+    <a href="apu.html" class="mm-item" data-roles="admin,gerencia,costos">💰 APU</a>
+    <a href="dashboard.html" class="mm-item" data-roles="admin,gerencia,costos">📈 Dashboard</a>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero-sm">
+    <div class="hero-l">
+      <div class="breadcrumb">
+        <a href="index.html">Inicio</a><span class="sep">›</span>
+        <span class="cur">Proyectos</span>
+      </div>
+      <h1>Hub de <em>Proyectos</em></h1>
+      <p>Avance general y reportes registrados por proyecto.</p>
+    </div>
+    <button class="btn-admin" data-roles="admin,gerencia" onclick="abrirModalAdmin()">
+      🔒 Gestionar proyecto
+    </button>
+  </div>
+
+  <div class="wrap">
+
+    <!-- STATS STRIP -->
+    <div class="stats">
+      <div class="stat-box">
+        <div class="stat-label">Proyectos activos</div>
+        <div class="stat-value" id="st-activos">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">En ejecución</div>
+        <div class="stat-value" id="st-ejecucion">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Finalizados</div>
+        <div class="stat-value" id="st-finalizados">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Bitácoras</div>
+        <div class="stat-value" id="st-bitacoras">—</div>
+        <div class="stat-sub" id="st-bitacoras-sub"></div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Avance promedio</div>
+        <div class="stat-value" id="st-avance">—</div>
+      </div>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="panel">
+      <div class="panel-title">🔍 Filtrar reportes</div>
+      <div class="filters-row">
+        <div class="f-field">
+          <label>Proyecto</label>
+          <select id="f-proyecto" onchange="guardarProyectoActivo()">
+            <option value="">Todos los proyectos</option>
+            <option value="MAD-AEPQ">MAD-AEPQ — Autopista Puerto Quetzal</option>
+            <option value="CAR-XOCHI">CAR-XOCHI — Corredor de las Flores</option>
+          </select>
+        </div>
+        <div class="f-field">
+          <label>Tipo de reporte</label>
+          <select id="f-tipo">
+            <option value="">Todos</option>
+            <option value="HOR">HOR — Horizontal</option>
+            <option value="VER">VER — Vertical</option>
+            <option value="DIS">DIS — Dispositivos</option>
+          </select>
+        </div>
+        <div class="f-field">
+          <label>Tipo de señal</label>
+          <select id="f-senal">
+            <option value="">Todos</option>
+            <optgroup label="Señalización Vertical (VER)">
+              <option value="Reglamentaria">Reglamentaria</option>
+              <option value="Preventiva">Preventiva</option>
+              <option value="Informativa">Informativa</option>
+            </optgroup>
+            <optgroup label="Señalización Horizontal (HOR)">
+              <option value="Líneas">Líneas (Longitudinal)</option>
+              <option value="Símbolos y Letras">Símbolos y Letras</option>
+              <option value="Dispositivos sobre pavimento">Dispositivos sobre pavimento</option>
+              <option value="Cruces peatonales">Cruces peatonales</option>
+            </optgroup>
+            <optgroup label="Dispositivos de Contención (DIS)">
+              <option value="Flexible">Flexible</option>
+              <option value="Semirrígido">Semirrígido</option>
+              <option value="Rígido">Rígido</option>
+              <option value="Deformable">Deformable</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="f-field">
+          <label>Fecha del reporte</label>
+          <input type="date" id="f-fecha">
+        </div>
+        <div class="f-actions">
+          <button class="btn-icon btn-buscar" onclick="aplicarFiltros()" title="Buscar">🔍</button>
+          <button class="btn-icon btn-limpiar" onclick="limpiarFiltros()" title="Limpiar">✕</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABLA -->
+    <div class="table-panel">
+      <div class="table-controls">
+        <div class="entries-sel">
+          <select id="t-entradas" onchange="cambiarEntradas()">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+          entradas por página
+        </div>
+        <input type="text" class="search-input" placeholder="Buscar en tabla..." id="t-busqueda" oninput="buscarTabla()">
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th class="sortable" onclick="ordenarPor('id')" id="th-id">
+                N° REPORTE <span class="sort-ic" id="si-id"></span>
+              </th>
+              <th class="sortable" onclick="ordenarPor('fecha')" id="th-fecha">
+                FECHA <span class="sort-ic" id="si-fecha"></span>
+              </th>
+              <th class="sortable" onclick="ordenarPor('proyecto')" id="th-proyecto">
+                PROYECTO <span class="sort-ic" id="si-proyecto"></span>
+              </th>
+              <th class="sortable" onclick="ordenarPor('responsable')" id="th-responsable">
+                RESPONSABLE <span class="sort-ic" id="si-responsable"></span>
+              </th>
+              <th class="sortable" onclick="ordenarPor('tipo')" id="th-tipo">
+                TIPO <span class="sort-ic" id="si-tipo"></span>
+              </th>
+              <th>ACCIÓN</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-body">
+            <tr><td colspan="6" class="no-results"><div class="spinner"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-foot">
+        <span id="t-info-registros">—</span>
+        <div class="pagi" id="paginacion"></div>
+      </div>
+    </div>
+
+    <!-- HORAS TRABAJADAS -->
+    <div class="horas-panel">
+      <div class="horas-head">
+        <span style="font-size:18px">⏱️</span>
+        <h3>Horas trabajadas</h3>
+      </div>
+      <div class="horas-filtros">
+        <div class="f-field">
+          <label>Proyecto</label>
+          <select id="h-proyecto">
+            <option value="MAD-AEPQ">MAD-AEPQ — Autopista Puerto Quetzal</option>
+            <option value="CAR-XOCHI">CAR-XOCHI — Corredor de las Flores</option>
+          </select>
+        </div>
+        <div class="f-field">
+          <label>Desde</label>
+          <input type="date" id="h-desde">
+        </div>
+        <div class="f-field">
+          <label>Hasta</label>
+          <input type="date" id="h-hasta">
+        </div>
+        <button class="btn-calcular" onclick="calcularHoras()">
+          🔍 Calcular
+        </button>
+      </div>
+
+      <div id="horas-resultado" style="display:none">
+        <div class="horas-resultado">
+          <div class="horas-total">
+            <div class="ht-num" id="h-total">—</div>
+            <div class="ht-lbl">Total horas-hombre</div>
+            <div class="ht-rango" id="h-rango">—</div>
+          </div>
+          <div class="horas-desglose">
+            <div class="hd-item">
+              <span class="badge b-hor">HOR</span>
+              <div class="hd-num" id="h-hor">—</div>
+            </div>
+            <div class="hd-item">
+              <span class="badge b-ver">VER</span>
+              <div class="hd-num" id="h-ver">—</div>
+            </div>
+            <div class="hd-item">
+              <span class="badge b-dis">DIS</span>
+              <div class="hd-num" id="h-dis">—</div>
+            </div>
+          </div>
+          <button class="btn-desc-horas" onclick="descargarReporteHoras()">
+            ⬇ Descargar reporte Excel
+          </button>
+        </div>
+        <div id="horas-msg"></div>
+      </div>
+    </div>
+
+  </div><!-- /wrap -->
+
+  <footer class="footer">
+    <p>© 2026 CNK Señalización Vial — Todos los derechos reservados</p>
+    <span>Guatemala · Operaciones &amp; Costos · v2.0</span>
+  </footer>
+
+</div><!-- /cnk-app -->
+
+<!-- ── MODAL DETALLE SOLO LECTURA ─────────────────────────────────────────── -->
+<div class="modal-overlay" id="modal-detalle">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 id="modal-det-titulo">Detalle del reporte</h3>
+      <span class="readonly-tag">SOLO LECTURA</span>
+    </div>
+    <div class="modal-body" id="modal-det-body"></div>
+    <div class="modal-foot">
+      <button class="btn-cerrar" onclick="cerrarModal('modal-detalle')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL GESTIONAR PROYECTO ───────────────────────────────────────────── -->
+<div class="modal-overlay" id="modal-admin">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Gestionar proyecto</h3>
+      <span class="readonly-tag" style="background:#333;color:#fff">🔒 Admin</span>
+    </div>
+    <div class="modal-body">
+      <div id="admin-lock-form">
+        <p style="font-size:12px;color:#889;margin-bottom:12px">Solo admin y gerencia. Requiere contraseña.</p>
+        <input type="password" id="admin-pw" placeholder="Contraseña" class="search-input" style="width:100%;margin-bottom:12px" onkeydown="if(event.key==='Enter')verificarAdminPw()">
+        <button class="btn-primary" onclick="verificarAdminPw()">Entrar</button>
+        <div class="modal-err" id="admin-pw-err"></div>
+      </div>
+      <div id="admin-open" style="display:none">
+        <div style="font-size:12px;font-weight:700;color:var(--verde);margin-bottom:14px">✓ Acceso verificado</div>
+        <div class="modal-modo-btns">
+          <button class="modal-modo-btn on" id="btn-modo-crear" onclick="setModo('crear')">+ Crear nuevo</button>
+          <button class="modal-modo-btn" id="btn-modo-editar" onclick="setModo('editar')">✎ Editar existente</button>
+        </div>
+        <div class="modal-form open" id="form-crear">
+          <div class="mf-field"><label>Código del proyecto</label><input type="text" id="np-codigo" placeholder="Ej: CAR-MIXCO"></div>
+          <div class="mf-field"><label>Nombre del proyecto</label><input type="text" id="np-nombre" placeholder="Nombre completo"></div>
+          <div class="mf-field"><label>Fecha de inicio</label><input type="date" id="np-inicio"></div>
+          <div class="mf-field"><label>Fecha de entrega</label><input type="date" id="np-entrega"></div>
+          <div class="mf-field">
+            <label>Tipos de actividad</label>
+            <div style="display:flex;gap:8px;margin-top:4px">
+              <label style="display:flex;align-items:center;gap:4px;font-size:12px"><input type="checkbox" value="HOR" class="np-tipo"> HOR</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:12px"><input type="checkbox" value="VER" class="np-tipo"> VER</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:12px"><input type="checkbox" value="DIS" class="np-tipo"> DIS</label>
+            </div>
+          </div>
+          <button class="btn-primary" onclick="guardarProyecto()">💾 Guardar proyecto</button>
+          <div class="modal-ok" id="form-crear-ok"></div>
+        </div>
+        <div class="modal-form" id="form-editar">
+          <div class="mf-field">
+            <label>Seleccionar proyecto a editar</label>
+            <select id="ep-select">
+              <option>MAD-AEPQ — Autopista Puerto Quetzal</option>
+              <option>CAR-XOCHI — Corredor de las Flores</option>
+            </select>
+          </div>
+          <p style="font-size:12px;color:#aaa;margin-top:8px">La edición completa de datos del proyecto estará disponible en el próximo sprint (módulo Configuración).</p>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cerrar" onclick="cerrarModal('modal-admin');resetModalAdmin()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── SCRIPTS ────────────────────────────────────────────────────────────── -->
+<script>
+/* ── CONFIGURACIÓN ──────────────────────────────────────────────────────────── */
+var WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzr028IJBJlaa4r5S467IZbwDDxBlo_91FGuCA6BJ9sftsqgZcuiD0yCaJ-pEwX_U1E/exec';
+var ADMIN_PW   = 'CNK2026';
+
+/* ── DATOS DE EJEMPLO (FALLBACK OFFLINE) ────────────────────────────────────── */
+var DATOS_FALLBACK = {
+  stats: { activos: 2, ejecucion: 2, finalizados: 0, bitacoras: 20, avance: 38 },
+  reportes: [
+    { id:'MAD-AEPQ-HOR-2026-012', fecha:'2026-06-19', proyecto:'MAD-AEPQ', responsable:'Carlos Ramírez', tipo:'HOR', senal:'Líneas', novedades:'Sin novedades', frentes:2 },
+    { id:'MAD-AEPQ-VER-2026-005', fecha:'2026-06-18', proyecto:'MAD-AEPQ', responsable:'Ana López',      tipo:'VER', senal:'Reglamentaria', novedades:'Lluvia ligera 11:00-12:30', frentes:1 },
+    { id:'MAD-AEPQ-HOR-2026-011', fecha:'2026-06-17', proyecto:'MAD-AEPQ', responsable:'Carlos Ramírez', tipo:'HOR', senal:'Líneas', novedades:'Sin novedades', frentes:2 },
+    { id:'MAD-AEPQ-DIS-2026-003', fecha:'2026-06-15', proyecto:'MAD-AEPQ', responsable:'Julio Martínez', tipo:'DIS', senal:'Flexible', novedades:'Sin novedades', frentes:1 },
+    { id:'CAR-XOCHI-HOR-2026-008',fecha:'2026-06-17', proyecto:'CAR-XOCHI',responsable:'Carlos Ramírez', tipo:'HOR', senal:'Líneas', novedades:'Sin novedades', frentes:2 },
+    { id:'CAR-XOCHI-DIS-2026-002',fecha:'2026-06-14', proyecto:'CAR-XOCHI',responsable:'Pedro Gómez',    tipo:'DIS', senal:'Semirrígido', novedades:'Bloqueo vial 30 min', frentes:1 },
+    { id:'MAD-AEPQ-VER-2026-004', fecha:'2026-06-12', proyecto:'MAD-AEPQ', responsable:'Ana López',      tipo:'VER', senal:'Preventiva', novedades:'Sin novedades', frentes:1 },
+    { id:'MAD-AEPQ-HOR-2026-010', fecha:'2026-06-11', proyecto:'MAD-AEPQ', responsable:'Carlos Ramírez', tipo:'HOR', senal:'Símbolos y Letras', novedades:'Sin novedades', frentes:3 },
+  ]
+};
+
+/* ── ESTADO GLOBAL ──────────────────────────────────────────────────────────── */
+var todosDatos     = [];
+var datosFiltrados = [];
+var paginaActual   = 1;
+var entradasPorPag = 10;
+var ordenActual    = { col: 'fecha', dir: 'desc' };
+var sesionActual   = null;
+
+/* ── INICIALIZACIÓN ──────────────────────────────────────────────────────────── */
+window.addEventListener('DOMContentLoaded', function () {
+  var hoy   = new Date();
+  var hace1m = new Date(); hace1m.setMonth(hace1m.getMonth() - 1);
+  document.getElementById('h-desde').valueAsDate = hace1m;
+  document.getElementById('h-hasta').valueAsDate = hoy;
+
+  // Pre-seleccionar último proyecto activo
+  var proyGuardado = localStorage.getItem('cnk_proyecto_activo');
+  if (proyGuardado) {
+    var sel = document.getElementById('f-proyecto');
+    for (var i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value === proyGuardado) { sel.selectedIndex = i; break; }
+    }
+    document.getElementById('h-proyecto').value = proyGuardado;
+  }
+
+  cargarDatos();
+});
+
+/* ── CARGA DE DATOS ──────────────────────────────────────────────────────────── */
+function cargarDatos() {
+  fetch(WEBAPP_URL + '?action=resumenProyectos', { mode: 'no-cors' })
+    .then(function () { usarFallback('Sin conexión al servidor — mostrando datos de ejemplo'); })
+    .catch(function () { usarFallback('Sin conexión al servidor — mostrando datos de ejemplo'); });
+
+  // Con no-cors no podemos leer la respuesta, así que usamos fallback directo
+  usarFallback(null);
+}
+
+function usarFallback(msg) {
+  var d = DATOS_FALLBACK;
+  document.getElementById('st-activos').textContent    = d.stats.activos;
+  document.getElementById('st-ejecucion').textContent  = d.stats.ejecucion;
+  document.getElementById('st-finalizados').textContent= d.stats.finalizados;
+  document.getElementById('st-bitacoras').textContent  = d.stats.bitacoras;
+  document.getElementById('st-avance').textContent     = d.stats.avance + '%';
+  if (msg) document.getElementById('st-bitacoras-sub').textContent = '(offline)';
+
+  todosDatos = d.reportes.slice();
+  aplicarFiltros();
+}
+
+/* ── FILTROS ────────────────────────────────────────────────────────────────── */
+function aplicarFiltros() {
+  var fProy  = document.getElementById('f-proyecto').value.trim().toLowerCase();
+  var fTipo  = document.getElementById('f-tipo').value.trim().toLowerCase();
+  var fSenal = document.getElementById('f-senal').value.trim().toLowerCase();
+  var fFecha = document.getElementById('f-fecha').value;
+  var fBusq  = document.getElementById('t-busqueda').value.trim().toLowerCase();
+
+  datosFiltrados = todosDatos.filter(function (r) {
+    if (fProy  && r.proyecto.toLowerCase()   !== fProy)  return false;
+    if (fTipo  && r.tipo.toLowerCase()        !== fTipo)  return false;
+    if (fSenal && (!r.senal || r.senal.toLowerCase().indexOf(fSenal) === -1)) return false;
+    if (fFecha && r.fecha !== fFecha) return false;
+    if (fBusq) {
+      var hay = Object.values(r).some(function (v) {
+        return String(v).toLowerCase().indexOf(fBusq) !== -1;
+      });
+      if (!hay) return false;
+    }
+    return true;
+  });
+
+  ordenarDatos();
+}
+
+function limpiarFiltros() {
+  ['f-proyecto','f-tipo','f-senal','f-fecha'].forEach(function (id) {
+    var el = document.getElementById(id);
+    el.selectedIndex ? el.selectedIndex = 0 : el.value = '';
+  });
+  document.getElementById('t-busqueda').value = '';
+  aplicarFiltros();
+}
+
+function buscarTabla() { aplicarFiltros(); }
+
+function guardarProyectoActivo() {
+  var v = document.getElementById('f-proyecto').value;
+  if (v) localStorage.setItem('cnk_proyecto_activo', v);
+  aplicarFiltros();
+}
+
+/* ── ORDENAMIENTO ────────────────────────────────────────────────────────────── */
+function ordenarPor(col) {
+  if (ordenActual.col === col) {
+    ordenActual.dir = ordenActual.dir === 'asc' ? 'desc' : 'asc';
+  } else {
+    ordenActual.col = col; ordenActual.dir = 'asc';
+  }
+  ['id','fecha','proyecto','responsable','tipo'].forEach(function (c) {
+    var el = document.getElementById('si-' + c);
+    if (!el) return;
+    el.className = 'sort-ic' + (c === ordenActual.col ? ' ' + ordenActual.dir : '');
+  });
+  ordenarDatos();
+}
+
+function ordenarDatos() {
+  var col = ordenActual.col, dir = ordenActual.dir;
+  datosFiltrados.sort(function (a, b) {
+    var va = (a[col] || '').toString().toLowerCase();
+    var vb = (b[col] || '').toString().toLowerCase();
+    return dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+  });
+  paginaActual = 1;
+  renderTabla();
+}
+
+/* ── RENDERIZADO DE TABLA ────────────────────────────────────────────────────── */
+function renderTabla() {
+  var tbody  = document.getElementById('tabla-body');
+  var total  = datosFiltrados.length;
+  var inicio = (paginaActual - 1) * entradasPorPag;
+  var fin    = Math.min(inicio + entradasPorPag, total);
+  var pagina = datosFiltrados.slice(inicio, fin);
+  var isAdmin = sesionActual && sesionActual.rol === 'admin';
+
+  document.getElementById('t-info-registros').textContent =
+    total === 0 ? 'Sin resultados' :
+    'Mostrando ' + (inicio + 1) + ' a ' + fin + ' de ' + total + ' reportes';
+
+  if (total === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="no-results">No se encontraron reportes con los filtros aplicados.</td></tr>';
+    renderPaginacion(0);
+    return;
+  }
+
+  tbody.innerHTML = pagina.map(function (r) {
+    var badgeClass = r.tipo === 'HOR' ? 'b-hor' : r.tipo === 'VER' ? 'b-ver' : 'b-dis';
+    var editBtn = isAdmin
+      ? '<button class="abtn abtn-edit admin-only visible" title="Editar (pendiente backend)" onclick="editarReporte(\'' + r.id + '\',\'' + r.tipo + '\')" style="display:flex">✎</button>'
+      : '';
+    var delBtn = isAdmin
+      ? '<button class="abtn abtn-del admin-only visible" title="Eliminar" onclick="eliminarReporte(\'' + r.id + '\')" style="display:flex">🗑</button>'
+      : '';
+    return (
+      '<tr>' +
+        '<td><span class="reporte-id">#' + r.id + '</span></td>' +
+        '<td>' + formatFecha(r.fecha) + '</td>' +
+        '<td>' + r.proyecto + '</td>' +
+        '<td>' + r.responsable + '</td>' +
+        '<td><span class="badge ' + badgeClass + '">' + r.tipo + '</span></td>' +
+        '<td><div class="accion-btns">' +
+          '<button class="abtn abtn-ver" title="Ver detalle" onclick="verDetalle(\'' + r.id + '\')">👁</button>' +
+          '<button class="abtn abtn-desc" title="Descargar" onclick="descargarReporte(\'' + r.id + '\')">⬇</button>' +
+          editBtn + delBtn +
+        '</div></td>' +
+      '</tr>'
+    );
+  }).join('');
+
+  renderPaginacion(total);
+}
+
+function formatFecha(f) {
+  if (!f) return '—';
+  var p = f.split('-');
+  return p.length === 3 ? p[2] + '-' + p[1] + '-' + p[0] : f;
+}
+
+/* ── PAGINACIÓN ──────────────────────────────────────────────────────────────── */
+function renderPaginacion(total) {
+  var totalPag = Math.ceil(total / entradasPorPag);
+  var cont = document.getElementById('paginacion');
+  if (totalPag <= 1) { cont.innerHTML = ''; return; }
+
+  var html = '';
+  if (paginaActual > 1)
+    html += '<button class="pagi-btn" onclick="irPagina(' + (paginaActual - 1) + ')">‹</button>';
+
+  var desde = Math.max(1, paginaActual - 2);
+  var hasta = Math.min(totalPag, paginaActual + 2);
+  for (var i = desde; i <= hasta; i++) {
+    html += '<button class="pagi-btn' + (i === paginaActual ? ' on' : '') +
+            '" onclick="irPagina(' + i + ')">' + i + '</button>';
+  }
+
+  if (paginaActual < totalPag)
+    html += '<button class="pagi-btn" onclick="irPagina(' + (paginaActual + 1) + ')">›</button>';
+
+  cont.innerHTML = html;
+}
+
+function irPagina(n) { paginaActual = n; renderTabla(); }
+
+function cambiarEntradas() {
+  entradasPorPag = parseInt(document.getElementById('t-entradas').value);
+  paginaActual = 1;
+  renderTabla();
+}
+
+/* ── ACCIONES DE TABLA ───────────────────────────────────────────────────────── */
+function verDetalle(id) {
+  var r = todosDatos.find(function (x) { return x.id === id; });
+  if (!r) return;
+  document.getElementById('modal-det-titulo').textContent = 'Reporte #' + id;
+  document.getElementById('modal-det-body').innerHTML = [
+    ['N° de Reporte', '#' + r.id],
+    ['Proyecto',      r.proyecto],
+    ['Responsable',   r.responsable],
+    ['Fecha',         formatFecha(r.fecha)],
+    ['Tipo',          r.tipo],
+    ['Tipo de señal', r.senal || '—'],
+    ['Frentes registrados', r.frentes || '—'],
+    ['Novedades',     r.novedades || 'Sin novedades'],
+  ].map(function (par) {
+    return '<div class="mrow"><span>' + par[0] + '</span><span>' + par[1] + '</span></div>';
+  }).join('');
+  document.getElementById('modal-detalle').classList.add('open');
+}
+
+function descargarReporte(id) {
+  var r = todosDatos.find(function (x) { return x.id === id; });
+  if (!r) return;
+  var csv = 'N° Reporte,Fecha,Proyecto,Responsable,Tipo,Tipo de señal,Novedades\n' +
+    [r.id, formatFecha(r.fecha), r.proyecto, r.responsable, r.tipo, r.senal||'', r.novedades||''].join(',');
+  var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'reporte_' + id + '.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function editarReporte(id, tipo) {
+  var destinos = { HOR: 'formularios.html', VER: 'bitacora-vertical.html', DIS: 'bitacora-dispositivos.html' };
+  var dest = destinos[tipo] || 'formularios.html';
+  // Guardar en localStorage para que el formulario lo detecte
+  localStorage.setItem('cnk_editar_id', id);
+  // Por ahora aviso que es pendiente de backend
+  alert('⚠️ Función pendiente de backend.\n\nCuando esté listo, redirigirá a:\n' + dest + '?editar=' + id);
+}
+
+function eliminarReporte(id) {
+  if (!confirm('¿Eliminar el reporte #' + id + '?\n\nEsta acción no se puede deshacer.')) return;
+  alert('⚠️ Función pendiente de backend (endpoint eliminarBitacora en Apps Script).\n\nReporte a eliminar: ' + id);
+}
+
+/* ── HORAS TRABAJADAS ────────────────────────────────────────────────────────── */
+function calcularHoras() {
+  var proyecto = document.getElementById('h-proyecto').value;
+  var desde    = document.getElementById('h-desde').value;
+  var hasta    = document.getElementById('h-hasta').value;
+
+  if (!desde || !hasta) {
+    document.getElementById('horas-msg').innerHTML =
+      '<div class="status-box status-err">⚠️ Ingresa el rango de fechas.</div>';
+    return;
+  }
+
+  document.getElementById('horas-resultado').style.display = 'none';
+  document.getElementById('horas-msg').innerHTML =
+    '<div class="horas-loading"><div class="spinner"></div> Consultando servidor...</div>';
+
+  // Llamada al endpoint (cuando exista — por ahora usamos cálculo local de fallback)
+  setTimeout(function () {
+    var reportesFiltrados = todosDatos.filter(function (r) {
+      return r.proyecto === proyecto && r.fecha >= desde && r.fecha <= hasta;
+    });
+
+    // Cálculo demo con horas fijas por frente (en producción vendrán del endpoint)
+    var totHOR = 0, totVER = 0, totDIS = 0;
+    reportesFiltrados.forEach(function (r) {
+      var hrs = (r.frentes || 1) * 9;
+      if (r.tipo === 'HOR') totHOR += hrs;
+      else if (r.tipo === 'VER') totVER += hrs;
+      else totDIS += hrs;
+    });
+    var total = totHOR + totVER + totDIS;
+
+    document.getElementById('h-total').textContent = total.toFixed(1) + ' h';
+    document.getElementById('h-hor').textContent   = totHOR.toFixed(1) + ' h';
+    document.getElementById('h-ver').textContent   = totVER.toFixed(1) + ' h';
+    document.getElementById('h-dis').textContent   = totDIS.toFixed(1) + ' h';
+    document.getElementById('h-rango').textContent =
+      proyecto + ' · ' + formatFecha(desde) + ' – ' + formatFecha(hasta);
+
+    document.getElementById('horas-resultado').style.display = 'flex';
+    document.getElementById('horas-resultado').style.flexWrap = 'wrap';
+    document.getElementById('horas-msg').innerHTML =
+      '<div class="status-box status-warn">⚠️ Datos aproximados. El cálculo exacto requiere el endpoint <code>horasTrabajadas</code> en Apps Script (próximo sprint).</div>';
+
+    document.getElementById('horas-resultado').style.display = 'block';
+
+  }, 800);
+}
+
+/* ── DESCARGA EXCEL DE HORAS ─────────────────────────────────────────────────── */
+function descargarReporteHoras() {
+  var proyecto = document.getElementById('h-proyecto').value;
+  var desde    = document.getElementById('h-desde').value;
+  var hasta    = document.getElementById('h-hasta').value;
+  var usuario  = sesionActual ? sesionActual.nombre : 'Usuario';
+
+  if (typeof XLSX === 'undefined') {
+    alert('Error: la librería SheetJS no está disponible. Verifica tu conexión a internet.');
+    return;
+  }
+
+  var wb = XLSX.utils.book_new();
+
+  // Reglas de jornada
+  function esFinDeSemana(fecha) {
+    var d = new Date(fecha + 'T00:00:00');
+    return d.getDay(); // 0=Dom, 6=Sáb
+  }
+  function calcHoras(r) {
+    // Valores demo — en producción vendrán de los frentes reales via endpoint
+    var totalFrentes = r.frentes || 1;
+    var hInicio = 7, hFin = 17;
+    var bruto = hFin - hInicio;
+    var diaSemana = esFinDeSemana(r.fecha);
+    var almuerzo = (diaSemana !== 0 && diaSemana !== 6 && bruto > 5) ? 1 : 0;
+    var activas = bruto - almuerzo;
+    var ordinarias = diaSemana === 0 ? 0 :
+                     diaSemana === 6 ? Math.min(activas, 4) :
+                     diaSemana === 5 ? Math.min(activas, 8) :
+                     Math.min(activas, 9);
+    var extra = Math.max(activas - ordinarias, 0);
+    return {
+      inicio: '07:00', salida: diaSemana === 5 ? '16:00' : '17:00',
+      activas: activas * totalFrentes, noActivas: 0,
+      ordinarias: ordinarias * totalFrentes, extra: extra * totalFrentes,
+      total: (ordinarias + extra) * totalFrentes
+    };
+  }
+
+  var reportesFiltrados = todosDatos.filter(function (r) {
+    return r.proyecto === proyecto && r.fecha >= desde && r.fecha <= hasta;
+  }).sort(function (a,b) { return a.fecha.localeCompare(b.fecha); });
+
+  // Encabezados
+  var rows = [
+    ['CNK SEÑALIZACIÓN VIAL  ·  www.grupocnk.com'],
+    ['PARTE DE HORAS — REPORTE DE JORNADA'],
+    [],
+    ['Proyecto:', proyecto, '', '', 'Generado por:', usuario],
+    ['Período:',  formatFecha(desde) + '  →  ' + formatFecha(hasta), '', '', 'Fecha de emisión:', formatFecha(new Date().toISOString().split('T')[0])],
+    [],
+    ['Ingrese la hora de inicio, la hora de finalización y el número de personas por día. Formato 24h. Lun–Jue: 9h ord. · Vie: 8h · Sáb ≤11:00: ord. · Dom: Extraordinarias.'],
+    [],
+    ['FECHA', 'N° PERSONAS', 'INICIO (hh:mm)', 'SALIDA (hh:mm)', 'HORAS ACTIVAS', 'HORAS NO ACTIVAS', 'HORAS ORDINARIAS', 'HORAS EXTRAORD.', 'TOTAL HORAS DÍA', 'CAUSA DE JORNADA', 'ESTADO DE JORNADA']
+  ];
+
+  reportesFiltrados.forEach(function (r) {
+    var h = calcHoras(r);
+    rows.push([
+      formatFecha(r.fecha), r.frentes || 1, h.inicio, h.salida,
+      h.activas, h.noActivas, h.ordinarias, h.extra, h.total,
+      'Normal', 'Completa'
+    ]);
+  });
+
+  if (reportesFiltrados.length === 0) {
+    rows.push(['Sin registros para el período y proyecto seleccionados.']);
+  }
+
+  rows.push([]);
+  rows.push(['• Formato de reloj 24 horas (hh:mm) para Inicio y Fin de Labores.']);
+  rows.push(['• Base de Jornada Ordinaria: Lun–Jue 9h · Vie 8h · Sáb 07:00–11:00 ordinarias · Dom 100% extraordinarias.']);
+  rows.push(['• Descuento automático de 1 hora para almuerzo en jornadas superiores a 5 horas (Lun–Vie).']);
+  rows.push(['• Formato centesimal/decimal: 30 min = 0.50 horas. Facilita multiplicación por costos unitarios de planilla.']);
+  rows.push(['• Fuente: Datos consolidados y validados a partir del registro fotográfico diario de las bitácoras de campo.']);
+  rows.push(['• Para mayor detalle sobre rendimiento y gestión de tiempos, consultar al Supervisor de Campo.']);
+
+  var ws = XLSX.utils.aoa_to_sheet(rows);
+
+  // Anchos de columna
+  ws['!cols'] = [
+    {wch:14},{wch:12},{wch:13},{wch:13},{wch:13},
+    {wch:15},{wch:16},{wch:15},{wch:14},{wch:22},{wch:20}
+  ];
+
+  XLSX.utils.book_append_sheet(wb, ws, 'Reporte de Horas');
+
+  var nombreArchivo = 'ReporteHoras_' + proyecto + '_' +
+    formatFecha(desde).replace(/-/g,'') + '_' +
+    formatFecha(hasta).replace(/-/g,'') + '.xlsx';
+
+  XLSX.writeFile(wb, nombreArchivo);
+}
+
+/* ── MODAL ADMIN ─────────────────────────────────────────────────────────────── */
+function abrirModalAdmin() {
+  document.getElementById('modal-admin').classList.add('open');
+}
+
+function verificarAdminPw() {
+  var pw = document.getElementById('admin-pw').value;
+  if (CNKAuth.checkAdminPw(pw)) {
+    document.getElementById('admin-lock-form').style.display = 'none';
+    document.getElementById('admin-open').style.display = 'block';
+    document.getElementById('admin-pw-err').textContent = '';
+  } else {
+    document.getElementById('admin-pw-err').textContent = 'Contraseña incorrecta';
+    document.getElementById('admin-pw').value = '';
+  }
+}
+
+function setModo(modo) {
+  document.getElementById('btn-modo-crear').className = 'modal-modo-btn' + (modo === 'crear' ? ' on' : '');
+  document.getElementById('btn-modo-editar').className = 'modal-modo-btn' + (modo === 'editar' ? ' on' : '');
+  document.getElementById('form-crear').className = 'modal-form' + (modo === 'crear' ? ' open' : '');
+  document.getElementById('form-editar').className = 'modal-form' + (modo === 'editar' ? ' open' : '');
+}
+
+function guardarProyecto() {
+  var codigo = document.getElementById('np-codigo').value.trim();
+  var nombre = document.getElementById('np-nombre').value.trim();
+  if (!codigo || !nombre) {
+    document.getElementById('form-crear-ok').textContent = '⚠️ Completa código y nombre.';
+    document.getElementById('form-crear-ok').style.color = 'var(--rojo)';
+    return;
+  }
+  document.getElementById('form-crear-ok').style.color = 'var(--verde)';
+  document.getElementById('form-crear-ok').textContent = '✓ Proyecto guardado (pendiente de backend para persistir en Sheets)';
+}
+
+function resetModalAdmin() {
+  document.getElementById('admin-lock-form').style.display = 'block';
+  document.getElementById('admin-open').style.display = 'none';
+  document.getElementById('admin-pw').value = '';
+  document.getElementById('admin-pw-err').textContent = '';
+  document.getElementById('form-crear-ok').textContent = '';
+}
+
+function cerrarModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+<!-- CNKAuth inline -->
+(function (global) {
+  'use strict';
+
+  // ── CONFIGURACIÓN GOOGLE OAUTH ──
+  var GOOGLE_CLIENT_ID = '1059326059950-p9pb6pktta8hbdmjpe30en23pe3go5lk.apps.googleusercontent.com';
+
+  // ── TABLA EMAIL → ROL ──
+  // TEMPORAL: vive aquí mientras se construye el endpoint de Apps Script
+  // que la leerá desde la hoja "Configuración". Ver roadmap del proyecto.
+  // ⚠️ Estos emails quedan públicos al subir este archivo al repo de
+  // GitHub (igual que ya ocurría con las contraseñas). Mantener la
+  // lista solo con personal autorizado real.
+  var CNK_USUARIOS = {
+    'fernandosinaycnk@gmail.com': { rol: 'admin', label: 'Administrador', nivel: 4, nombre: 'Fernando Sinay' }
+    // Agregar aquí más personas conforme se sumen como test users en
+    // Google Cloud Console, ej:
+    // 'tecnico.juan@gmail.com': { rol: 'tecnico', label: 'Técnico de campo', nivel: 1, nombre: 'Juan Pérez' },
+  };
+
+  // Contraseña única del candado "Administración" dentro de bitácoras
+  // (independiente del login por Google — protege catálogo/personal)
+  var ADMIN_PANEL_PW_DEFAULT = 'CNK2026';
+
+  var SESSION_KEY   = 'cnk_session';
+  var ADMIN_PW_KEY  = 'cnk_admin_panel_pw';
+  var SESSION_HOURS = 12; // expira sesión tras 12h de inactividad
+
+  // ── HELPERS INTERNOS ──
+  function safeGet(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  }
+  function safeSet(key, val) {
+    try { localStorage.setItem(key, val); return true; } catch (e) { return false; }
+  }
+  function safeRemove(key) {
+    try { localStorage.removeItem(key); } catch (e) {}
+  }
+  function getAdminPanelPw() {
+    return safeGet(ADMIN_PW_KEY) || ADMIN_PANEL_PW_DEFAULT;
+  }
+
+  function decodeJWT(token) {
+    try {
+      var base64Url = token.split('.')[1];
+      var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      var jsonPayload = decodeURIComponent(
+        atob(base64).split('').map(function (c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join('')
+      );
+      return JSON.parse(jsonPayload);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function resolverRol(email) {
+    var def = CNK_USUARIOS[(email || '').toLowerCase()];
+    return def || null;
+  }
+
+  // ── SESIÓN ──
+  function cnkGetSession() {
+    var raw = safeGet(SESSION_KEY);
+    if (!raw) return null;
+    var session;
+    try { session = JSON.parse(raw); } catch (e) { return null; }
+    if (!session || !session.ts) return null;
+
+    var ageHours = (Date.now() - session.ts) / 36e5;
+    if (ageHours > SESSION_HOURS) {
+      safeRemove(SESSION_KEY);
+      return null;
+    }
+    return session;
+  }
+
+  function cnkTouchSession() {
+    var session = cnkGetSession();
+    if (!session) return;
+    session.ts = Date.now();
+    safeSet(SESSION_KEY, JSON.stringify(session));
+  }
+
+  function cnkLogout() {
+    safeRemove(SESSION_KEY);
+    if (global.google && global.google.accounts && global.google.accounts.id) {
+      global.google.accounts.id.disableAutoSelect();
+    }
+  }
+
+  function cnkRequireAuth(rolesPermitidos, onOk) {
+    var session = cnkGetSession();
+    if (!session) {
+      global.location.href = 'login.html';
+      return null;
+    }
+    if (rolesPermitidos && rolesPermitidos.length &&
+        rolesPermitidos.indexOf(session.rol) === -1) {
+      global.location.href = 'index.html?error=acceso_denegado';
+      return null;
+    }
+    cnkTouchSession();
+    if (onOk) onOk(session);
+    return session;
+  }
+
+  // ── GOOGLE SIGN-IN ──
+  var _onLoginSuccess = null;
+  var _onLoginError = null;
+
+  function handleGoogleCredential(response) {
+    var payload = decodeJWT(response.credential);
+    if (!payload || !payload.email) {
+      if (_onLoginError) _onLoginError('No se pudo leer la respuesta de Google.');
+      return;
+    }
+    if (!payload.email_verified) {
+      if (_onLoginError) _onLoginError('El correo de Google no está verificado.');
+      return;
+    }
+
+    var def = resolverRol(payload.email);
+    if (!def) {
+      if (_onLoginError) _onLoginError(
+        'Tu cuenta (' + payload.email + ') inició sesión con Google correctamente, ' +
+        'pero no tiene un rol asignado en CNK Central ERP. Contacta al administrador.'
+      );
+      return;
+    }
+
+    var session = {
+      email: payload.email,
+      nombre: def.nombre || payload.name || payload.email,
+      rol: def.rol,
+      label: def.label,
+      nivel: def.nivel,
+      ts: Date.now()
+    };
+    safeSet(SESSION_KEY, JSON.stringify(session));
+    if (_onLoginSuccess) _onLoginSuccess(session);
+  }
+
+  function cnkInitGoogleSignIn(onSuccess, onError) {
+    _onLoginSuccess = onSuccess || null;
+    _onLoginError = onError || null;
+
+    if (!global.google || !global.google.accounts || !global.google.accounts.id) {
+      if (_onLoginError) _onLoginError('El SDK de Google no cargó. Verifica tu conexión a internet.');
+      return false;
+    }
+
+    global.google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: handleGoogleCredential,
+      auto_select: false
+    });
+    return true;
+  }
+
+  function cnkRenderGoogleButton(container, options) {
+    var el = typeof container === 'string' ? document.getElementById(container) : container;
+    if (!el || !global.google || !global.google.accounts || !global.google.accounts.id) return false;
+
+    global.google.accounts.id.renderButton(el, Object.assign({
+      type: 'standard',
+      theme: 'outline',
+      size: 'large',
+      text: 'signin_with',
+      shape: 'rectangular',
+      locale: 'es'
+    }, options || {}));
+    return true;
+  }
+
+  // ── CANDADO ADMIN DE PANEL (dentro de bitácoras) ──
+  function cnkCheckAdminPw(password) {
+    return password === getAdminPanelPw();
+  }
+  function cnkChangeAdminPw(nueva) {
+    if (!nueva || nueva.length < 4) return false;
+    return safeSet(ADMIN_PW_KEY, nueva);
+  }
+
+  // ── EXPORTAR API PÚBLICA ──
+  global.CNKAuth = {
+    initGoogleSignIn: cnkInitGoogleSignIn,
+    renderGoogleButton: cnkRenderGoogleButton,
+    logout: cnkLogout,
+    getSession: cnkGetSession,
+    touchSession: cnkTouchSession,
+    requireAuth: cnkRequireAuth,
+    checkAdminPw: cnkCheckAdminPw,
+    changeAdminPw: cnkChangeAdminPw,
+    _resolverRol: resolverRol
+  };
+
+})(window);
+
+/* ── ARRANQUE AUTH ────────────────────────────────────────────────────────────── */
+window.addEventListener('load', function () {
+  CNKAuth.requireAuth(['admin', 'gerencia', 'costos'], function (sesion) {
+    sesionActual = sesion;
+    document.body.classList.remove('cnk-auth-pending');
+
+    // Topbar dinámico
+    document.getElementById('topbar-nombre').textContent = sesion.nombre;
+    document.getElementById('topbar-rol').textContent    = sesion.label;
+    document.getElementById('topbar-avatar').textContent =
+      sesion.nombre.split(' ').map(function (n) { return n[0]; }).join('').slice(0, 2).toUpperCase();
+
+    // Visibilidad por rol
+    document.querySelectorAll('[data-roles]').forEach(function (el) {
+      var roles = el.getAttribute('data-roles').split(',');
+      if (roles.indexOf(sesion.rol) !== -1) el.classList.add('visible');
+    });
+
+    // Recalcular tabla ahora que sabemos el rol (para mostrar/ocultar botones admin)
+    aplicarFiltros();
+  });
+});
+
+</script>
+
+</body>
+</html>
