@@ -12,9 +12,9 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --negro:       #111111;
-      --negro-medio: #1a1a1a;
-      --negro-claro: #252525;
+      --negro:        #0B2545;
+      --negro-medio:  #0d2d56;
+      --negro-claro:  #112e52;
       --amarillo:    #F5A623;
       --amarillo-bg: rgba(245,166,35,.10);
       --amarillo-bd: rgba(245,166,35,.30);
@@ -35,7 +35,7 @@
 
     /* ── TOPBAR ── */
     .topbar {
-      background: var(--negro);
+      background: var(--azul);
       padding: 12px 32px;
       display: flex;
       align-items: center;
@@ -383,37 +383,36 @@
 
     /* ── VERIFICACIÓN DE SESIÓN ── */
     body.cnk-auth-pending #cnk-app { display: none; }
-.auth-gate {
-  position: fixed; inset: 0; background: var(--negro);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 9999; flex-direction: column; gap: 16px;
-}
-body:not(.cnk-auth-pending) .auth-gate { display: none; }
-.auth-gate .gate-logo {
-  width: 56px; height: 56px; background: var(--amarillo); border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 800; font-size: 18px; color: var(--negro); margin-bottom: 8px;
-}
-.auth-gate p { color: #aaa; font-family: 'Inter', sans-serif; font-size: 13px; }
-.auth-gate .gate-title { color: #fff; font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; }
-.auth-spinner {
-  width: 24px; height: 24px; border: 3px solid #333;
-  border-top-color: var(--amarillo); border-radius: 50%;
-  animation: spin .7s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+    .auth-gate {
+      position: fixed; inset: 0; z-index: 999;
+      background: var(--negro);
+      display: none;
+      align-items: center; justify-content: center;
+      flex-direction: column; gap: 12px;
+    }
+    body.cnk-auth-pending .auth-gate { display: flex; }
+    .auth-gate .spinner {
+      width: 22px; height: 22px;
+      border: 3px solid rgba(255,255,255,.15);
+      border-top-color: var(--amarillo);
+      border-radius: 50%;
+      animation: cnkspin .7s linear infinite;
+    }
+    .auth-gate span { color: var(--texto-claro); font-size: 12px; }
+    @keyframes cnkspin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) {
+      .auth-gate .spinner { animation: none; border-top-color: var(--amarillo); }
+    }
   </style>
 </head>
 <body class="cnk-auth-pending">
 
-<!-- ── AUTH GATE ───────────────────────────────────────────────────────────── -->
-<div class="auth-gate">
-  <div class="gate-logo">CNK</div>
-  <p class="gate-title">CNK Señalización Vial</p>
-  <div class="auth-spinner"></div>
-  <p>Verificando acceso...</p>
-</div>
-    <span>Verificando sesión…</span>
+  <!-- VERIFICACIÓN DE SESIÓN -->
+  <div class="auth-gate">
+    <div class="gate-logo">CNK</div>
+    <p class="gate-title">CNK Señalización Vial</p>
+    <div class="auth-spinner"></div>
+    <p>Verificando acceso...</p>
   </div>
 
   <div id="cnk-app">
