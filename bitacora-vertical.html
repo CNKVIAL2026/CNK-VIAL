@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -32,9 +33,24 @@ body { font-family:'Inter',sans-serif; background:var(--gris); color:var(--azul)
 .brand-name { color:var(--blanco); font-size:14px; font-weight:700; }
 .brand-name span { color:var(--amarillo); }
 .brand-sub { color:var(--opaco); font-size:8px; letter-spacing:.9px; text-transform:uppercase; margin-top:2px; }
-.topbar-right { display:flex; align-items:center; gap:14px; }
+.topbar-right { display:flex; align-items:center; gap:16px; }
 .pais { color:var(--opaco); font-size:10px; }
-.avatar { width:28px; height:28px; border-radius:50%; background:var(--amarillo); display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:800; color:var(--azul); }
+.avatar { width:28px; height:28px; border-radius:50%; background:var(--amarillo); display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:800; color:var(--azul); flex-shrink:0; }
+.user-block { display:flex; align-items:center; gap:10px; }
+.user-info { text-align:right; line-height:1.3; }
+.user-name { color:var(--blanco); font-size:11px; font-weight:600; max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.user-rol { color:var(--opaco); font-size:9px; text-transform:uppercase; letter-spacing:.4px; }
+.btn-logout { background:none; border:1px solid rgba(255,255,255,.15); color:var(--claro); font-family:'Inter',sans-serif; font-size:10px; font-weight:600; cursor:pointer; padding:6px 12px; border-radius:6px; transition:background .15s, color .15s, border-color .15s; }
+.btn-logout:hover { background:rgba(255,255,255,.06); color:var(--blanco); border-color:rgba(255,255,255,.3); }
+
+/* VERIFICACIÓN DE SESIÓN */
+body.cnk-auth-pending #cnk-app { display:none; }
+.auth-gate { position:fixed; inset:0; z-index:999; background:var(--azul); display:none; align-items:center; justify-content:center; flex-direction:column; gap:12px; }
+body.cnk-auth-pending .auth-gate { display:flex; }
+.auth-gate .ag-spinner { width:22px; height:22px; border:3px solid rgba(255,255,255,.15); border-top-color:var(--amarillo); border-radius:50%; animation:cnkspin .7s linear infinite; }
+.auth-gate span { color:var(--claro); font-size:12px; }
+@keyframes cnkspin { to { transform:rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .auth-gate .ag-spinner { animation:none; border-top-color:var(--amarillo); } }
 
 /* MEGAMENÚ */
 .megamenu { background:var(--azul2); border-bottom:2px solid var(--amarillo); padding:0 28px; display:flex; overflow-x:auto; }
@@ -169,7 +185,15 @@ textarea { resize:vertical; min-height:60px; }
 .footer span { color:var(--amarillo); font-size:9px; font-weight:600; }
 </style>
 </head>
-<body>
+<body class="cnk-auth-pending">
+
+<!-- VERIFICACIÓN DE SESIÓN -->
+<div class="auth-gate">
+  <div class="ag-spinner"></div>
+  <span>Verificando sesión…</span>
+</div>
+
+<div id="cnk-app">
 
 <!-- TOPBAR -->
 <header class="topbar">
@@ -182,25 +206,33 @@ textarea { resize:vertical; min-height:60px; }
   </div>
   <div class="topbar-right">
     <span class="pais">🇬🇹 Guatemala</span>
-    <div class="avatar">GT</div>
+    <div class="user-block">
+      <div class="avatar" id="cnk-avatar">·</div>
+      <div class="user-info">
+        <div class="user-name" id="cnk-user-name">—</div>
+        <div class="user-rol" id="cnk-user-rol">—</div>
+      </div>
+      <button class="btn-logout" id="cnk-logout-btn">Salir</button>
+    </div>
   </div>
 </header>
 
 <!-- MEGAMENÚ -->
 <nav class="megamenu">
-  <a href="https://cnkvial2026.github.io/CNK-VIAL/index.html"           class="mm-item">🏠 Inicio</a>
-  <a href="https://cnkvial2026.github.io/CNK-VIAL/fichas-tecnicas.html" class="mm-item">📐 Fichas Técnicas</a>
-  <a href="https://cnkvial2026.github.io/CNK-VIAL/apu.html"             class="mm-item">💰 APU</a>
-  <a href="https://cnkvial2026.github.io/CNK-VIAL/formularios.html"     class="mm-item active">📋 Formularios</a>
-  <a href="https://cnkvial2026.github.io/CNK-VIAL/dashboard.html"       class="mm-item">📊 Dashboard</a>
+  <a href="https://cnkvial2026.github.io/CNK-VIAL/index.html"           class="mm-item" data-roles="admin,gerencia,costos,tecnico">🏠 Inicio</a>
+  <a href="https://cnkvial2026.github.io/CNK-VIAL/fichas-tecnicas.html" class="mm-item" data-roles="admin,gerencia,costos,tecnico">📐 Fichas Técnicas</a>
+  <a href="https://cnkvial2026.github.io/CNK-VIAL/apu.html"             class="mm-item" data-roles="admin,gerencia,costos">💰 APU</a>
+  <a href="https://cnkvial2026.github.io/CNK-VIAL/bitacora-horizontal.html"     class="mm-item active" data-roles="admin,gerencia,tecnico">📋 Formularios</a>
+  <a href="https://cnkvial2026.github.io/CNK-VIAL/dashboard.html"       class="mm-item" data-roles="admin,gerencia,costos,tecnico">📊 Dashboard</a>
 </nav>
+
 
 <!-- HERO -->
 <div class="hero-sm">
   <div class="breadcrumb">
     <a href="https://cnkvial2026.github.io/CNK-VIAL/index.html">Inicio</a>
     <span class="sep">›</span>
-    <a href="https://cnkvial2026.github.io/CNK-VIAL/formularios.html">Formularios</a>
+    <a href="https://cnkvial2026.github.io/CNK-VIAL/bitacora-horizontal.html">Formularios</a>
     <span class="sep">›</span>
     <span class="cur">Bitácora Vertical</span>
   </div>
@@ -354,6 +386,8 @@ textarea { resize:vertical; min-height:60px; }
   <p>© 2026 CNK Señalización Vial — Todos los derechos reservados</p>
   <span>Guatemala · Operaciones &amp; Costos · v2.1</span>
 </footer>
+
+</div><!-- /#cnk-app -->
 
 <script>
 var WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwX5R0XrMt0dVr3kjERyFzi8JTXdvS2nvEP5rmLoP3YKD64sImBUin8K8VVHmBk7Ys/exec';
@@ -975,6 +1009,59 @@ document.addEventListener('change', function(e){
   if(e.target.id==='r-proyecto'||e.target.id==='r-fecha') actualizarDrivePaths();
   if(['r-proyecto','r-nombre','r-fecha'].includes(e.target.id)) updateBar();
 });
+</script>
+
+<!--
+  auth.js — módulo centralizado de autenticación (Google Sign-In).
+  En desarrollo, usar la URL "raw" (sin caché) en vez de jsDelivr:
+  https://raw.githubusercontent.com/CNKVIAL2026/CNK-VIAL/main/auth.js
+-->
+<script src="https://cdn.jsdelivr.net/gh/CNKVIAL2026/CNK-VIAL@main/auth.js"></script>
+
+<script>
+(function () {
+  function iniciales(nombre) {
+    if (!nombre) return '?';
+    var partes = nombre.trim().split(/\s+/);
+    var ini = partes[0].charAt(0);
+    if (partes.length > 1) ini += partes[partes.length - 1].charAt(0);
+    return ini.toUpperCase();
+  }
+
+  function aplicarVisibilidadPorRol(rol) {
+    document.querySelectorAll('[data-roles]').forEach(function (el) {
+      var permitidos = el.getAttribute('data-roles').split(',');
+      el.style.display = permitidos.indexOf(rol) === -1 ? 'none' : '';
+    });
+  }
+
+  function pintarUsuario(session) {
+    document.getElementById('cnk-avatar').textContent = iniciales(session.nombre);
+    document.getElementById('cnk-user-name').textContent = session.nombre;
+    document.getElementById('cnk-user-rol').textContent = session.label;
+  }
+
+  function initAuthGate() {
+    if (typeof CNKAuth === 'undefined') {
+      window.location.href = 'login.html';
+      return;
+    }
+
+    var session = CNKAuth.requireAuth(['admin', 'gerencia', 'tecnico']);
+    if (!session) return;
+
+    pintarUsuario(session);
+    aplicarVisibilidadPorRol(session.rol);
+    document.body.classList.remove('cnk-auth-pending');
+
+    document.getElementById('cnk-logout-btn').addEventListener('click', function () {
+      CNKAuth.logout();
+      window.location.href = 'login.html';
+    });
+  }
+
+  window.addEventListener('load', initAuthGate);
+})();
 </script>
 </body>
 </html>
