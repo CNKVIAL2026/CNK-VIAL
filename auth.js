@@ -12,7 +12,7 @@
 
    ── ESTADO DEL PROYECTO OAuth (Google Cloud) ──
    Proyecto:      CNK-Central
-   Client ID:     1059326059950-p9pb6kttta8hbdmjpe30en23pe3go5lk.apps.googleusercontent.com
+   Client ID:     1059326059950-p9pb6pktta8hbdmjpe30en23pe3go5lk.apps.googleusercontent.com
    Origen autorizado: https://cnkvial2026.github.io
    Pantalla de consentimiento: Externo / modo Testing
    Usuarios de prueba autorizados: fernandosinaycnk@gmail.com (admin)
