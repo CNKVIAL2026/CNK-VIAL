@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -131,122 +132,42 @@
     }
     .login-box-header p { font-size: 12px; color: #778899; line-height: 1.6; }
 
-    /* ── FORMULARIO ── */
-    .form-group { margin-bottom: 20px; }
-    .form-group label {
-      display: block; font-size: 11px; font-weight: 600;
-      color: var(--azul); margin-bottom: 7px; letter-spacing: .2px;
+    /* ── INICIO DE SESIÓN CON GOOGLE ── */
+    #google-btn-wrap {
+      display: flex; justify-content: center;
+      min-height: 44px; margin-bottom: 6px;
     }
-    .input-wrap { position: relative; }
-    .input-icon {
-      position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
-      font-size: 15px; pointer-events: none; opacity: .5;
+    .gsi-loading {
+      display: flex; align-items: center; justify-content: center; gap: 9px;
+      padding: 12px; width: 100%;
+      border: 1.5px solid var(--gris-bd); border-radius: 8px;
+      font-size: 12.5px; color: #889;
     }
-    .form-group input {
-      width: 100%;
-      padding: 11px 14px 11px 40px;
-      border: 1.5px solid var(--gris-bd);
-      border-radius: 8px;
-      font-size: 13px; font-family: 'Inter', sans-serif;
-      color: var(--azul); background: var(--gris-bg);
-      transition: border-color .2s, background .2s, box-shadow .2s;
-      outline: none;
-    }
-    .form-group input:focus {
-      border-color: var(--azul);
-      background: var(--blanco);
-      box-shadow: 0 0 0 3px rgba(11,37,69,.08);
-    }
-    .form-group input.error {
-      border-color: var(--error);
-      background: var(--error-bg);
-    }
-
-    .pass-toggle {
-      position: absolute; right: 13px; top: 50%; transform: translateY(-50%);
-      background: none; border: none; cursor: pointer;
-      font-size: 15px; opacity: .4; transition: opacity .2s; padding: 0;
-    }
-    .pass-toggle:hover { opacity: .8; }
-
-    .form-options {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 24px;
-    }
-    .remember { display: flex; align-items: center; gap: 7px; cursor: pointer; }
-    .remember input[type="checkbox"] {
-      width: 15px; height: 15px; accent-color: var(--azul);
-      border-radius: 3px; cursor: pointer;
-      padding: 0;
-    }
-    .remember span { font-size: 11px; color: #667788; }
-    .forgot {
-      font-size: 11px; color: var(--texto-opaco);
-      text-decoration: none; font-weight: 500;
-      transition: color .15s;
-    }
-    .forgot:hover { color: var(--azul); }
-
-    /* ── MENSAJE DE ERROR ── */
-    .error-msg {
-      display: none; align-items: center; gap: 8px;
-      background: var(--error-bg); border: 1px solid #F09595;
-      border-radius: 7px; padding: 10px 14px;
-      margin-bottom: 18px;
-    }
-    .error-msg.visible { display: flex; }
-    .error-msg span { font-size: 11px; color: #A32D2D; line-height: 1.5; }
-
-    /* ── BOTÓN LOGIN ── */
-    .btn-login {
-      width: 100%; padding: 13px;
-      background: var(--azul); color: var(--blanco);
-      border: none; border-radius: 8px;
-      font-size: 13px; font-weight: 700; font-family: 'Inter', sans-serif;
-      letter-spacing: .3px; cursor: pointer;
-      transition: background .2s, transform .15s;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-    }
-    .btn-login:hover { background: var(--azul-medio); }
-    .btn-login:active { transform: scale(.98); }
-    .btn-login.loading { opacity: .7; pointer-events: none; }
-
     .btn-loader {
       width: 14px; height: 14px;
-      border: 2px solid rgba(255,255,255,.3);
-      border-top-color: var(--blanco);
+      border: 2px solid var(--gris-bd);
+      border-top-color: var(--amarillo);
       border-radius: 50%;
       animation: spin .7s linear infinite;
-      display: none;
+      flex-shrink: 0;
     }
-    .btn-login.loading .btn-loader { display: block; }
-    .btn-login.loading .btn-text { opacity: .6; }
-
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── DIVISOR ── */
-    .divider {
-      display: flex; align-items: center; gap: 12px;
-      margin: 22px 0; color: #aabbcc; font-size: 10px;
-    }
-    .divider::before, .divider::after {
-      content: ''; flex: 1; height: 1px; background: var(--gris-bd);
+    @media (prefers-reduced-motion: reduce) {
+      .btn-loader { animation: none; border-top-color: var(--amarillo); }
     }
 
-    /* ── ACCESO RÁPIDO (roles demo) ── */
-    .roles-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .role-btn {
-      padding: 9px 10px;
-      border: 1px solid var(--gris-bd);
-      border-radius: 7px; background: var(--gris-bg);
-      cursor: pointer; text-align: left;
-      transition: border-color .15s, background .15s;
-      display: flex; align-items: center; gap: 8px;
+    /* ── MENSAJE DE ESTADO (éxito / error) ── */
+    .error-msg {
+      display: none; align-items: flex-start; gap: 8px;
+      border-radius: 7px; padding: 10px 14px;
+      margin-top: 16px; margin-bottom: 18px;
     }
-    .role-btn:hover { border-color: var(--amarillo); background: #fffbf5; }
-    .role-icon { font-size: 16px; flex-shrink: 0; }
-    .role-name { font-size: 10px; font-weight: 600; color: var(--azul); display: block; }
-    .role-desc { font-size: 9px; color: #889; display: block; margin-top: 1px; }
+    .error-msg.visible { display: flex; }
+    .error-msg.is-error { background: var(--error-bg); border: 1px solid #F09595; }
+    .error-msg.is-error span:last-child { color: #A32D2D; }
+    .error-msg.is-ok { background: #E1F5EE; border: 1px solid #5DCAA5; }
+    .error-msg.is-ok span:last-child { color: #085041; }
+    .error-msg span { font-size: 11px; line-height: 1.5; }
 
     /* ── FOOTER LOGIN ── */
     .login-footer {
@@ -348,81 +269,25 @@
         <div class="login-box-header">
           <div class="login-eyebrow">Acceso al sistema</div>
           <h2>Bienvenido de vuelta</h2>
-          <p>Ingresa tus credenciales para acceder al sistema de gestión CNK.</p>
+          <p>Inicia sesión con tu cuenta de Google autorizada para acceder al sistema de gestión CNK.</p>
         </div>
 
-        <!-- MENSAJE DE ERROR -->
+        <!-- BOTÓN GOOGLE SIGN-IN -->
+        <div id="google-btn-wrap">
+          <div class="gsi-loading" id="gsi-loading">
+            <div class="btn-loader"></div>
+            Cargando inicio de sesión de Google…
+          </div>
+        </div>
+
+        <!-- MENSAJE DE ESTADO -->
         <div class="error-msg" id="errorMsg">
           <span>⚠️</span>
-          <span>Usuario o contraseña incorrectos. Verifica tus datos e intenta de nuevo.</span>
-        </div>
-
-        <!-- FORMULARIO -->
-        <div class="form-group">
-          <label for="usuario">Usuario</label>
-          <div class="input-wrap">
-            <span class="input-icon">👤</span>
-            <input type="text" id="usuario" placeholder="tu.usuario@cnk.com" autocomplete="username" />
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="password">Contraseña</label>
-          <div class="input-wrap">
-            <span class="input-icon">🔒</span>
-            <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" />
-            <button class="pass-toggle" id="passToggle" type="button" aria-label="Mostrar contraseña" onclick="togglePass()">👁️</button>
-          </div>
-        </div>
-
-        <div class="form-options">
-          <label class="remember">
-            <input type="checkbox" id="remember" />
-            <span>Recordar sesión</span>
-          </label>
-          <a href="#" class="forgot">¿Olvidaste tu contraseña?</a>
-        </div>
-
-        <button class="btn-login" id="btnLogin" onclick="handleLogin()">
-          <div class="btn-loader" id="loader"></div>
-          <span class="btn-text">Ingresar al sistema</span>
-        </button>
-
-        <div class="divider">o acceso rápido por rol</div>
-
-        <div class="roles-grid">
-          <button class="role-btn" onclick="quickLogin('admin','admin123')">
-            <span class="role-icon">🛡️</span>
-            <div>
-              <span class="role-name">Administrador</span>
-              <span class="role-desc">Acceso completo</span>
-            </div>
-          </button>
-          <button class="role-btn" onclick="quickLogin('tecnico','tec123')">
-            <span class="role-icon">👷</span>
-            <div>
-              <span class="role-name">Técnico de campo</span>
-              <span class="role-desc">Formularios y fichas</span>
-            </div>
-          </button>
-          <button class="role-btn" onclick="quickLogin('costos','cos123')">
-            <span class="role-icon">💼</span>
-            <div>
-              <span class="role-name">Costos y APU</span>
-              <span class="role-desc">Precios unitarios</span>
-            </div>
-          </button>
-          <button class="role-btn" onclick="quickLogin('gerencia','ger123')">
-            <span class="role-icon">📊</span>
-            <div>
-              <span class="role-name">Gerencia</span>
-              <span class="role-desc">Dashboard ejecutivo</span>
-            </div>
-          </button>
+          <span id="errorMsgText">Usuario o contraseña incorrectos. Verifica tus datos e intenta de nuevo.</span>
         </div>
 
         <div class="login-footer">
-          ¿Necesitas acceso? <a href="mailto:admin@cnk.com">Contacta al administrador</a>
+          ¿Tu correo no tiene acceso? <a href="mailto:admin@cnk.com">Contacta al administrador</a>
           <br><br>
           CNK Señalización Vial · <a href="#">Política de privacidad</a>
         </div>
@@ -432,79 +297,76 @@
 
   </div>
 
+  <!--
+    auth.js — módulo centralizado de autenticación (Google Sign-In).
+    En desarrollo, usar la URL "raw" (sin caché) en vez de jsDelivr:
+    https://raw.githubusercontent.com/CNKVIAL2026/CNK-VIAL/main/auth.js
+    jsDelivr cachea ~12h; cambiar a esa URL solo cuando el archivo esté
+    estable y ya no se edite con frecuencia.
+  -->
+  <script src="https://cdn.jsdelivr.net/gh/CNKVIAL2026/CNK-VIAL@main/auth.js"></script>
+
   <script>
-    /* ── CREDENCIALES DE DEMO ── */
-    const USERS = {
-      'admin':   { pass: 'admin123', rol: 'Administrador',    redirect: 'https://cnkvial2026.github.io/CNK-VIAL/index.html' },
-      'tecnico': { pass: 'tec123',   rol: 'Técnico de campo', redirect: 'https://cnkvial2026.github.io/CNK-VIAL/index.html' },
-      'costos':  { pass: 'cos123',   rol: 'Costos y APU',     redirect: 'https://cnkvial2026.github.io/CNK-VIAL/index.html' },
-      'gerencia':{ pass: 'ger123',   rol: 'Gerencia',         redirect: 'https://cnkvial2026.github.io/CNK-VIAL/index.html' },
-    };
+    var REDIRECT_URL = 'https://cnkvial2026.github.io/CNK-VIAL/index.html';
 
-    function togglePass() {
-      const inp = document.getElementById('password');
-      const btn = document.getElementById('passToggle');
-      if (inp.type === 'password') {
-        inp.type = 'text'; btn.textContent = '🙈';
-      } else {
-        inp.type = 'password'; btn.textContent = '👁️';
+    function showStatus(kind, message) {
+      var box = document.getElementById('errorMsg');
+      var text = document.getElementById('errorMsgText');
+      box.classList.remove('is-error', 'is-ok');
+      box.classList.add('visible', kind === 'ok' ? 'is-ok' : 'is-error');
+      text.textContent = message;
+    }
+
+    function clearStatus() {
+      var box = document.getElementById('errorMsg');
+      box.classList.remove('visible', 'is-error', 'is-ok');
+    }
+
+    function redirectAfterLogin() {
+      var params = new URLSearchParams(window.location.search);
+      var next = params.get('next');
+      window.location.href = next || REDIRECT_URL;
+    }
+
+    function onGoogleLoginSuccess(session) {
+      clearStatus();
+      showStatus('ok', '✓ Bienvenido, ' + session.nombre + ' (' + session.label + '). Redirigiendo…');
+      setTimeout(redirectAfterLogin, 900);
+    }
+
+    function onGoogleLoginError(message) {
+      showStatus('error', message);
+    }
+
+    function initLogin() {
+      var loadingEl = document.getElementById('gsi-loading');
+
+      if (typeof CNKAuth === 'undefined') {
+        showStatus('error', 'No se pudo cargar el módulo de autenticación. Verifica tu conexión e intenta de nuevo.');
+        if (loadingEl) loadingEl.style.display = 'none';
+        return;
       }
+
+      // Si ya hay sesión activa válida, saltar directo (evita re-login innecesario)
+      var existing = CNKAuth.getSession();
+      if (existing) {
+        redirectAfterLogin();
+        return;
+      }
+
+      var ok = CNKAuth.initGoogleSignIn(onGoogleLoginSuccess, onGoogleLoginError);
+      if (!ok) {
+        showStatus('error', 'El servicio de Google aún no está disponible. Espera unos segundos y recarga la página.');
+        return;
+      }
+
+      if (loadingEl) loadingEl.style.display = 'none';
+      CNKAuth.renderGoogleButton('google-btn-wrap', { width: 312 });
     }
 
-    function showError() {
-      document.getElementById('errorMsg').classList.add('visible');
-      document.getElementById('usuario').classList.add('error');
-      document.getElementById('password').classList.add('error');
-    }
-
-    function clearError() {
-      document.getElementById('errorMsg').classList.remove('visible');
-      document.getElementById('usuario').classList.remove('error');
-      document.getElementById('password').classList.remove('error');
-    }
-
-    function setLoading(on) {
-      const btn = document.getElementById('btnLogin');
-      btn.classList.toggle('loading', on);
-    }
-
-    function handleLogin() {
-      clearError();
-      const user = document.getElementById('usuario').value.trim().toLowerCase();
-      const pass = document.getElementById('password').value;
-
-      if (!user || !pass) { showError(); return; }
-
-      setLoading(true);
-      setTimeout(() => {
-        const found = Object.entries(USERS).find(([u, d]) =>
-          (user === u || user === u + '@cnk.com') && pass === d.pass
-        );
-        if (found) {
-          window.location.href = found[1].redirect;
-        } else {
-          setLoading(false);
-          showError();
-        }
-      }, 900);
-    }
-
-    function quickLogin(user, pass) {
-      document.getElementById('usuario').value = user;
-      document.getElementById('password').value = pass;
-      clearError();
-      handleLogin();
-    }
-
-    /* Enter para hacer login */
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Enter') handleLogin();
-    });
-
-    /* Limpiar error al escribir */
-    ['usuario','password'].forEach(id => {
-      document.getElementById(id).addEventListener('input', clearError);
-    });
+    // El SDK de Google y auth.js cargan con async/defer; esperamos a
+    // window.onload para asegurar que ambos estén listos.
+    window.addEventListener('load', initLogin);
   </script>
 
 </body>
