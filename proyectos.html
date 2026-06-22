@@ -370,7 +370,7 @@ tbody tr:last-child td { border-bottom: none; }
         </div>
         <div class="user-avatar" id="topbar-avatar">?</div>
       </div>
-      <button class="btn-logout" onclick="CNKAuth.logout(); window.location.href='login.html';">Salir</button>
+      <button class="btn-logout" onclick="CNKAuth.logout()">Salir</button>
     </div>
   </header>
 
@@ -920,8 +920,8 @@ function descargarReporte(id) {
 }
 
 function editarReporte(id, tipo) {
-  var destinos = { HOR: 'formularios.html', VER: 'bitacora-vertical.html', DIS: 'bitacora-dispositivos.html' };
-  var dest = destinos[tipo] || 'formularios.html';
+  var destinos = { HOR: 'bitacora-horizontal.html', VER: 'bitacora-vertical.html', DIS: 'bitacora-dispositivos.html' };
+  var dest = destinos[tipo] || 'bitacora-horizontal.html';
   // Guardar en localStorage para que el formulario lo detecte
   localStorage.setItem('cnk_editar_id', id);
   // Por ahora aviso que es pendiente de backend
@@ -1084,7 +1084,7 @@ function abrirModalAdmin() {
 
 function verificarAdminPw() {
   var pw = document.getElementById('admin-pw').value;
-  if (CNKAuth.checkAdminPw(pw)) {
+  if (pw === ADMIN_PW) {
     document.getElementById('admin-lock-form').style.display = 'none';
     document.getElementById('admin-open').style.display = 'block';
     document.getElementById('admin-pw-err').textContent = '';
@@ -1125,7 +1125,10 @@ function cerrarModal(id) {
   document.getElementById(id).classList.remove('open');
 }
 
+</script>
+
 <!-- CNKAuth inline -->
+<script>
 (function (global) {
   'use strict';
 
@@ -1167,6 +1170,10 @@ function cerrarModal(id) {
     return safeGet(ADMIN_PW_KEY) || ADMIN_PANEL_PW_DEFAULT;
   }
 
+  /**
+   * Decodifica un JWT sin verificar firma (ver nota de seguridad arriba).
+   * @returns {object|null} payload decodificado o null si es inválido
+   */
   function decodeJWT(token) {
     try {
       var base64Url = token.split('.')[1];
@@ -1182,6 +1189,11 @@ function cerrarModal(id) {
     }
   }
 
+  /**
+   * Busca el rol asignado a un email en la tabla local.
+   * (Punto de extensión: reemplazar por fetch a Apps Script cuando
+   * exista el endpoint de Sheets — la firma de la función no cambia.)
+   */
   function resolverRol(email) {
     var def = CNK_USUARIOS[(email || '').toLowerCase()];
     return def || null;
@@ -1217,7 +1229,7 @@ function cerrarModal(id) {
     }
   }
 
-  function cnkRequireAuth(rolesPermitidos, onOk) {
+  function cnkRequireAuth(rolesPermitidos) {
     var session = cnkGetSession();
     if (!session) {
       global.location.href = 'login.html';
@@ -1229,7 +1241,6 @@ function cerrarModal(id) {
       return null;
     }
     cnkTouchSession();
-    if (onOk) onOk(session);
     return session;
   }
 
@@ -1237,6 +1248,10 @@ function cerrarModal(id) {
   var _onLoginSuccess = null;
   var _onLoginError = null;
 
+  /**
+   * Callback invocado automáticamente por el SDK de Google tras el login.
+   * Recibe { credential: <JWT> }.
+   */
   function handleGoogleCredential(response) {
     var payload = decodeJWT(response.credential);
     if (!payload || !payload.email) {
@@ -1269,6 +1284,13 @@ function cerrarModal(id) {
     if (_onLoginSuccess) _onLoginSuccess(session);
   }
 
+  /**
+   * Inicializa el SDK de Google Identity Services.
+   * Llamar una vez que el script de Google (accounts.google.com/gsi/client)
+   * ya esté cargado en la página (usar window.onload o defer).
+   * @param {function} onSuccess - recibe la sesión creada
+   * @param {function} onError - recibe un mensaje de error legible
+   */
   function cnkInitGoogleSignIn(onSuccess, onError) {
     _onLoginSuccess = onSuccess || null;
     _onLoginError = onError || null;
@@ -1286,6 +1308,11 @@ function cerrarModal(id) {
     return true;
   }
 
+  /**
+   * Dibuja el botón oficial "Sign in with Google" dentro del elemento dado.
+   * @param {string|HTMLElement} container - id del elemento o el elemento mismo
+   * @param {object} [options] - opciones de estilo del botón de Google
+   */
   function cnkRenderGoogleButton(container, options) {
     var el = typeof container === 'string' ? document.getElementById(container) : container;
     if (!el || !global.google || !global.google.accounts || !global.google.accounts.id) return false;
@@ -1320,34 +1347,36 @@ function cerrarModal(id) {
     requireAuth: cnkRequireAuth,
     checkAdminPw: cnkCheckAdminPw,
     changeAdminPw: cnkChangeAdminPw,
-    _resolverRol: resolverRol
+    _resolverRol: resolverRol // expuesto solo para pruebas/debug
   };
 
 })(window);
 
-/* ── ARRANQUE AUTH ────────────────────────────────────────────────────────────── */
+</script>
+
+<script>
 window.addEventListener('load', function () {
-  CNKAuth.requireAuth(['admin', 'gerencia', 'costos'], function (sesion) {
-    sesionActual = sesion;
-    document.body.classList.remove('cnk-auth-pending');
+  var sesion = CNKAuth.requireAuth(['admin', 'gerencia', 'costos']);
+  if (!sesion) return; // requireAuth ya redirigió a login.html
 
-    // Topbar dinámico
-    document.getElementById('topbar-nombre').textContent = sesion.nombre;
-    document.getElementById('topbar-rol').textContent    = sesion.label;
-    document.getElementById('topbar-avatar').textContent =
-      sesion.nombre.split(' ').map(function (n) { return n[0]; }).join('').slice(0, 2).toUpperCase();
+  sesionActual = sesion;
+  document.body.classList.remove('cnk-auth-pending');
 
-    // Visibilidad por rol
-    document.querySelectorAll('[data-roles]').forEach(function (el) {
-      var roles = el.getAttribute('data-roles').split(',');
-      if (roles.indexOf(sesion.rol) !== -1) el.classList.add('visible');
-    });
+  // Topbar dinámico
+  document.getElementById('topbar-nombre').textContent = sesion.nombre;
+  document.getElementById('topbar-rol').textContent    = sesion.label;
+  document.getElementById('topbar-avatar').textContent =
+    sesion.nombre.split(' ').map(function (n) { return n[0]; }).join('').slice(0, 2).toUpperCase();
 
-    // Recalcular tabla ahora que sabemos el rol (para mostrar/ocultar botones admin)
-    aplicarFiltros();
+  // Visibilidad por rol
+  document.querySelectorAll('[data-roles]').forEach(function (el) {
+    var roles = el.getAttribute('data-roles').split(',');
+    if (roles.indexOf(sesion.rol) !== -1) el.classList.add('visible');
   });
-});
 
+  // Recalcular tabla ahora que sabemos el rol
+  aplicarFiltros();
+});
 </script>
 
 </body>
