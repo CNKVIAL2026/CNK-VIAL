@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reportes — CNK Señalización Vial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Google Sign-In -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+/* ── RESET & VARIABLES ─────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --negro:       #111111;
+  --negro-medio: #1a1a1a;
+  --amarillo:    #F5A623;
+  --amarillo-bg: rgba(245,166,35,.10);
+  --amarillo-bd: rgba(245,166,35,.30);
+  --texto-claro: #a8c0d8;
+  --texto-opaco: #5a7a99;
+  --blanco:      #ffffff;
+  --gris-bg:     #f4f6f9;
+  --gris-bd:     #dde3ea;
+  --verde:       #1d9e75;
+  --azul-link:   #378add;
+  --rojo:        #c0392b;
+  --morado:      #7c5cdb;
+  --hor:         #378add;
+  --ver:         #F5A623;
+  --dis:         #7c5cdb;
+}
+
+/* ── AUTH GATE ─────────────────────────────────────────────────────────────── */
+body.cnk-auth-pending #cnk-app { display: none; }
+.auth-gate {
+  position: fixed; inset: 0; background: var(--negro);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999; flex-direction: column; gap: 16px;
+}
+body:not(.cnk-auth-pending) .auth-gate { display: none; }
+.auth-gate .gate-logo {
+  width: 56px; height: 56px; background: var(--amarillo); border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 18px; color: var(--negro); margin-bottom: 8px;
+}
+.auth-gate p { color: #aaa; font-family: 'Inter', sans-serif; font-size: 13px; }
+.auth-gate .gate-title { color: #fff; font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; }
+.auth-spinner {
+  width: 24px; height: 24px; border: 3px solid #333;
+  border-top-color: var(--amarillo); border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── BASE ───────────────────────────────────────────────────────────────────── */
+body { font-family: 'Inter', sans-serif; background: var(--gris-bg); color: var(--negro); min-height: 100vh; }
+
+/* ── TOPBAR ─────────────────────────────────────────────────────────────────── */
+.topbar {
+  background: var(--negro); padding: 10px 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,.4);
+}
+.logo-area { display: flex; align-items: center; gap: 12px; }
+.logo-box {
+  width: 36px; height: 36px; background: var(--amarillo); border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 12px; color: var(--negro);
+}
+.brand-name { color: var(--blanco); font-size: 14px; font-weight: 700; }
+.brand-name span { color: var(--amarillo); }
+.brand-sub { color: var(--texto-opaco); font-size: 8px; letter-spacing: .9px; text-transform: uppercase; margin-top: 2px; }
+.topbar-right { display: flex; align-items: center; gap: 14px; }
+.user-block { display: flex; align-items: center; gap: 8px; }
+.user-info { text-align: right; }
+.user-name { color: var(--blanco); font-size: 11px; font-weight: 600; }
+.user-role { color: var(--texto-opaco); font-size: 9px; }
+.user-avatar {
+  width: 28px; height: 28px; border-radius: 50%; background: var(--amarillo);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 800; color: var(--negro);
+}
+.btn-logout {
+  font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600;
+  background: none; border: 1px solid #333; border-radius: 6px;
+  padding: 5px 10px; cursor: pointer; color: #aaa;
+}
+.btn-logout:hover { border-color: var(--rojo); color: var(--rojo); }
+
+/* ── MEGAMENÚ ───────────────────────────────────────────────────────────────── */
+.megamenu {
+  background: var(--negro-medio); border-bottom: 2px solid var(--amarillo);
+  padding: 0 28px; display: flex; overflow-x: auto;
+}
+.megamenu::-webkit-scrollbar { height: 0; }
+.mm-item {
+  padding: 9px 16px; color: var(--texto-claro); font-size: 11px; font-weight: 500;
+  cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px;
+  white-space: nowrap; display: none; align-items: center; gap: 5px;
+  text-decoration: none; transition: color .15s;
+}
+.mm-item.visible { display: flex; }
+.mm-item:hover { color: var(--blanco); }
+.mm-item.active { color: var(--amarillo); border-bottom: 2px solid var(--amarillo); background: var(--amarillo-bg); }
+
+/* ── HERO ───────────────────────────────────────────────────────────────────── */
+.hero-sm {
+  background: var(--negro); padding: 18px 28px 22px;
+  border-bottom: 3px solid var(--amarillo);
+}
+.breadcrumb { font-size: 9px; color: var(--texto-opaco); margin-bottom: 8px; }
+.breadcrumb a { color: var(--texto-opaco); text-decoration: none; }
+.breadcrumb a:hover { color: var(--amarillo); }
+.breadcrumb .sep { margin: 0 5px; }
+.breadcrumb .cur { color: var(--amarillo); }
+.hero-sm h1 { color: var(--blanco); font-size: 18px; font-weight: 800; }
+.hero-sm h1 em { color: var(--amarillo); font-style: normal; }
+.hero-sm p { color: var(--texto-claro); font-size: 11px; margin-top: 5px; }
+
+/* ── WRAP ───────────────────────────────────────────────────────────────────── */
+.wrap { padding: 28px 28px 48px; max-width: 960px; margin: 0 auto; }
+
+/* ── SECCIÓN LABEL ──────────────────────────────────────────────────────────── */
+.sec-label {
+  font-size: 11px; font-weight: 700; color: var(--texto-opaco);
+  text-transform: uppercase; letter-spacing: .7px; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.sec-label .line { flex: 1; height: 1px; background: var(--gris-bd); }
+
+/* ── GRID DE TARJETAS ───────────────────────────────────────────────────────── */
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 32px; }
+@media(max-width: 700px) { .grid { grid-template-columns: 1fr 1fr; } }
+@media(max-width: 480px) { .grid { grid-template-columns: 1fr; } }
+
+/* ── TARJETA ────────────────────────────────────────────────────────────────── */
+.card {
+  background: var(--blanco); border: 1px solid var(--gris-bd);
+  border-radius: 14px; padding: 20px 18px;
+  display: flex; flex-direction: column; gap: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+  transition: border-color .15s, box-shadow .15s, transform .12s;
+}
+.card.live { cursor: pointer; }
+.card.live:hover {
+  border-color: var(--negro);
+  box-shadow: 0 6px 18px rgba(17,17,17,.10);
+  transform: translateY(-2px);
+}
+.card.restricted {
+  opacity: .45; cursor: not-allowed; pointer-events: none;
+}
+.card.soon { opacity: .55; }
+
+.card-icon { font-size: 28px; line-height: 1; }
+.card-title { font-size: 14px; font-weight: 800; color: var(--negro); }
+.card-desc { font-size: 11.5px; color: #889; line-height: 1.6; flex: 1; }
+
+.card-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 2px; }
+.card-tag {
+  display: inline-flex; align-self: flex-start;
+  font-size: 9.5px; font-weight: 700;
+  padding: 3px 10px; border-radius: 14px; letter-spacing: .3px;
+}
+.tag-live { background: #e1f5ee; color: #085041; }
+.tag-soon { background: var(--amarillo-bg); color: #854F0B; border: 1px solid var(--amarillo-bd); }
+.tag-restricted { background: #f0f0f0; color: #999; }
+
+.card-arrow {
+  font-size: 16px; color: var(--texto-opaco);
+  transition: transform .15s, color .15s;
+}
+.card.live:hover .card-arrow { transform: translateX(4px); color: var(--negro); }
+
+/* Badge de tipo en tarjeta */
+.card-badge {
+  display: inline-block; font-size: 9px; font-weight: 700;
+  padding: 2px 7px; border-radius: 8px; margin-bottom: 2px;
+}
+.badge-hor { background: #e8f4fd; color: #0c447c; }
+.badge-ver { background: var(--amarillo-bg); color: #854F0B; }
+.badge-dis { background: #ede8fd; color: #3c3489; }
+
+/* Acento de color en el borde superior de tarjetas live */
+.card-hor { border-top: 3px solid var(--hor); }
+.card-ver { border-top: 3px solid var(--ver); }
+.card-dis { border-top: 3px solid var(--dis); }
+
+/* ── AVISO DE ROL ────────────────────────────────────────────────────────────── */
+.rol-notice {
+  background: var(--amarillo-bg); border: 1px solid var(--amarillo-bd);
+  border-radius: 10px; padding: 12px 16px; margin-bottom: 24px;
+  font-size: 12px; color: #854F0B; display: none; align-items: center; gap: 8px;
+}
+.rol-notice.visible { display: flex; }
+
+/* ── FOOTER ─────────────────────────────────────────────────────────────────── */
+.footer {
+  background: var(--negro); padding: 12px 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 8px; margin-top: 8px;
+}
+.footer p { color: var(--texto-opaco); font-size: 9px; }
+.footer span { color: var(--amarillo); font-size: 9px; font-weight: 600; }
+</style>
+</head>
+
+<body class="cnk-auth-pending">
+
+<!-- ── AUTH GATE ─────────────────────────────────────────────────────────── -->
+<div class="auth-gate">
+  <div class="gate-logo">CNK</div>
+  <p class="gate-title">CNK Señalización Vial</p>
+  <div class="auth-spinner"></div>
+  <p>Verificando acceso...</p>
+</div>
+
+<!-- ── APP ───────────────────────────────────────────────────────────────── -->
+<div id="cnk-app">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="logo-area">
+      <div class="logo-box">CNK</div>
+      <div>
+        <div class="brand-name"><span>CNK</span> Señalización Vial</div>
+        <div class="brand-sub">Sistema de Gestión de Proyectos</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="user-block">
+        <div class="user-info">
+          <div class="user-name" id="topbar-nombre">—</div>
+          <div class="user-role"  id="topbar-rol">—</div>
+        </div>
+        <div class="user-avatar" id="topbar-avatar">?</div>
+      </div>
+      <button class="btn-logout" onclick="CNKAuth.logout()">Salir</button>
+    </div>
+  </header>
+
+  <!-- MEGAMENÚ -->
+  <nav class="megamenu">
+    <a href="index.html"              class="mm-item" data-roles="admin,gerencia,costos,tecnico">🏠 Inicio</a>
+    <a href="reportes.html"           class="mm-item active" data-roles="admin,gerencia,costos,tecnico">📋 Reportes</a>
+    <a href="proyectos.html"          class="mm-item" data-roles="admin,gerencia,costos">📁 Proyectos</a>
+    <a href="gantt.html"              class="mm-item" data-roles="admin,gerencia,costos">📊 Gantt</a>
+    <a href="fichas-tecnicas.html"    class="mm-item" data-roles="admin,gerencia,costos,tecnico">📐 Fichas Técnicas</a>
+    <a href="apu.html"                class="mm-item" data-roles="admin,gerencia,costos">💰 APU</a>
+    <a href="dashboard.html"          class="mm-item" data-roles="admin,gerencia,costos">📈 Dashboard</a>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero-sm">
+    <div class="breadcrumb">
+      <a href="index.html">Inicio</a><span class="sep">›</span>
+      <span class="cur">Reportes</span>
+    </div>
+    <h1>Reportes de <em>Campo</em></h1>
+    <p>Bitácoras diarias y formularios de inspección y producción en sitio.</p>
+  </div>
+
+  <div class="wrap">
+
+    <!-- Aviso para rol costos -->
+    <div class="rol-notice" id="aviso-costos">
+      ℹ️ Tu rol (<strong>Costos</strong>) tiene acceso de solo lectura a los proyectos. Las bitácoras de campo son accesibles únicamente para roles técnicos, gerencia y administración.
+    </div>
+
+    <!-- SECCIÓN: BITÁCORAS -->
+    <div class="sec-label">Bitácoras de campo <span class="line"></span></div>
+    <div class="grid">
+
+      <!-- Bitácora Horizontal -->
+      <div class="card live card-hor" id="card-hor" data-roles="admin,gerencia,tecnico"
+           onclick="irA('bitacora-horizontal.html', 'HOR')">
+        <div class="card-icon">🛣️</div>
+        <span class="card-badge badge-hor">HOR</span>
+        <div class="card-title">Bitácora Horizontal</div>
+        <div class="card-desc">Registro de producción diaria: pintura, premarcado, dispositivos sobre pavimento y marcas viales.</div>
+        <div class="card-footer">
+          <span class="card-tag tag-live">Disponible</span>
+          <span class="card-arrow">→</span>
+        </div>
+      </div>
+
+      <!-- Bitácora Vertical -->
+      <div class="card live card-ver" id="card-ver" data-roles="admin,gerencia,tecnico"
+           onclick="irA('bitacora-vertical.html', 'VER')">
+        <div class="card-icon">🚧</div>
+        <span class="card-badge badge-ver">VER</span>
+        <div class="card-title">Bitácora Vertical</div>
+        <div class="card-desc">Instalación de señales reglamentarias, preventivas e informativas según SIECA 2014.</div>
+        <div class="card-footer">
+          <span class="card-tag tag-live">Disponible</span>
+          <span class="card-arrow">→</span>
+        </div>
+      </div>
+
+      <!-- Bitácora Dispositivos -->
+      <div class="card live card-dis" id="card-dis" data-roles="admin,gerencia,tecnico"
+           onclick="irA('bitacora-dispositivos.html', 'DIS')">
+        <div class="card-icon">🔶</div>
+        <span class="card-badge badge-dis">DIS</span>
+        <div class="card-title">Bitácora Dispositivos</div>
+        <div class="card-desc">Sistemas de contención: flexible, semirrígido, rígido y deformable.</div>
+        <div class="card-footer">
+          <span class="card-tag tag-live">Disponible</span>
+          <span class="card-arrow">→</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SECCIÓN: OTROS REPORTES -->
+    <div class="sec-label">Otros reportes <span class="line"></span></div>
+    <div class="grid">
+
+      <div class="card soon">
+        <div class="card-icon">📦</div>
+        <div class="card-title">Resumen de Producción</div>
+        <div class="card-desc">Consolidado diario de avance por proyecto, frente y tipo de actividad.</div>
+        <div class="card-footer">
+          <span class="card-tag tag-soon">Próximamente</span>
+        </div>
+      </div>
+
+      <div class="card soon">
+        <div class="card-icon">🚜</div>
+        <div class="card-title">Reporte de Maquinaria</div>
+        <div class="card-desc">Uso, horas de operación y mantenimiento de equipo en campo.</div>
+        <div class="card-footer">
+          <span class="card-tag tag-soon">Próximamente</span>
+        </div>
+      </div>
+
+      <div class="card soon">
+        <div class="card-icon">🔍</div>
+        <div class="card-title">Inspección de Señales</div>
+        <div class="card-desc">Estado físico, nivel de reflectividad y recomendaciones de mantenimiento.</div>
+        <div class="card-footer">
+          <span class="card-tag tag-soon">Próximamente</span>
+        </div>
+      </div>
+
+      <div class="card soon">
+        <div class="card-icon">📋</div>
+        <div class="card-title">Levantamiento de Inventario</div>
+        <div class="card-desc">Conteo y georreferenciación de señales existentes en campo.</div>
+        <div class="card-footer">
+          <span class="card-tag tag-soon">Próximamente</span>
+        </div>
+      </div>
+
+      <div class="card soon">
+        <div class="card-icon">⚠️</div>
+        <div class="card-title">Reporte de Daños</div>
+        <div class="card-desc">Registro fotográfico de señales dañadas o vandalizadas. Genera PDF para trámites.</div>
+        <div class="card-footer">
+          <span class="card-tag tag-soon">Próximamente</span>
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- /wrap -->
+
+  <footer class="footer">
+    <p>© 2026 CNK Señalización Vial — Todos los derechos reservados</p>
+    <span>Guatemala · Operaciones &amp; Costos · v2.0</span>
+  </footer>
+
+</div><!-- /cnk-app -->
+
+<script>
+/* ── NAVEGACIÓN CON CONTEXTO ──────────────────────────────────────────────── */
+function irA(destino, tipo) {
+  // Guardar tipo de bitácora para que el formulario lo preseleccione
+  try { localStorage.setItem('cnk_tipo_activo', tipo); } catch(e) {}
+  window.location.href = destino;
+}
+
+</script>
+
+<!-- CNKAuth inline -->
+<script>
+(function (global) {
+  'use strict';
+
+  // ── CONFIGURACIÓN GOOGLE OAUTH ──
+  var GOOGLE_CLIENT_ID = '1059326059950-p9pb6pktta8hbdmjpe30en23pe3go5lk.apps.googleusercontent.com';
+
+  // ── TABLA EMAIL → ROL ──
+  // TEMPORAL: vive aquí mientras se construye el endpoint de Apps Script
+  // que la leerá desde la hoja "Configuración". Ver roadmap del proyecto.
+  // ⚠️ Estos emails quedan públicos al subir este archivo al repo de
+  // GitHub (igual que ya ocurría con las contraseñas). Mantener la
+  // lista solo con personal autorizado real.
+  var CNK_USUARIOS = {
+    'fernandosinaycnk@gmail.com': { rol: 'admin', label: 'Administrador', nivel: 4, nombre: 'Fernando Sinay' }
+    // Agregar aquí más personas conforme se sumen como test users en
+    // Google Cloud Console, ej:
+    // 'tecnico.juan@gmail.com': { rol: 'tecnico', label: 'Técnico de campo', nivel: 1, nombre: 'Juan Pérez' },
+  };
+
+  // Contraseña única del candado "Administración" dentro de bitácoras
+  // (independiente del login por Google — protege catálogo/personal)
+  var ADMIN_PANEL_PW_DEFAULT = 'CNK2026';
+
+  var SESSION_KEY   = 'cnk_session';
+  var ADMIN_PW_KEY  = 'cnk_admin_panel_pw';
+  var SESSION_HOURS = 12; // expira sesión tras 12h de inactividad
+
+  // ── HELPERS INTERNOS ──
+  function safeGet(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  }
+  function safeSet(key, val) {
+    try { localStorage.setItem(key, val); return true; } catch (e) { return false; }
+  }
+  function safeRemove(key) {
+    try { localStorage.removeItem(key); } catch (e) {}
+  }
+  function getAdminPanelPw() {
+    return safeGet(ADMIN_PW_KEY) || ADMIN_PANEL_PW_DEFAULT;
+  }
+
+  /**
+   * Decodifica un JWT sin verificar firma (ver nota de seguridad arriba).
+   * @returns {object|null} payload decodificado o null si es inválido
+   */
+  function decodeJWT(token) {
+    try {
+      var base64Url = token.split('.')[1];
+      var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      var jsonPayload = decodeURIComponent(
+        atob(base64).split('').map(function (c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join('')
+      );
+      return JSON.parse(jsonPayload);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /**
+   * Busca el rol asignado a un email en la tabla local.
+   * (Punto de extensión: reemplazar por fetch a Apps Script cuando
+   * exista el endpoint de Sheets — la firma de la función no cambia.)
+   */
+  function resolverRol(email) {
+    var def = CNK_USUARIOS[(email || '').toLowerCase()];
+    return def || null;
+  }
+
+  // ── SESIÓN ──
+  function cnkGetSession() {
+    var raw = safeGet(SESSION_KEY);
+    if (!raw) return null;
+    var session;
+    try { session = JSON.parse(raw); } catch (e) { return null; }
+    if (!session || !session.ts) return null;
+
+    var ageHours = (Date.now() - session.ts) / 36e5;
+    if (ageHours > SESSION_HOURS) {
+      safeRemove(SESSION_KEY);
+      return null;
+    }
+    return session;
+  }
+
+  function cnkTouchSession() {
+    var session = cnkGetSession();
+    if (!session) return;
+    session.ts = Date.now();
+    safeSet(SESSION_KEY, JSON.stringify(session));
+  }
+
+  function cnkLogout() {
+    safeRemove(SESSION_KEY);
+    if (global.google && global.google.accounts && global.google.accounts.id) {
+      global.google.accounts.id.disableAutoSelect();
+    }
+  }
+
+  function cnkRequireAuth(rolesPermitidos) {
+    var session = cnkGetSession();
+    if (!session) {
+      global.location.href = 'login.html';
+      return null;
+    }
+    if (rolesPermitidos && rolesPermitidos.length &&
+        rolesPermitidos.indexOf(session.rol) === -1) {
+      global.location.href = 'index.html?error=acceso_denegado';
+      return null;
+    }
+    cnkTouchSession();
+    return session;
+  }
+
+  // ── GOOGLE SIGN-IN ──
+  var _onLoginSuccess = null;
+  var _onLoginError = null;
+
+  /**
+   * Callback invocado automáticamente por el SDK de Google tras el login.
+   * Recibe { credential: <JWT> }.
+   */
+  function handleGoogleCredential(response) {
+    var payload = decodeJWT(response.credential);
+    if (!payload || !payload.email) {
+      if (_onLoginError) _onLoginError('No se pudo leer la respuesta de Google.');
+      return;
+    }
+    if (!payload.email_verified) {
+      if (_onLoginError) _onLoginError('El correo de Google no está verificado.');
+      return;
+    }
+
+    var def = resolverRol(payload.email);
+    if (!def) {
+      if (_onLoginError) _onLoginError(
+        'Tu cuenta (' + payload.email + ') inició sesión con Google correctamente, ' +
+        'pero no tiene un rol asignado en CNK Central ERP. Contacta al administrador.'
+      );
+      return;
+    }
+
+    var session = {
+      email: payload.email,
+      nombre: def.nombre || payload.name || payload.email,
+      rol: def.rol,
+      label: def.label,
+      nivel: def.nivel,
+      ts: Date.now()
+    };
+    safeSet(SESSION_KEY, JSON.stringify(session));
+    if (_onLoginSuccess) _onLoginSuccess(session);
+  }
+
+  /**
+   * Inicializa el SDK de Google Identity Services.
+   * Llamar una vez que el script de Google (accounts.google.com/gsi/client)
+   * ya esté cargado en la página (usar window.onload o defer).
+   * @param {function} onSuccess - recibe la sesión creada
+   * @param {function} onError - recibe un mensaje de error legible
+   */
+  function cnkInitGoogleSignIn(onSuccess, onError) {
+    _onLoginSuccess = onSuccess || null;
+    _onLoginError = onError || null;
+
+    if (!global.google || !global.google.accounts || !global.google.accounts.id) {
+      if (_onLoginError) _onLoginError('El SDK de Google no cargó. Verifica tu conexión a internet.');
+      return false;
+    }
+
+    global.google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: handleGoogleCredential,
+      auto_select: false
+    });
+    return true;
+  }
+
+  /**
+   * Dibuja el botón oficial "Sign in with Google" dentro del elemento dado.
+   * @param {string|HTMLElement} container - id del elemento o el elemento mismo
+   * @param {object} [options] - opciones de estilo del botón de Google
+   */
+  function cnkRenderGoogleButton(container, options) {
+    var el = typeof container === 'string' ? document.getElementById(container) : container;
+    if (!el || !global.google || !global.google.accounts || !global.google.accounts.id) return false;
+
+    global.google.accounts.id.renderButton(el, Object.assign({
+      type: 'standard',
+      theme: 'outline',
+      size: 'large',
+      text: 'signin_with',
+      shape: 'rectangular',
+      locale: 'es'
+    }, options || {}));
+    return true;
+  }
+
+  // ── CANDADO ADMIN DE PANEL (dentro de bitácoras) ──
+  function cnkCheckAdminPw(password) {
+    return password === getAdminPanelPw();
+  }
+  function cnkChangeAdminPw(nueva) {
+    if (!nueva || nueva.length < 4) return false;
+    return safeSet(ADMIN_PW_KEY, nueva);
+  }
+
+  // ── EXPORTAR API PÚBLICA ──
+  global.CNKAuth = {
+    initGoogleSignIn: cnkInitGoogleSignIn,
+    renderGoogleButton: cnkRenderGoogleButton,
+    logout: cnkLogout,
+    getSession: cnkGetSession,
+    touchSession: cnkTouchSession,
+    requireAuth: cnkRequireAuth,
+    checkAdminPw: cnkCheckAdminPw,
+    changeAdminPw: cnkChangeAdminPw,
+    _resolverRol: resolverRol // expuesto solo para pruebas/debug
+  };
+
+})(window);
+
+</script>
+
+<script>
+/* ── AUTH ─────────────────────────────────────────────────────────────────── */
+window.addEventListener('load', function () {
+  var sesion = CNKAuth.requireAuth(['admin', 'gerencia', 'costos', 'tecnico']);
+  if (!sesion) return;
+
+  document.body.classList.remove('cnk-auth-pending');
+  document.getElementById('topbar-nombre').textContent = sesion.nombre;
+  document.getElementById('topbar-rol').textContent    = sesion.label;
+  document.getElementById('topbar-avatar').textContent =
+    sesion.nombre.split(' ').map(function(n){ return n[0]; }).join('').slice(0, 2).toUpperCase();
+
+  document.querySelectorAll('.megamenu .mm-item[data-roles]').forEach(function(el) {
+    var roles = el.getAttribute('data-roles').split(',');
+    if (roles.indexOf(sesion.rol) !== -1) el.classList.add('visible');
+  });
+
+  document.querySelectorAll('.card[data-roles]').forEach(function(card) {
+    var roles = card.getAttribute('data-roles').split(',');
+    if (roles.indexOf(sesion.rol) === -1) {
+      card.classList.remove('live');
+      card.classList.add('restricted');
+      card.removeAttribute('onclick');
+      var tag = card.querySelector('.card-tag');
+      if (tag) { tag.className = 'card-tag tag-restricted'; tag.textContent = 'Sin acceso'; }
+      var arrow = card.querySelector('.card-arrow');
+      if (arrow) arrow.style.display = 'none';
+    }
+  });
+
+  if (sesion.rol === 'costos') {
+    document.getElementById('aviso-costos').classList.add('visible');
+  }
+});
+</script>
+
+</body>
+</html>
