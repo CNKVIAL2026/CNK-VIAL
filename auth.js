@@ -36,7 +36,7 @@
   'use strict';
 
   // ── CONFIGURACIÓN GOOGLE OAUTH ──
-  var GOOGLE_CLIENT_ID = '1059326059950-p9pb6kttta8hbdmjpe30en23pe3go5lk.apps.googleusercontent.com';
+  var GOOGLE_CLIENT_ID = '1059326059950-p9pb6pktta8hbdmjpe30en23pe3go5lk.apps.googleusercontent.com';
 
   // ── TABLA EMAIL → ROL ──
   // TEMPORAL: vive aquí mientras se construye el endpoint de Apps Script
