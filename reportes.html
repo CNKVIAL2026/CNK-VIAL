@@ -91,28 +91,13 @@ body { font-family: 'Inter', sans-serif; background: var(--gris-bg); color: var(
 .btn-logout:hover { border-color: var(--rojo); color: var(--rojo); }
 
 /* ── MEGAMENÚ ───────────────────────────────────────────────────────────────── */
-.megamenu {
-  background: var(--negro-medio); border-bottom: 2px solid var(--amarillo);
-  padding: 0 28px; display: flex; overflow-x: auto;
-}
-.megamenu::-webkit-scrollbar { height: 0; }
-.mm-item {
-  padding: 9px 16px; color: var(--texto-claro); font-size: 11px; font-weight: 500;
-  cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px;
-  white-space: nowrap; display: none; align-items: center; gap: 5px;
-  text-decoration: none; transition: color .15s;
-}
-.mm-item.visible { display: flex; }
-.mm-item:hover { color: var(--blanco); }
-.mm-item.active { color: var(--amarillo); border-bottom: 2px solid var(--amarillo); background: var(--amarillo-bg); }
-
 .app-layout { display:flex; min-height:calc(100vh - 64px); }
 .megamenu-sidebar { width:240px; background:#0f1115; border-right:1px solid rgba(255,255,255,.08); display:flex; flex-direction:column; padding:20px 0; position:sticky; top:64px; height:calc(100vh - 64px); }
-.mm-item-sb { display:flex; align-items:center; gap:12px; color:#b9c4d0; text-decoration:none; padding:14px 24px; font-size:14px; font-weight:500; transition:.2s; }
-.mm-item-sb:hover { background:rgba(245,166,35,.08); color:#fff; }
-.mm-item-sb.active { background:rgba(245,166,35,.12); color:#F5A623; border-left:4px solid #F5A623; }
-.mm-icon-sb { width:20px; text-align:center; font-size:16px; }
-.mm-admin-sb { margin-top:auto; margin-left:16px; margin-right:16px; background:rgba(245,166,35,.12); border:1px solid rgba(245,166,35,.30); border-radius:8px; }
+.mm-item { display:flex; align-items:center; gap:12px; color:#b9c4d0; text-decoration:none; padding:14px 24px; font-size:14px; font-weight:500; transition:.2s; }
+.mm-item:hover { background:rgba(245,166,35,.08); color:#fff; }
+.mm-item.active { background:rgba(245,166,35,.12); color:#F5A623; border-left:4px solid #F5A623; }
+.mm-icon { width:20px; text-align:center; font-size:16px; }
+.mm-admin { margin-top:auto; margin-left:16px; margin-right:16px; background:rgba(245,166,35,.12); border:1px solid rgba(245,166,35,.30); border-radius:8px; }
 .main-content { flex:1; min-width:0; }
 
 /* ── HERO ───────────────────────────────────────────────────────────────────── */
@@ -637,7 +622,7 @@ window.addEventListener('load', function () {
   document.getElementById('topbar-avatar').textContent =
     sesion.nombre.split(' ').map(function(n){ return n[0]; }).join('').slice(0, 2).toUpperCase();
 
-  document.querySelectorAll('.megamenu .mm-item[data-roles]').forEach(function(el) {
+  document.querySelectorAll('[data-roles]').forEach(function(el) {
     var roles = el.getAttribute('data-roles').split(',');
     if (roles.indexOf(sesion.rol) !== -1) el.classList.add('visible');
   });
