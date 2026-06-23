@@ -341,51 +341,24 @@
 
     .biblioteca-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 14px;
-      margin-bottom: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px; margin-bottom: 16px;
     }
     .biblio-card {
-      background: var(--blanco);
-      border: 1px solid var(--gris-bd);
-      border-radius: 10px;
-      padding: 14px 16px;
+      background: var(--blanco); border: 1px solid var(--gris-bd);
+      border-radius: 10px; padding: 14px 16px;
       text-decoration: none; color: inherit;
       display: flex; flex-direction: column; gap: 10px;
-      transition: transform .18s, box-shadow .18s, border-color .18s;
-      cursor: pointer;
+      transition: border-color .18s; cursor: pointer;
     }
-    .biblio-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--sombra);
-      border-color: var(--amarillo);
+    .biblio-card:hover { border-color: var(--amarillo); }
+    .biblio-icon-wrap {
+      width: 34px; height: 34px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; font-size: 17px;
     }
-    .biblio-badge {
-      display: inline-block; align-self: flex-start;
-      font-size: 8px; font-weight: 800; letter-spacing: .7px;
-      padding: 2px 8px; border-radius: 4px;
-      text-transform: uppercase;
-    }
-    .biblio-body {
-      display: flex; align-items: flex-start; gap: 10px;
-    }
-    .biblio-thumb { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
-    .biblio-title {
-      font-size: 11px; font-weight: 700; color: var(--negro);
-      line-height: 1.45; margin-bottom: 4px;
-    }
-    .biblio-meta { font-size: 10px; color: #889; }
-    .biblio-footer {
-      display: flex; align-items: center; justify-content: space-between;
-      border-top: 1px solid var(--gris-bd); padding-top: 10px; margin-top: 2px;
-    }
-    .biblio-tag {
-      font-size: 9px; font-weight: 600; color: var(--texto-opaco);
-      background: var(--gris-bg); padding: 3px 8px; border-radius: 4px;
-    }
-    .biblio-open {
-      font-size: 10px; font-weight: 600; color: var(--amarillo);
-    }
+    .biblio-title { font-size: 12px; font-weight: 700; color: var(--negro); line-height: 1.4; margin-bottom: 3px; }
+    .biblio-meta { font-size: 10px; color: #889; line-height: 1.4; flex: 1; }
+    .biblio-link { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 5px; align-self: flex-start; margin-top: 2px; }
     .biblio-nota {
       display: flex; align-items: center; gap: 8px;
       font-size: 10px; color: var(--texto-opaco);
@@ -627,72 +600,33 @@
     </div>
 
     <div class="biblioteca-grid">
-
-      <a href="https://drive.google.com/file/d/1QfNEbK3xxONTL57Gvc5FpGnY6_PiqXvB/view?usp=drive_link" class="biblio-card" target="_blank" >
-        <div class="biblio-badge" style="background:#E6F1FB; color:#0C447C;">SIECA</div>
-        <div class="biblio-body">
-          <div class="biblio-thumb">📘</div>
-          <div>
-            <div class="biblio-title">Manual Centroamericano de Señalización Vial</div>
-            <div class="biblio-meta">SIECA · 2014 · Edición vigente</div>
-          </div>
-        </div>
-        <div class="biblio-footer">
-          <span class="biblio-tag">Señalización general</span>
-          <span class="biblio-open">📄 Ver documento</span>
-        </div>
+      <a href="https://drive.google.com/file/d/1QfNEbK3xxONTL57Gvc5FpGnY6_PiqXvB/view?usp=drive_link" class="biblio-card" target="_blank">
+        <div class="biblio-icon-wrap" style="background:#E6F1FB">📘</div>
+        <div class="biblio-title">Manual Centroamericano de Señalización Vial</div>
+        <div class="biblio-meta">SIECA · 2014 · Edición vigente</div>
+        <span class="biblio-link" style="background:#E6F1FB;color:#0C447C">Ver documento →</span>
       </a>
 
-      <a href="https://drive.google.com/file/d/1zopWTju30uo6JZ5i6z7_9B0u2oY-OAtd/view?usp=drive_link" class="biblio-card" target="_blank" >
-        <div class="biblio-badge" style="background:#EAF3DE; color:#3B6D11;">SIECA</div>
-        <div class="biblio-body">
-          <div class="biblio-thumb">📗</div>
-          <div>
-            <div class="biblio-title">Manual Centroamericano de Dispositivos Uniformes</div>
-            <div class="biblio-meta">SIECA · 2014 · Control del tránsito</div>
-          </div>
-        </div>
-        <div class="biblio-footer">
-          <span class="biblio-tag">Dispositivos preventivos</span>
-          <span class="biblio-open">📄 Ver documento</span>
-        </div>
+      <a href="https://drive.google.com/file/d/1zopWTju30uo6JZ5i6z7_9B0u2oY-OAtd/view?usp=drive_link" class="biblio-card" target="_blank">
+        <div class="biblio-icon-wrap" style="background:#EAF3DE">📗</div>
+        <div class="biblio-title">Manual Centroamericano de Dispositivos Uniformes</div>
+        <div class="biblio-meta">SIECA · 2014 · Control del tránsito</div>
+        <span class="biblio-link" style="background:#EAF3DE;color:#3B6D11">Ver documento →</span>
       </a>
 
-      <a href="https://drive.google.com/file/d/1Uz2C8ePjeg0epdY9wPTDnF_SXNG8IJh_/view?usp=drive_link" class="biblio-card" target="_blank" >
-        <div class="biblio-badge" style="background:#FEF3E2; color:#854F0B;">MINTRANS</div>
-        <div class="biblio-body">
-          <div class="biblio-thumb">📙</div>
-          <div>
-            <div class="biblio-title">Reglamento de Señalización Vial — Guatemala</div>
-            <div class="biblio-meta">Ministerio de Transportes · Vigente</div>
-          </div>
-        </div>
-        <div class="biblio-footer">
-          <span class="biblio-tag">Normativa nacional</span>
-          <span class="biblio-open">📄 Ver documento</span>
-        </div>
+      <a href="https://drive.google.com/file/d/1Uz2C8ePjeg0epdY9wPTDnF_SXNG8IJh_/view?usp=drive_link" class="biblio-card" target="_blank">
+        <div class="biblio-icon-wrap" style="background:#FEF3E2">📙</div>
+        <div class="biblio-title">Reglamento de Señalización Vial — Guatemala</div>
+        <div class="biblio-meta">Ministerio de Transportes · Vigente</div>
+        <span class="biblio-link" style="background:#FEF3E2;color:#854F0B">Ver documento →</span>
       </a>
 
-      <a href="https://drive.google.com/file/d/1IUjgcjxIJtBx_ZWGFuCk0v8sMnC1XtcA/view?usp=drive_link" class="biblio-card" target="_blank" >
-        <div class="biblio-badge" style="background:#F3EFFE; color:#3C3489;">OPS</div>
-        <div class="biblio-body">
-          <div class="biblio-thumb">📓</div>
-          <div>
-            <div class="biblio-title">Manual de Seguridad Vial para Zonas de Trabajo</div>
-            <div class="biblio-meta">OPS/OMS · Edición Latinoamérica</div>
-          </div>
-        </div>
-        <div class="biblio-footer">
-          <span class="biblio-tag">Seguridad en obra</span>
-          <span class="biblio-open">📄 Ver documento</span>
-        </div>
+      <a href="https://drive.google.com/file/d/1IUjgcjxIJtBx_ZWGFuCk0v8sMnC1XtcA/view?usp=drive_link" class="biblio-card" target="_blank">
+        <div class="biblio-icon-wrap" style="background:#F3EFFE">📓</div>
+        <div class="biblio-title">Manual de Seguridad Vial para Zonas de Trabajo</div>
+        <div class="biblio-meta">OPS/OMS · Edición Latinoamérica</div>
+        <span class="biblio-link" style="background:#F3EFFE;color:#3C3489">Ver documento →</span>
       </a>
-
-    </div>
-
-    <div class="biblio-nota">
-      <span>🔒</span>
-
     </div>
   </section>
 
