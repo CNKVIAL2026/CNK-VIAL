@@ -88,22 +88,51 @@ body { font-family: 'Inter', sans-serif; background: var(--gris-bg); color: var(
 }
 .btn-logout:hover { border-color: var(--rojo); color: var(--rojo); }
 
-/* ── MEGAMENÚ ───────────────────────────────────────────────────────────────── */
-.megamenu {
-  background: var(--negro-medio); border-bottom: 2px solid var(--amarillo);
-  padding: 0 28px; display: flex; overflow-x: auto;
+/* ── SIDEBAR ────────────────────────────────────────────────────────────────── */
+.app-layout { display: flex; min-height: calc(100vh - 56px); }
+.megamenu-sidebar {
+  width: 220px; background: #0f1115;
+  border-right: 1px solid rgba(255,255,255,.08);
+  display: flex; flex-direction: column;
+  padding: 16px 0; position: sticky; top: 56px;
+  height: calc(100vh - 56px); overflow-y: auto; flex-shrink: 0;
 }
-.megamenu::-webkit-scrollbar { height: 0; }
+.megamenu-sidebar::-webkit-scrollbar { width: 0; }
 .mm-item {
-  padding: 9px 16px; color: var(--texto-claro); font-size: 11px; font-weight: 500;
-  cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px;
-  white-space: nowrap; display: flex; align-items: center; gap: 5px;
-  text-decoration: none; transition: color .15s;
+  display: flex; align-items: center; gap: 12px;
+  color: #b9c4d0; text-decoration: none;
+  padding: 12px 20px; font-size: 13px; font-weight: 500;
+  transition: background .15s, color .15s;
+  border-left: 3px solid transparent;
 }
-.mm-item:hover { color: var(--blanco); }
-.mm-item.active { color: var(--amarillo); border-bottom: 2px solid var(--amarillo); background: var(--amarillo-bg); }
+.mm-item:hover { background: rgba(245,166,35,.08); color: #fff; }
+.mm-item.active {
+  background: rgba(245,166,35,.12); color: var(--amarillo);
+  border-left: 3px solid var(--amarillo);
+}
+.mm-icon { width: 20px; text-align: center; font-size: 15px; flex-shrink: 0; }
+.mm-divider { height: 1px; background: rgba(255,255,255,.06); margin: 8px 16px; }
+.mm-admin-item {
+  margin: auto 12px 0; background: rgba(245,166,35,.10);
+  border: 1px solid rgba(245,166,35,.25); border-radius: 8px;
+  display: flex; align-items: center; gap: 12px;
+  color: var(--amarillo); text-decoration: none;
+  padding: 10px 16px; font-size: 13px; font-weight: 600;
+  transition: background .15s;
+}
+.mm-admin-item:hover { background: rgba(245,166,35,.20); }
 .mm-item[data-roles] { display: none; }
 .mm-item[data-roles].visible { display: flex; }
+.mm-admin-item[data-roles] { display: none; }
+.mm-admin-item[data-roles].visible { display: flex; }
+.main-content { flex: 1; min-width: 0; }
+@media(max-width:700px){
+  .app-layout { flex-direction: column; }
+  .megamenu-sidebar { width: 100%; height: auto; position: static; flex-direction: row; flex-wrap: wrap; padding: 4px 8px; top: 0; }
+  .mm-item { padding: 8px 10px; font-size: 11px; }
+  .mm-admin-item { margin: 4px 8px; }
+  .mm-divider { display: none; }
+}
 
 /* ── HERO ───────────────────────────────────────────────────────────────────── */
 .hero-sm {
@@ -374,16 +403,23 @@ tbody tr:last-child td { border-bottom: none; }
     </div>
   </header>
 
-  <!-- MEGAMENÚ -->
-  <nav class="megamenu">
-    <a href="index.html" class="mm-item">🏠 Inicio</a>
-    <a href="reportes.html" class="mm-item" data-roles="admin,gerencia,costos,tecnico">📋 Reportes</a>
-    <a href="proyectos.html" class="mm-item active" data-roles="admin,gerencia,costos">📁 Proyectos</a>
-    <a href="gantt.html" class="mm-item" data-roles="admin,gerencia,costos">📊 Gantt</a>
-    <a href="fichas-tecnicas.html" class="mm-item" data-roles="admin,gerencia,costos,tecnico">📐 Fichas Técnicas</a>
-    <a href="apu.html" class="mm-item" data-roles="admin,gerencia,costos">💰 APU</a>
-    <a href="dashboard.html" class="mm-item" data-roles="admin,gerencia,costos">📈 Dashboard</a>
+  
+  <!-- SIDEBAR -->
+  <div class="app-layout">
+  <nav class="megamenu-sidebar">
+    <a href="index.html" class="mm-item" data-roles="admin,gerencia,costos,tecnico"><span class="mm-icon">🏠</span>Inicio</a>
+    <a href="proyectos.html" class="mm-item active" data-roles="admin,gerencia,costos"><span class="mm-icon">📁</span>Proyectos</a>
+    <a href="reportes.html" class="mm-item" data-roles="admin,gerencia,costos,tecnico"><span class="mm-icon">📋</span>Reportes</a>
+    <a href="fichas-tecnicas.html" class="mm-item" data-roles="admin,gerencia,costos,tecnico"><span class="mm-icon">📐</span>Fichas Técnicas</a>
+    <a href="apu.html" class="mm-item" data-roles="admin,gerencia,costos"><span class="mm-icon">💰</span>APU</a>
+    <a href="catalogo-materiales.html" class="mm-item" data-roles="admin,gerencia,costos,tecnico"><span class="mm-icon">📦</span>Catálogo de Materiales</a>
+    <a href="cotizaciones.html" class="mm-item" data-roles="admin,gerencia"><span class="mm-icon">💼</span>Cotizaciones</a>
+    <a href="gantt.html" class="mm-item" data-roles="admin,gerencia,costos"><span class="mm-icon">📊</span>Gantt</a>
+    <a href="dashboard.html" class="mm-item" data-roles="admin,gerencia,costos,tecnico"><span class="mm-icon">📈</span>Dashboard</a>
+    <div class="mm-divider"></div>
+    <a href="configuracion.html" class="mm-admin-item" data-roles="admin"><span class="mm-icon">⚙️</span>Administración</a>
   </nav>
+  <div class="main-content">
 
   <!-- HERO -->
   <div class="hero-sm">
@@ -920,8 +956,8 @@ function descargarReporte(id) {
 }
 
 function editarReporte(id, tipo) {
-  var destinos = { HOR: 'bitacora-horizontal.html', VER: 'bitacora-vertical.html', DIS: 'bitacora-dispositivos.html' };
-  var dest = destinos[tipo] || 'bitacora-horizontal.html';
+  var destinos = { HOR: 'formularios.html', VER: 'bitacora-vertical.html', DIS: 'bitacora-dispositivos.html' };
+  var dest = destinos[tipo] || 'formularios.html';
   // Guardar en localStorage para que el formulario lo detecte
   localStorage.setItem('cnk_editar_id', id);
   // Por ahora aviso que es pendiente de backend
@@ -1125,257 +1161,45 @@ function cerrarModal(id) {
   document.getElementById(id).classList.remove('open');
 }
 
-</script>
-
-<!-- CNKAuth inline -->
-<script>
-(function (global) {
-  'use strict';
-
-  // ── CONFIGURACIÓN GOOGLE OAUTH ──
-  var GOOGLE_CLIENT_ID = '1059326059950-p9pb6pktta8hbdmjpe30en23pe3go5lk.apps.googleusercontent.com';
-
-  // ── TABLA EMAIL → ROL ──
-  // TEMPORAL: vive aquí mientras se construye el endpoint de Apps Script
-  // que la leerá desde la hoja "Configuración". Ver roadmap del proyecto.
-  // ⚠️ Estos emails quedan públicos al subir este archivo al repo de
-  // GitHub (igual que ya ocurría con las contraseñas). Mantener la
-  // lista solo con personal autorizado real.
-  var CNK_USUARIOS = {
-    'fernandosinaycnk@gmail.com': { rol: 'admin', label: 'Administrador', nivel: 4, nombre: 'Fernando Sinay' }
-    // Agregar aquí más personas conforme se sumen como test users en
-    // Google Cloud Console, ej:
-    // 'tecnico.juan@gmail.com': { rol: 'tecnico', label: 'Técnico de campo', nivel: 1, nombre: 'Juan Pérez' },
-  };
-
-  // Contraseña única del candado "Administración" dentro de bitácoras
-  // (independiente del login por Google — protege catálogo/personal)
-  var ADMIN_PANEL_PW_DEFAULT = 'CNK2026';
-
-  var SESSION_KEY   = 'cnk_session';
-  var ADMIN_PW_KEY  = 'cnk_admin_panel_pw';
-  var SESSION_HOURS = 12; // expira sesión tras 12h de inactividad
-
-  // ── HELPERS INTERNOS ──
-  function safeGet(key) {
-    try { return localStorage.getItem(key); } catch (e) { return null; }
-  }
-  function safeSet(key, val) {
-    try { localStorage.setItem(key, val); return true; } catch (e) { return false; }
-  }
-  function safeRemove(key) {
-    try { localStorage.removeItem(key); } catch (e) {}
-  }
-  function getAdminPanelPw() {
-    return safeGet(ADMIN_PW_KEY) || ADMIN_PANEL_PW_DEFAULT;
-  }
-
-  /**
-   * Decodifica un JWT sin verificar firma (ver nota de seguridad arriba).
-   * @returns {object|null} payload decodificado o null si es inválido
-   */
-  function decodeJWT(token) {
-    try {
-      var base64Url = token.split('.')[1];
-      var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      var jsonPayload = decodeURIComponent(
-        atob(base64).split('').map(function (c) {
-          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join('')
-      );
-      return JSON.parse(jsonPayload);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  /**
-   * Busca el rol asignado a un email en la tabla local.
-   * (Punto de extensión: reemplazar por fetch a Apps Script cuando
-   * exista el endpoint de Sheets — la firma de la función no cambia.)
-   */
-  function resolverRol(email) {
-    var def = CNK_USUARIOS[(email || '').toLowerCase()];
-    return def || null;
-  }
-
-  // ── SESIÓN ──
-  function cnkGetSession() {
-    var raw = safeGet(SESSION_KEY);
-    if (!raw) return null;
-    var session;
-    try { session = JSON.parse(raw); } catch (e) { return null; }
-    if (!session || !session.ts) return null;
-
-    var ageHours = (Date.now() - session.ts) / 36e5;
-    if (ageHours > SESSION_HOURS) {
-      safeRemove(SESSION_KEY);
-      return null;
-    }
-    return session;
-  }
-
-  function cnkTouchSession() {
-    var session = cnkGetSession();
-    if (!session) return;
-    session.ts = Date.now();
-    safeSet(SESSION_KEY, JSON.stringify(session));
-  }
-
-  function cnkLogout() {
-    safeRemove(SESSION_KEY);
-    if (global.google && global.google.accounts && global.google.accounts.id) {
-      global.google.accounts.id.disableAutoSelect();
-    }
-  }
-
-  function cnkRequireAuth(rolesPermitidos) {
-    var session = cnkGetSession();
-    if (!session) {
-      global.location.href = 'login.html';
-      return null;
-    }
-    if (rolesPermitidos && rolesPermitidos.length &&
-        rolesPermitidos.indexOf(session.rol) === -1) {
-      global.location.href = 'index.html?error=acceso_denegado';
-      return null;
-    }
-    cnkTouchSession();
-    return session;
-  }
-
-  // ── GOOGLE SIGN-IN ──
-  var _onLoginSuccess = null;
-  var _onLoginError = null;
-
-  /**
-   * Callback invocado automáticamente por el SDK de Google tras el login.
-   * Recibe { credential: <JWT> }.
-   */
-  function handleGoogleCredential(response) {
-    var payload = decodeJWT(response.credential);
-    if (!payload || !payload.email) {
-      if (_onLoginError) _onLoginError('No se pudo leer la respuesta de Google.');
-      return;
-    }
-    if (!payload.email_verified) {
-      if (_onLoginError) _onLoginError('El correo de Google no está verificado.');
-      return;
-    }
-
-    var def = resolverRol(payload.email);
-    if (!def) {
-      if (_onLoginError) _onLoginError(
-        'Tu cuenta (' + payload.email + ') inició sesión con Google correctamente, ' +
-        'pero no tiene un rol asignado en CNK Central ERP. Contacta al administrador.'
-      );
-      return;
-    }
-
-    var session = {
-      email: payload.email,
-      nombre: def.nombre || payload.name || payload.email,
-      rol: def.rol,
-      label: def.label,
-      nivel: def.nivel,
-      ts: Date.now()
-    };
-    safeSet(SESSION_KEY, JSON.stringify(session));
-    if (_onLoginSuccess) _onLoginSuccess(session);
-  }
-
-  /**
-   * Inicializa el SDK de Google Identity Services.
-   * Llamar una vez que el script de Google (accounts.google.com/gsi/client)
-   * ya esté cargado en la página (usar window.onload o defer).
-   * @param {function} onSuccess - recibe la sesión creada
-   * @param {function} onError - recibe un mensaje de error legible
-   */
-  function cnkInitGoogleSignIn(onSuccess, onError) {
-    _onLoginSuccess = onSuccess || null;
-    _onLoginError = onError || null;
-
-    if (!global.google || !global.google.accounts || !global.google.accounts.id) {
-      if (_onLoginError) _onLoginError('El SDK de Google no cargó. Verifica tu conexión a internet.');
-      return false;
-    }
-
-    global.google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-      callback: handleGoogleCredential,
-      auto_select: false
-    });
-    return true;
-  }
-
-  /**
-   * Dibuja el botón oficial "Sign in with Google" dentro del elemento dado.
-   * @param {string|HTMLElement} container - id del elemento o el elemento mismo
-   * @param {object} [options] - opciones de estilo del botón de Google
-   */
-  function cnkRenderGoogleButton(container, options) {
-    var el = typeof container === 'string' ? document.getElementById(container) : container;
-    if (!el || !global.google || !global.google.accounts || !global.google.accounts.id) return false;
-
-    global.google.accounts.id.renderButton(el, Object.assign({
-      type: 'standard',
-      theme: 'outline',
-      size: 'large',
-      text: 'signin_with',
-      shape: 'rectangular',
-      locale: 'es'
-    }, options || {}));
-    return true;
-  }
-
-  // ── CANDADO ADMIN DE PANEL (dentro de bitácoras) ──
-  function cnkCheckAdminPw(password) {
-    return password === getAdminPanelPw();
-  }
-  function cnkChangeAdminPw(nueva) {
-    if (!nueva || nueva.length < 4) return false;
-    return safeSet(ADMIN_PW_KEY, nueva);
-  }
-
-  // ── EXPORTAR API PÚBLICA ──
-  global.CNKAuth = {
-    initGoogleSignIn: cnkInitGoogleSignIn,
-    renderGoogleButton: cnkRenderGoogleButton,
-    logout: cnkLogout,
-    getSession: cnkGetSession,
-    touchSession: cnkTouchSession,
-    requireAuth: cnkRequireAuth,
-    checkAdminPw: cnkCheckAdminPw,
-    changeAdminPw: cnkChangeAdminPw,
-    _resolverRol: resolverRol // expuesto solo para pruebas/debug
-  };
-
-})(window);
-
-</script>
-
-<script>
+/* ── AUTH ────────────────────────────────────────────────────────────────────── */
 window.addEventListener('load', function () {
-  var sesion = CNKAuth.requireAuth(['admin', 'gerencia', 'costos']);
-  if (!sesion) return; // requireAuth ya redirigió a login.html
+  var authJs = document.createElement('script');
+  authJs.src = 'https://raw.githubusercontent.com/CNKVIAL2026/CNK-VIAL/main/auth.js';
+  authJs.onload = function () {
+    CNKAuth.requireAuth(['admin', 'gerencia', 'costos'], function (sesion) {
+      sesionActual = sesion;
+      document.body.classList.remove('cnk-auth-pending');
 
-  sesionActual = sesion;
-  document.body.classList.remove('cnk-auth-pending');
+      // Topbar dinámico
+      document.getElementById('topbar-nombre').textContent = sesion.nombre;
+      document.getElementById('topbar-rol').textContent    = sesion.label;
+      document.getElementById('topbar-avatar').textContent =
+        sesion.nombre.split(' ').map(function (n) { return n[0]; }).join('').slice(0, 2).toUpperCase();
 
-  // Topbar dinámico
-  document.getElementById('topbar-nombre').textContent = sesion.nombre;
-  document.getElementById('topbar-rol').textContent    = sesion.label;
-  document.getElementById('topbar-avatar').textContent =
-    sesion.nombre.split(' ').map(function (n) { return n[0]; }).join('').slice(0, 2).toUpperCase();
+      // Visibilidad por rol
+      document.querySelectorAll('[data-roles]').forEach(function (el) {
+        var roles = el.getAttribute('data-roles').split(',');
+        if (roles.indexOf(sesion.rol) !== -1) el.classList.add('visible');
+      });
 
-  // Visibilidad por rol
-  document.querySelectorAll('[data-roles]').forEach(function (el) {
-    var roles = el.getAttribute('data-roles').split(',');
-    if (roles.indexOf(sesion.rol) !== -1) el.classList.add('visible');
-  });
-
-  // Recalcular tabla ahora que sabemos el rol
-  aplicarFiltros();
+      // Recalcular tabla ahora que sabemos el rol (para mostrar/ocultar botones admin)
+      aplicarFiltros();
+    });
+  };
+  authJs.onerror = function () {
+    // Fallback: mostrar la app en modo demo sin auth (solo desarrollo local)
+    console.warn('auth.js no disponible — modo demo');
+    sesionActual = { nombre: 'Demo', label: 'Admin Demo', rol: 'admin', nivel: 4 };
+    document.body.classList.remove('cnk-auth-pending');
+    document.getElementById('topbar-nombre').textContent = 'Demo';
+    document.getElementById('topbar-rol').textContent    = 'Admin Demo';
+    document.getElementById('topbar-avatar').textContent = 'DM';
+    document.querySelectorAll('[data-roles]').forEach(function (el) {
+      el.classList.add('visible');
+    });
+    aplicarFiltros();
+  };
+  document.body.appendChild(authJs);
 });
 </script>
 
