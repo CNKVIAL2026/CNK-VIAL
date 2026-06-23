@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fichas Técnicas — CNK Señalización Vial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+/* ── RESET & VARIABLES ─────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --negro:       #111111;
+  --negro-medio: #1a1a1a;
+  --amarillo:    #F5A623;
+  --amarillo-bg: rgba(245,166,35,.10);
+  --amarillo-bd: rgba(245,166,35,.30);
+  --texto-claro: #a8c0d8;
+  --texto-opaco: #5a7a99;
+  --blanco:      #ffffff;
+  --gris-bg:     #f4f6f9;
+  --gris-bd:     #dde3ea;
+  --verde:       #1d9e75;
+  --azul-link:   #378add;
+  --rojo:        #c0392b;
+  --morado:      #7c5cdb;
+}
+
+/* ── AUTH GATE ─────────────────────────────────────────────────────────────── */
+body.cnk-auth-pending #cnk-app { display: none; }
+.auth-gate {
+  position: fixed; inset: 0; background: var(--negro);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999; flex-direction: column; gap: 16px;
+}
+body:not(.cnk-auth-pending) .auth-gate { display: none; }
+.auth-gate .gate-logo {
+  width: 56px; height: 56px; background: var(--amarillo); border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 18px; color: var(--negro); margin-bottom: 8px;
+}
+.auth-gate p { color: #aaa; font-family: 'Inter', sans-serif; font-size: 13px; }
+.auth-gate .gate-title { color: #fff; font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; }
+.auth-spinner {
+  width: 24px; height: 24px; border: 3px solid #333;
+  border-top-color: var(--amarillo); border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+body { font-family: 'Inter', sans-serif; background: var(--gris-bg); color: var(--negro); min-height: 100vh; }
+
+/* ── TOPBAR ─────────────────────────────────────────────────────────────────── */
+.topbar {
+  background: var(--negro); padding: 10px 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,.4);
+}
+.logo-area { display: flex; align-items: center; gap: 12px; }
+.logo-box {
+  width: 36px; height: 36px; background: var(--amarillo); border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 12px; color: var(--negro);
+}
+.brand-name { color: var(--blanco); font-size: 14px; font-weight: 700; }
+.brand-name span { color: var(--amarillo); }
+.brand-sub { color: var(--texto-opaco); font-size: 8px; letter-spacing: .9px; text-transform: uppercase; margin-top: 2px; }
+.topbar-right { display: flex; align-items: center; gap: 14px; }
+.user-block { display: flex; align-items: center; gap: 8px; }
+.user-info { text-align: right; }
+.user-name { color: var(--blanco); font-size: 11px; font-weight: 600; }
+.user-role { color: var(--texto-opaco); font-size: 9px; }
+.user-avatar {
+  width: 28px; height: 28px; border-radius: 50%; background: var(--amarillo);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 800; color: var(--negro);
+}
+.btn-logout {
+  font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600;
+  background: none; border: 1px solid #333; border-radius: 6px;
+  padding: 5px 10px; cursor: pointer; color: #aaa;
+}
+.btn-logout:hover { border-color: var(--rojo); color: var(--rojo); }
+
+/* ── SIDEBAR ────────────────────────────────────────────────────────────────── */
+.app-layout { display: flex; min-height: calc(100vh - 56px); }
+.megamenu-sidebar {
+  width: 220px; background: #0f1115;
+  border-right: 1px solid rgba(255,255,255,.08);
+  display: flex; flex-direction: column;
+  padding: 16px 0; position: sticky; top: 56px;
+  height: calc(100vh - 56px); overflow-y: auto; flex-shrink: 0;
+}
+.megamenu-sidebar::-webkit-scrollbar { width: 0; }
+.mm-item {
+  display: flex; align-items: center; gap: 12px;
+  color: #b9c4d0; text-decoration: none;
+  padding: 12px 20px; font-size: 13px; font-weight: 500;
+  transition: background .15s, color .15s;
+  border-left: 3px solid transparent;
+}
+.mm-item:hover { background: rgba(245,166,35,.08); color: #fff; }
+.mm-item.active {
+  background: rgba(245,166,35,.12); color: var(--amarillo);
+  border-left: 3px solid var(--amarillo);
+}
+.mm-icon { width: 20px; text-align: center; font-size: 15px; flex-shrink: 0; }
+.mm-divider { height: 1px; background: rgba(255,255,255,.06); margin: 8px 16px; }
+.mm-admin-item {
+  margin: auto 12px 0; background: rgba(245,166,35,.10);
+  border: 1px solid rgba(245,166,35,.25); border-radius: 8px;
+  display: flex; align-items: center; gap: 12px;
+  color: var(--amarillo); text-decoration: none;
+  padding: 10px 16px; font-size: 13px; font-weight: 600;
+  transition: background .15s;
+}
+.mm-admin-item:hover { background: rgba(245,166,35,.20); }
+.mm-item[data-roles] { display: none; }
+.mm-item[data-roles].visible { display: flex; }
+.mm-admin-item[data-roles] { display: none; }
+.mm-admin-item[data-roles].visible { display: flex; }
+.main-content { flex: 1; min-width: 0; }
+@media(max-width:700px){
+  .app-layout { flex-direction: column; }
+  .megamenu-sidebar { width: 100%; height: auto; position: static; flex-direction: row; flex-wrap: wrap; padding: 4px 8px; top: 0; }
+  .mm-item { padding: 8px 10px; font-size: 11px; }
+  .mm-admin-item { margin: 4px 8px; }
+  .mm-divider { display: none; }
+}
+
+/* ── HERO ───────────────────────────────────────────────────────────────────── */
+.hero-sm {
+  background: var(--negro); padding: 18px 28px 22px;
+  border-bottom: 3px solid var(--amarillo);
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.hero-l .breadcrumb { font-size: 9px; color: var(--texto-opaco); margin-bottom: 8px; }
+.hero-l .breadcrumb a { color: var(--texto-opaco); text-decoration: none; }
+.hero-l .breadcrumb a:hover { color: var(--amarillo); }
+.hero-l .breadcrumb .sep { margin: 0 5px; }
+.hero-l .breadcrumb .cur { color: var(--amarillo); }
+.hero-l h1 { color: var(--blanco); font-size: 18px; font-weight: 800; }
+.hero-l h1 em { color: var(--amarillo); font-style: normal; }
+.hero-l p { color: var(--texto-claro); font-size: 11px; margin-top: 5px; }
+.btn-admin {
+  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700;
+  background: var(--amarillo); color: var(--negro); border: none;
+  border-radius: 8px; padding: 10px 18px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  flex-shrink: 0;
+}
+.btn-admin[data-roles] { display: none; }
+.btn-admin[data-roles].visible { display: inline-flex; }
+
+/* ── WRAP ───────────────────────────────────────────────────────────────────── */
+.wrap { padding: 24px 28px; max-width: 1200px; margin: 0 auto; }
+
+/* ── CARDS DE CATEGORÍA ──────────────────────────────────────────────────────── */
+.cat-grid {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 28px;
+}
+@media(max-width:800px){ .cat-grid { grid-template-columns: repeat(2,1fr); } }
+@media(max-width:480px){ .cat-grid { grid-template-columns: 1fr 1fr; } }
+
+.cat-card {
+  background: var(--blanco); border: 2px solid var(--gris-bd);
+  border-radius: 14px; padding: 20px 18px; cursor: pointer;
+  transition: border-color .15s, box-shadow .15s;
+  display: flex; flex-direction: column; gap: 10px; user-select: none;
+}
+.cat-card:hover { border-color: var(--negro); box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+.cat-card.active { border-color: var(--negro); background: var(--negro); }
+.cat-card.active .cat-label { color: var(--blanco); }
+.cat-card.active .cat-sub { color: #aaa; }
+.cat-card.active .cat-count { background: var(--amarillo); color: var(--negro); }
+.cat-card.active .cat-icon-box { background: var(--amarillo-bg); }
+
+.cat-icon-box {
+  width: 42px; height: 42px; border-radius: 10px; background: var(--gris-bg);
+  display: flex; align-items: center; justify-content: center; font-size: 20px;
+  transition: background .15s;
+}
+.cat-label { font-size: 13px; font-weight: 800; color: var(--negro); }
+.cat-sub { font-size: 11px; color: var(--texto-opaco); }
+.cat-count {
+  display: inline-block; font-size: 10px; font-weight: 800;
+  background: var(--gris-bg); color: var(--texto-opaco);
+  padding: 3px 10px; border-radius: 10px; width: fit-content;
+  transition: background .15s, color .15s;
+}
+
+/* ── LISTADO ─────────────────────────────────────────────────────────────────── */
+.listado-panel {
+  background: var(--blanco); border: 1px solid var(--gris-bd);
+  border-radius: 12px; overflow: hidden; margin-bottom: 24px;
+}
+.listado-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px; border-bottom: 1px solid var(--gris-bd);
+  flex-wrap: wrap; gap: 10px;
+}
+.listado-title { font-size: 12px; font-weight: 700; color: var(--texto-opaco); text-transform: uppercase; letter-spacing: .5px; }
+.listado-search {
+  padding: 7px 12px; border: 1px solid var(--gris-bd); border-radius: 7px;
+  font-family: 'Inter', sans-serif; font-size: 12px; width: 220px;
+}
+.listado-search:focus { outline: none; border-color: var(--negro); }
+
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  font-size: 10.5px; font-weight: 700; color: var(--texto-opaco); text-transform: uppercase;
+  letter-spacing: .5px; text-align: left; padding: 10px 16px;
+  background: var(--gris-bg); border-bottom: 1px solid var(--gris-bd); white-space: nowrap;
+}
+tbody td { padding: 10px 16px; font-size: 12.5px; border-bottom: 1px solid #f0f0ec; vertical-align: middle; }
+tbody tr:hover td { background: #fafbfc; }
+tbody tr:last-child td { border-bottom: none; }
+
+.badge { font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 10px; white-space: nowrap; }
+.b-reg  { background: #fde8e8; color: #7b1c1c; }
+.b-pre  { background: #fff3e0; color: #854f0b; }
+.b-inf  { background: #e8f4fd; color: #0c447c; }
+.b-lon  { background: #e8f5e9; color: #1b5e20; }
+.b-trans{ background: #ede8fd; color: #3c3489; }
+.b-sim  { background: #fce4ec; color: #880e4f; }
+.b-flex { background: #e0f2f1; color: #004d40; }
+.b-semi { background: #f3e5f5; color: #4a148c; }
+.b-rig  { background: #e8eaf6; color: #1a237e; }
+.b-glor { background: var(--amarillo-bg); color: #854f0b; }
+
+.accion-btns { display: flex; gap: 5px; }
+.abtn {
+  width: 30px; height: 30px; border-radius: 7px; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; font-size: 13px;
+  color: var(--blanco); transition: opacity .15s;
+}
+.abtn:hover { opacity: .85; }
+.abtn-ver  { background: var(--verde); }
+.abtn-edit { background: var(--amarillo); color: var(--negro); }
+.edit-btn-cell { display: none; }
+.edit-btn-cell.visible { display: table-cell; }
+
+.no-results { text-align: center; padding: 40px 20px; color: var(--texto-opaco); font-size: 13px; }
+.empty-state { text-align: center; padding: 60px 20px; color: var(--texto-opaco); }
+.empty-state .es-icon { font-size: 40px; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; font-weight: 700; color: var(--negro); }
+.empty-state span { font-size: 12px; }
+
+/* ── PANEL DETALLE (MODAL) ───────────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(17,17,17,.6);
+  display: none; align-items: center; justify-content: center;
+  z-index: 200; padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: var(--blanco); border-radius: 14px;
+  max-width: 680px; width: 100%; overflow: hidden;
+  max-height: 90vh; display: flex; flex-direction: column;
+}
+.modal-head {
+  background: var(--negro); padding: 16px 20px;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  flex-shrink: 0;
+}
+.modal-head-info {}
+.modal-head-info h3 { color: var(--blanco); font-size: 15px; font-weight: 800; }
+.modal-head-info .mh-codigo {
+  display: inline-block; font-size: 11px; font-weight: 700;
+  color: var(--negro); background: var(--amarillo);
+  padding: 2px 9px; border-radius: 8px; margin-top: 6px;
+}
+.modal-head-info .mh-sub { color: #aaa; font-size: 11px; margin-top: 4px; }
+.btn-close-modal {
+  background: none; border: none; cursor: pointer; color: #aaa;
+  font-size: 20px; line-height: 1; padding: 2px 6px; flex-shrink: 0;
+}
+.btn-close-modal:hover { color: var(--blanco); }
+
+/* Tabs */
+.modal-tabs {
+  display: flex; border-bottom: 1px solid var(--gris-bd); flex-shrink: 0;
+  background: var(--blanco);
+}
+.mtab {
+  padding: 11px 18px; font-size: 11.5px; font-weight: 600; cursor: pointer;
+  border-bottom: 2px solid transparent; color: var(--texto-opaco);
+  margin-bottom: -1px; transition: color .15s; white-space: nowrap;
+}
+.mtab.active { color: var(--negro); border-bottom-color: var(--negro); }
+.mtab:hover:not(.active) { color: var(--negro); }
+
+.modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* Dimensiones grid */
+.dims-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 18px;
+}
+@media(max-width:500px){ .dims-grid { grid-template-columns: repeat(2,1fr); } }
+.dim-box {
+  background: var(--gris-bg); border: 1px solid var(--gris-bd);
+  border-radius: 10px; padding: 12px 14px;
+}
+.dim-lbl { font-size: 10px; font-weight: 700; color: var(--texto-opaco); text-transform: uppercase; letter-spacing: .4px; }
+.dim-val { font-size: 16px; font-weight: 800; color: var(--negro); margin-top: 4px; }
+.dim-unit { font-size: 11px; color: var(--texto-opaco); font-weight: 500; }
+
+/* Proceso */
+.proceso-etapa { margin-bottom: 20px; }
+.proceso-etapa-title {
+  font-size: 12px; font-weight: 800; color: var(--negro);
+  padding: 7px 12px; background: var(--negro); color: var(--blanco);
+  border-radius: 8px 8px 0 0; display: flex; align-items: center; gap: 6px;
+}
+.proceso-steps { border: 1px solid var(--gris-bd); border-radius: 0 0 8px 8px; overflow: hidden; }
+.proceso-step {
+  display: grid; grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid #f0f0ec; font-size: 12px;
+}
+.proceso-step:last-child { border-bottom: none; }
+.ps-desc { padding: 9px 12px; color: var(--negro); }
+.ps-mat  { padding: 9px 12px; color: var(--texto-opaco); background: var(--gris-bg); border-left: 1px solid var(--gris-bd); }
+.proceso-thead {
+  display: grid; grid-template-columns: 1fr 1fr;
+  background: var(--gris-bg); border-bottom: 1px solid var(--gris-bd);
+}
+.proceso-thead span { padding: 7px 12px; font-size: 10px; font-weight: 700; color: var(--texto-opaco); text-transform: uppercase; letter-spacing: .4px; }
+.proceso-thead span:last-child { border-left: 1px solid var(--gris-bd); }
+
+/* Notas */
+.nota-item { margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--gris-bd); }
+.nota-item:last-child { border-bottom: none; margin-bottom: 0; }
+.nota-titulo { font-size: 11px; font-weight: 800; color: var(--negro); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+.nota-texto { font-size: 12.5px; color: #444; line-height: 1.6; }
+
+.modal-foot {
+  padding: 14px 20px; border-top: 1px solid var(--gris-bd);
+  display: flex; gap: 8px; justify-content: flex-end; flex-shrink: 0;
+}
+.btn-cerrar {
+  font-family: 'Inter', sans-serif; font-size: 12px; background: var(--gris-bg);
+  border: 1px solid var(--gris-bd); border-radius: 8px; padding: 8px 16px; cursor: pointer;
+}
+
+/* ── FOOTER ──────────────────────────────────────────────────────────────────── */
+.footer {
+  background: var(--negro); padding: 12px 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 8px; margin-top: 8px;
+}
+.footer p { color: var(--texto-opaco); font-size: 9px; }
+.footer span { color: var(--amarillo); font-size: 9px; font-weight: 600; }
+</style>
+</head>
+
+<body class="cnk-auth-pending">
+
+<!-- ── AUTH GATE ───────────────────────────────────────────────────────────── -->
+<div class="auth-gate">
+  <div class="gate-logo">CNK</div>
+  <p class="gate-title">CNK Señalización Vial</p>
+  <div class="auth-spinner"></div>
+  <p>Verificando acceso...</p>
+</div>
+
+<!-- ── APP ─────────────────────────────────────────────────────────────────── -->
+<div id="cnk-app">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="logo-area">
+      <div class="logo-box">CNK</div>
+      <div>
+        <div class="brand-name"><span>CNK</span> Señalización Vial</div>
+        <div class="brand-sub">Sistema de Gestión de Proyectos</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="user-block">
+        <div class="user-info">
+          <div class="user-name" id="topbar-nombre">—</div>
+          <div class="user-role" id="topbar-rol">—</div>
+        </div>
+        <div class="user-avatar" id="topbar-avatar">?</div>
+      </div>
+      <button class="btn-logout" onclick="CNKAuth.logout()">Salir</button>
+    </div>
+  </header>
+
+  
+  <!-- SIDEBAR -->
+  <div class="app-layout">
+  <nav class="megamenu-sidebar">
+    <a href="index.html" class="mm-item" data-roles="admin,gerencia,costos,tecnico"><span class="mm-icon">🏠</span>Inicio</a>
+    <a href="proyectos.html" class="mm-item" data-roles="admin,gerencia,costos"><span class="mm-icon">📁</span>Proyectos</a>
+    <a href="reportes.html" class="mm-item" data-roles="admin,gerencia,costos,tecnico"><span class="mm-icon">📋</span>Reportes</a>
+    <a href="fichas-tecnicas.html" class="mm-item active" data-roles="admin,gerencia,costos,tecnico"><span class="mm-icon">📐</span>Fichas Técnicas</a>
+    <a href="apu.html" class="mm-item" data-roles="admin,gerencia,costos"><span class="mm-icon">💰</span>APU</a>
+    <a href="catalogo-materiales.html" class="mm-item" data-roles="admin,gerencia,costos,tecnico"><span class="mm-icon">📦</span>Catálogo de Materiales</a>
+    <a href="cotizaciones.html" class="mm-item" data-roles="admin,gerencia"><span class="mm-icon">💼</span>Cotizaciones</a>
+    <a href="gantt.html" class="mm-item" data-roles="admin,gerencia,costos"><span class="mm-icon">📊</span>Gantt</a>
+    <a href="dashboard.html" class="mm-item" data-roles="admin,gerencia,costos,tecnico"><span class="mm-icon">📈</span>Dashboard</a>
+    <div class="mm-divider"></div>
+    <a href="configuracion.html" class="mm-admin-item" data-roles="admin"><span class="mm-icon">⚙️</span>Administración</a>
+  </nav>
+  <div class="main-content">
+
+  <!-- HERO -->
+  <div class="hero-sm">
+    <div class="hero-l">
+      <div class="breadcrumb">
+        <a href="index.html">Inicio</a><span class="sep">›</span>
+        <span class="cur">Fichas Técnicas</span>
+      </div>
+      <h1>Fichas <em>Técnicas</em></h1>
+      <p>Catálogo de señales viales — SIECA 2014 · CNK Señalización Vial.</p>
+    </div>
+    <button class="btn-admin" data-roles="admin" onclick="alert('Nueva ficha — disponible en Fase 2 (backend Apps Script).')">
+      + Nueva ficha
+    </button>
+  </div>
+
+  <div class="wrap">
+
+    <!-- TARJETAS DE CATEGORÍA -->
+    <div class="cat-grid">
+      <div class="cat-card" id="card-VER" onclick="seleccionarCategoria('VER')">
+        <div class="cat-icon-box">🚦</div>
+        <div>
+          <div class="cat-label">VER — Vertical</div>
+          <div class="cat-sub">Señales verticales SIECA</div>
+        </div>
+        <div class="cat-count" id="cnt-VER">0 fichas</div>
+      </div>
+      <div class="cat-card" id="card-HOR" onclick="seleccionarCategoria('HOR')">
+        <div class="cat-icon-box">🛣️</div>
+        <div>
+          <div class="cat-label">HOR — Horizontal</div>
+          <div class="cat-sub">Marcas sobre pavimento</div>
+        </div>
+        <div class="cat-count" id="cnt-HOR">0 fichas</div>
+      </div>
+      <div class="cat-card" id="card-DIS" onclick="seleccionarCategoria('DIS')">
+        <div class="cat-icon-box">🚧</div>
+        <div>
+          <div class="cat-label">DIS — Dispositivos</div>
+          <div class="cat-sub">Sistemas de contención</div>
+        </div>
+        <div class="cat-count" id="cnt-DIS">0 fichas</div>
+      </div>
+      <div class="cat-card" id="card-GLO" onclick="seleccionarCategoria('GLO')">
+        <div class="cat-icon-box">🔄</div>
+        <div>
+          <div class="cat-label">GLO — Glorieta</div>
+          <div class="cat-sub">Señalización de rotondas</div>
+        </div>
+        <div class="cat-count" id="cnt-GLO">0 fichas</div>
+      </div>
+    </div>
+
+    <!-- LISTADO -->
+    <div class="listado-panel">
+      <div class="listado-head">
+        <span class="listado-title" id="listado-titulo">Selecciona una categoría</span>
+        <input type="search" class="listado-search" id="buscador" placeholder="🔍 Buscar señal…" oninput="filtrarListado()" disabled>
+      </div>
+      <div id="tabla-container">
+        <div class="empty-state">
+          <div class="es-icon">📐</div>
+          <p>Selecciona una categoría</p>
+          <span>Las fichas técnicas aparecerán aquí</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /wrap -->
+  </div><!-- /main-content -->
+  </div><!-- /app-layout -->
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>CNK Señalización Vial — Sistema de Gestión © 2026</p>
+    <span>Normativa SIECA 2014</span>
+  </footer>
+
+</div><!-- /cnk-app -->
+
+<!-- ── MODAL DETALLE ────────────────────────────────────────────────────────── -->
+<div class="modal-overlay" id="modal-ficha">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-head-info">
+        <h3 id="mf-nombre">—</h3>
+        <div><span class="mh-codigo" id="mf-codigo">—</span></div>
+        <div class="mh-sub" id="mf-sub">—</div>
+      </div>
+      <button class="btn-close-modal" onclick="cerrarModal()">✕</button>
+    </div>
+    <div class="modal-tabs">
+      <div class="mtab active" id="tab-btn-dim" onclick="activarTab('dim')">📏 Dimensiones</div>
+      <div class="mtab" id="tab-btn-proc" onclick="activarTab('proc')">⚙️ Proceso</div>
+      <div class="mtab" id="tab-btn-notas" onclick="activarTab('notas')">📝 Notas</div>
+    </div>
+    <div class="modal-body">
+      <div class="tab-panel active" id="tab-dim"></div>
+      <div class="tab-panel" id="tab-proc"></div>
+      <div class="tab-panel" id="tab-notas"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cerrar" onclick="cerrarModal()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── SCRIPTS ───────────────────────────────────────────────────────────────── -->
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════════
+   CATÁLOGO DE FICHAS TÉCNICAS — SIECA 2014
+   Datos estáticos Fase 1 (sin backend)
+═══════════════════════════════════════════════════════════════════════════════ */
+var FICHAS = {
+
+  /* ── SEÑALIZACIÓN VERTICAL ─────────────────────────────────────────────── */
+  VER: [
+    /* ── REGLAMENTARIAS ── */
+    {
+      codigo: 'R-1', nombre: 'Señal PARE', cat: 'Reglamentaria',
+      dims: { alto: '0.75 m', ancho: '0.75 m', poste: '1.80 m', seccion: '2"×2"', cimiento: '0.50 m', base: '0.25×0.25 m' },
+      proceso: [
+        { etapa: 'Preparación de poste', pasos: [
+          { desc: 'Cortar tubo cuadrado 2"×2" a longitud requerida', mat: 'Tubo cuadrado galvanizado 2"×2"' },
+          { desc: 'Lijar y aplicar anticorrosivo', mat: 'Anticorrosivo gris + brocha' }
+        ]},
+        { etapa: 'Fabricación de placa', pasos: [
+          { desc: 'Cortar plancha de aluminio 3mm al tamaño octagonal', mat: 'Plancha aluminio 3mm' },
+          { desc: 'Aplicar pintura reflexiva roja de fondo', mat: 'Pintura retroreflectiva Scotchlite Tipo III roja' },
+          { desc: 'Serigrafiar letras PARE y borde blanco', mat: 'Pintura retroreflectiva Scotchlite Tipo III blanca' }
+        ]},
+        { etapa: 'Instalación', pasos: [
+          { desc: 'Excavar hoyo 0.50 m profundidad × 0.25×0.25 m base', mat: 'Piocha + pala' },
+          { desc: 'Colar concreto 3000 psi y plomar poste', mat: 'Concreto premezclado 3000 psi + plomada' },
+          { desc: 'Fijar placa al poste con tornillería inoxidable', mat: 'Tornillos inox M8 + tuercas + roldanas' }
+        ]}
+      ],
+      notas: [
+        { titulo: 'Normatividad', texto: 'Manual Centroamericano de Señalización Vial SIECA 2014, Capítulo 2, Señales Reglamentarias, Sección R-1. Obligatoria en intersecciones de menor prioridad, entradas a autopistas y vías secundarias.' },
+        { titulo: 'Visibilidad', texto: 'Retroreflectividad mínima Tipo III según ASTM D4956. El fondo rojo debe mantener valor mínimo de retroreflectividad de 7.0 cd/lux/m² a los 5 años de instalada.' },
+        { titulo: 'Mantenimiento', texto: 'Inspección anual de retroreflectividad. Limpieza semestral con agua y jabón neutro. Reemplazar si presenta corrosión >10% de la superficie o pérdida de retroreflectividad por debajo del mínimo normado.' }
+      ]
+    },
+    {
+      codigo: 'R-2-1', nombre: 'Velocidad Máxima 90 KPH', cat: 'Reglamentaria',
+      dims: { alto: '0.91 m', ancho: '1.37 m', poste: '1.80 m', seccion: '2"×2"', cimiento: '0.50 m', base: '0.25×0.25 m' },
+      proceso: [
+        { etapa: 'Preparación de soporte', pasos: [
+          { desc: 'Cortar tubo cuadrado 2"×2" a 3.30 m total', mat: 'Tubo cuadrado galvanizado 2"×2"' },
+          { desc: 'Pintar poste con esmalte color gris aluminio', mat: 'Esmalte gris aluminio' }
+        ]},
+        { etapa: 'Fabricación de placa', pasos: [
+          { desc: 'Cortar plancha aluminio al tamaño rectangular con esquinas redondeadas', mat: 'Plancha aluminio 3mm' },
+          { desc: 'Aplicar fondo blanco retroreflectivo', mat: 'Lámina retroreflectiva Tipo III blanca' },
+          { desc: 'Serigrafiar número de velocidad y orla roja', mat: 'Pintura retroreflectiva negra + roja' }
+        ]},
+        { etapa: 'Instalación', pasos: [
+          { desc: 'Excavar y colar base de concreto', mat: 'Concreto 3000 psi' },
+          { desc: 'Fijar placa al poste a 1.80 m de altura libre', mat: 'Tornillos inox M8' }
+        ]}
+      ],
+      notas: [
+        { titulo: 'Normatividad', texto: 'SIECA 2014, Cap. 2, Señales Reglamentarias. La velocidad máxima regulada aplica únicamente al tramo señalizado. La variante numérica (30–130 KPH) se imprime según el proyecto; la placa base es la misma.' },
+        { titulo: 'Ubicación', texto: 'Colocar inmediatamente después del inicio del límite de velocidad y repetir cada 1,500 m en zonas interurbanas o cada 300 m en zonas urbanas y escolares.' }
+      ]
+    },
+    {
+      codigo: 'R-5', nombre: 'Ceda el Paso', cat: 'Reglamentaria',
+      dims: { alto: '0.75 m', ancho: '0.75 m', poste: '1.80 m', seccion: '2"×2"', cimiento: '0.50 m', base: '0.25×0.25 m' },
+      proceso: [
+        { etapa: 'Fabricación de placa', pasos: [
+          { desc: 'Cortar plancha aluminio en forma triangular invertida', mat: 'Plancha aluminio 3mm' },
+          { desc: 'Aplicar fondo blanco retroreflectivo con orla roja', mat: 'Lámina retroreflectiva Tipo III' },
+          { desc: 'Serigrafiar texto CEDA EL PASO en rojo', mat: 'Pintura retroreflectiva roja' }
+        ]},
+        { etapa: 'Instalación', pasos: [
+          { desc: 'Instalar poste y placa a 1.80 m de altura', mat: 'Tubo galvanizado + concreto 3000 psi' }
+        ]}
+      ],
+      notas: [
+        { titulo: 'Normatividad', texto: 'SIECA 2014, Sección R-5. Se usa en intersecciones de prioridad donde el conductor debe ceder el paso sin detenerse completamente, a diferencia del PARE.' }
+      ]
+    },
+    {
+      codigo: 'R-16', nombre: 'No Adelantar', cat: 'Reglamentaria',
+      dims: { alto: '0.91 m', ancho: '0.91 m', poste: '1.80 m', seccion: '2"×2"', cimiento: '0.50 m', base: '0.25×0.25 m' },
+      proceso: [
+        { etapa: 'Fabricación de placa', pasos: [
+          { desc: 'Cortar aluminio en forma circular', mat: 'Plancha aluminio 3mm' },
+          { desc: 'Aplicar fondo blanco + símbolo de no adelantar', mat: 'Lámina retroreflectiva Tipo III' }
+        ]},
+        { etapa: 'Instalación', pasos: [
+          { desc: 'Instalar en el inicio de zona sin adelantamiento', mat: 'Tubo galvanizado + concreto 3000 psi' }
+        ]}
+      ],
+      notas: [
+        { titulo: 'Normatividad', texto: 'SIECA 2014, Sección R-16. Colocar al inicio de tramos con visibilidad reducida, curvas, cimas de colinas o zonas escolares donde el adelantamiento es peligroso.' }
+      ]
+    },
+    /* ── PREVENTIVAS ── */
+    {
+      codigo: 'P-1-1', nombre: 'Curva Pronunciada a la Derecha', cat: 'Preventiva',
+      dims: { alto: '0.75 m', ancho: '0.75 m', poste: '1.80 m', seccion: '2"×2"', cimiento: '0.50 m', base: '0.25×0.25 m' },
+      proceso: [
+        { etapa: 'Fabricación de placa', pasos: [
+          { desc: 'Cortar aluminio en forma cuadrada, girar 45° (rombo)', mat: 'Plancha aluminio 3mm' },
+          { desc: 'Aplicar fondo amarillo-limón retroreflectivo', mat: 'Lámina retroreflectiva amarillo limón Tipo III' },
+          { desc: 'Serigrafiar símbolo flecha curva hacia derecha en negro', mat: 'Pintura retroreflectiva negra' }
+        ]},
+        { etapa: 'Instalación', pasos: [
+          { desc: 'Ubicar 60–150 m antes de la curva según velocidad de diseño', mat: 'Tubo galvanizado + concreto 3000 psi' }
+        ]}
+      ],
+      notas: [
+        { titulo: 'Normatividad', texto: 'SIECA 2014, Cap. 3, Señales Preventivas. La distancia de anticipación varía según la velocidad de diseño: 60 m a 60 KPH, 105 m a 80 KPH, 150 m a 100 KPH.' },
+        { titulo: 'Variantes', texto: 'P-1-1 (curva a derecha) / P-1-2 (curva a izquierda) / P-1-3 (curva doble derecha-izquierda) / P-1-4 (curva doble izquierda-derecha).' }
+      ]
+    },
+    {
+      codigo: 'P-5', nombre: 'Cruce de Peatones', cat: 'Preventiva',
+      dims: { alto: '0.75 m', ancho: '0.75 m', poste: '1.80 m', seccion: '2"×2"', cimiento: '0.50 m', base: '0.25×0.25 m' },
+      proceso: [
+        { etapa: 'Fabricación de placa', pasos: [
+          { desc: 'Cortar aluminio en rombo 75×75 cm', mat: 'Plancha aluminio 3mm' },
+          { desc: 'Aplicar fondo amarillo-limón retroreflectivo', mat: 'Lámina retroreflectiva Tipo III' },
+          { desc: 'Serigrafiar pictograma de peatón en negro', mat: 'Pintura retroreflectiva negra' }
+        ]},
+        { etapa: 'Instalación', pasos: [
+          { desc: 'Colocar 30–50 m antes del paso peatonal', mat: 'Tubo galvanizado + concreto 3000 psi' }
+        ]}
+      ],
+      notas: [
+        { titulo: 'Normatividad', texto: 'SIECA 2014, Señal Preventiva P-5. Complementar con señal R-1 PARE o con marcas de paso peatonal en el pavimento (rayas de cebra).' }
+      ]
+    },
+    {
+      codigo: 'P-8', nombre: 'Superficie Resbaladiza', cat: 'Preventiva',
+      dims: { alto: '0.75 m', ancho: '0.75 m', poste: '1.80 m', seccion: '2"×2"', cimiento: '0.50 m', base: '0.25×0.25 m' },
+      proceso: [
+        { etapa: 'Fabricación de placa', pasos: [
+          { desc: 'Cortar aluminio en rombo y aplicar fondo amarillo', mat: 'Plancha aluminio 3mm + lámina Tipo III' },
+          { desc: 'Serigrafiar símbolo de vehículo derrapando', mat: 'Pintura retroreflectiva negra' }
+        ]},
+        { etapa: 'Instalación', pasos: [
+          { desc: 'Instalar antes de puentes, curvas húmedas o cambios de pavimento', mat: 'Tubo galvanizado + concreto 3000 psi' }
+        ]}
+      ],
+      notas: [
+        { titulo: 'Normatividad', texto: 'SIECA 2014. Obligatoria en tramos con historial de accidentes por deslizamiento o en superficies con índice de textura (IFI) inferior a 0.30.' }
+      ]
+    },
+    /* ── INFORMATIVAS ── */
+    {
+      codigo: 'I-1', nombre: 'Confirmación de Ruta', cat: 'Informativa',
+      dims: { alto: '0.60 m', ancho: '0.60 m', poste: '2.20 m', seccion: '2"×2"', cimiento: '0.60 m', base: '0.30×0.30 m' },
+      proceso: [
+        { etapa: 'Fabricación de placa', pasos: [
+          { desc: 'Cortar aluminio en forma rectangular', mat: 'Plancha aluminio 3mm' },
+          { desc: 'Aplicar fondo verde retroreflectivo', mat: 'Lámina retroreflectiva Tipo IV verde' },
+          { desc: 'Serigrafiar número de ruta y flecha en blanco', mat: 'Pintura retroreflectiva blanca' }
+        ]},
+        { etapa: 'Instalación', pasos: [
+          { desc: 'Colocar a 2.20 m de altura libre en hombro de vía', mat: 'Tubo galvanizado + concreto 3000 psi' }
+        ]}
+      ],
+      notas: [
+        { titulo: 'Normatividad', texto: 'SIECA 2014, Cap. 4, Señales Informativas. Las señales informativas de ruta deben colocarse en intersecciones, después de cruces y cada 5 km en carreteras interurbanas.' }
+      ]
+    },
+    {
+      codigo: 'I-12', nombre: 'Desvío', cat: 'Informativa',
+      dims: { alto: '0.60 m', ancho: '1.20 m', poste: '2.20 m', seccion: '2"×2"', cimiento: '0.60 m', base: '0.30×0.30 m' },
+      proceso: [
+        { etapa: 'Fabricación de placa', pasos: [
+          { desc: 'Cortar aluminio rectangular 120×60 cm', mat: 'Plancha aluminio 3mm' },
+          { desc: 'Aplicar fondo naranja retroreflectivo (uso en obras)', mat: 'Lámina retroreflectiva Tipo III naranja' },
+          { desc: 'Serigrafiar texto DESVÍO + flecha en negro', mat: 'Pintura retroreflectiva negra' }
+        ]},
+        { etapa: 'Instalación', pasos: [
+          { desc: 'Instalar con soporte temporal tipo caballete o poste temporal', mat: 'Base de concreto móvil + tubo galvanizado' }
+        ]}
+      ],
+      notas: [
+        { titulo: 'Normatividad', texto: 'SIECA 2014, Señales Temporales. El fondo naranja identifica exclusivamente señales temporales de obras. Retirar al finalizar trabajos.' }
+      ]
+    },
+    {
+      codigo: 'I-20', nombre: 'Velocidad Aconsejable en Curva', cat: 'Informativa',
+      dims: { alto: '0.50 m', ancho: '0.50 m', poste: '1.80 m', seccion: '2"×2"', cimiento: '0.50 m', base: '0.25×0.25 m' },
+      proceso: [
+        { etapa: 'Fabricación de placa', pasos: [
+          { desc: 'Cortar aluminio cuadrado con fondo amarillo', mat: 'Plancha aluminio 3mm + lámina Tipo III amarilla' },
+          { desc: 'Serigrafiar velocidad aconsejable en negro (ej: 30 KPH)', mat: 'Pintura retroreflectiva negra' }
+        ]},
+        { etapa: 'Instalación', pasos: [
+          { desc: 'Colocar inmediatamente antes de la curva, debajo de la señal P-1', mat: 'Tubo galvanizado + concreto 3000 psi' }
+        ]}
+      ],
+      notas: [
+        { titulo: 'Normatividad', texto: 'SIECA 2014. Esta señal complementa la señal P-1 y advierte la velocidad máxima segura para negociar la curva. No es una señal reglamentaria.' }
+      ]
+    }
+  ],
+
+  /* ── SEÑALIZACIÓN HORIZONTAL ────────────────────────────────────────────── */
+  HOR: [
+    {
+      codigo: 'HOR-LBC-01', nombre: 'Línea de Centro Continua Blanca', cat: 'Longitudinal',
+      dims: { ancho: '0.10 m', longitud: 'continua', material: 'Termoplástico', espesor: '1.5 mm', rendimiento: '25 m²/gal', microesferas: '500 g/m²' },
+      proceso: [
+        { etapa: 'Preparación de superficie', pasos: [
+          { desc: 'Limpiar pavimento con sopladora y quitar residuos', mat: 'Sopladora industrial' },
+          { desc: 'Trazar línea guía con cordel y tiza azul', mat: 'Cordel + tiza azul + cinta métrica' }
+        ]},
+        { etapa: 'Aplicación termoplástico', pasos: [
+          { desc: 'Calentar termoplástico a 200°C en caldera', mat: 'Termoplástico vial blanco + caldera tipo volcán' },
+          { desc: 'Aplicar con extrusora de líneas a velocidad constante', mat: 'Máquina extrusora de líneas Road Lazer' },
+          { desc: 'Aplicar microesferas de vidrio inmediatamente', mat: 'Microesferas tipo I-A (0.85–1.18 mm) 500 g/m²' }
+        ]},
+        { etapa: 'Control de calidad', pasos: [
+          { desc: 'Verificar ancho y espesor con calibrador', mat: 'Calibrador de espesor de pintura + cinta métrica' },
+          { desc: 'Medir retroreflectividad con retrorreflectómetro', mat: 'Delta LTL-X o similar' }
+        ]}
+      ],
+      notas: [
+        { titulo: 'Normatividad', texto: 'SIECA 2014, Capítulo 5, Marcas de Pavimento. Línea de centro continua indica prohibición absoluta de adelantamiento en ambos sentidos.' },
+        { titulo: 'Retroreflectividad mínima', texto: 'RL ≥ 200 mcd/m²/lux recién aplicada. RL ≥ 100 mcd/m²/lux al año de instalada (ASTM E1710). Medir a ángulo de geometría 30 m / 1.22 m.' }
+      ]
+    },
+    {
+      codigo: 'HOR-LBA-02', nombre: 'Línea de Borde Continua Blanca', cat: 'Longitudinal',
+      dims: { ancho: '0.10–0.15 m', longitud: 'continua', material: 'Termoplástico', espesor: '1.5 mm', rendimiento: '25 m²/gal', microesferas: '500 g/m²' },
+      proceso: [
+        { etapa: 'Preparación', pasos: [
+          { desc: 'Demarcar borde con cinta métrica desde orilla del pavimento', mat: 'Cinta métrica 50m + tiza' }
+        ]},
+        { etapa: 'Aplicación', pasos: [
+          { desc: 'Aplicar termoplástico blanco en línea continua de 10–15 cm', mat: 'Termoplástico vial blanco + máquina extrusora' },
+          { desc: 'Sembrar microesferas de vidrio', mat: 'Microesferas tipo I-A 500 g/m²' }
+        ]}
+      ],
+      notas: [
+        { titulo: 'Normatividad', texto: 'SIECA 2014. La línea de borde delimita la calzada pavimentada del hombro. Obligatoria en carreteras de 2 o más carriles con velocidades de diseño ≥ 60 KPH.' }
+      ]
+    },
+    {
+      codigo: 'HOR-LDA-03', nombre: 'Línea Discontinua Amarilla de Centro', cat: 'Longitudinal',
+      dims: { ancho: '0.10 m', segmento: '3.0 m', espacio: '9.0 m', material: 'Termoplástico', espesor: '1.5 mm', microesferas: '500 g/m²' },
+      proceso: [
+        { etapa: 'Trazado', pasos: [
+          { desc: 'Marcar puntos de inicio/fin de cada segmento discontinuo', mat: 'Cinta métrica + tiza + plantilla 3m' }
+        ]},
+        { etapa: 'Aplicación', pasos: [
+          { desc: 'Aplicar segmentos de 3.0 m con espacios de 9.0 m', mat: 'Termoplástico amarillo + extrusora' },
+          { desc: 'Sembrar microesferas inmediatamente', mat: 'Microesferas tipo I-A 500 g/m²' }
+        ]}
+      ],
+      notas: [
+        { titulo: 'Normatividad', texto: 'SIECA 2014. Línea de centro discontinua amarilla indica zona de adelantamiento permitido cuando se tiene visibilidad suficiente. Relación segmento/espacio 1:3.' }
+      ]
+    },
+    {
+      codigo: 'HOR-SIM-01', nombre: 'Símbolo Flecha de Carril Recto', cat: 'Símbolos y Letras',
+      dims: { largo: '4.00 m', ancho: '0.60 m', material: 'Termoplástico', espesor: '2.0 mm', microesferas: '600 g/m²' },
+      proceso: [
+        { etapa: 'Plantillado', pasos: [
+          { desc: 'Colocar plantilla metálica de flecha en posición correcta', mat: 'Plantilla metálica 4m × 0.60 m' }
+        ]},
+        { etapa: 'Aplicación', pasos: [
+          { desc: 'Aplicar termoplástico blanco rellenando toda la plantilla', mat: 'Termoplástico blanco + paleta extrusora manual' },
+          { desc: 'Retirar plantilla y sembrar microesferas', mat: 'Microesferas tipo I-A 600 g/m²' }
+        ]}
+      ],
+      notas: [
+        { titulo: 'Normatividad', texto: 'SIECA 2014. Las flechas de dirección se colocan en carriles de giro obligatorio. Se ubican a 15–30 m antes de la línea de pare o la intersección.' }
+      ]
+    },
+    {
+      codigo: 'HOR-CRU-01', nombre: 'Paso Peatonal — Rayas de Cebra', cat: 'Cruces Peatonales',
+      dims: { ancho_franja: '0.50 m', espacio_franja: '0.50 m', ancho_total: '4.00 m', longitud: 'variable', material: 'Termoplástico', microesferas: '600 g/m²' },
+      proceso: [
+        { etapa: 'Trazado', pasos: [
+          { desc: 'Marcar posición de cada franja blanca con tiza', mat: 'Cordel + tiza + escuadra' }
+        ]},
+        { etapa: 'Aplicación de franjas', pasos: [
+          { desc: 'Aplicar franjas blancas de 50 cm con espacios de 50 cm', mat: 'Termoplástico blanco + extrusora + plantilla' },
+          { desc: 'Sembrar microesferas en cada franja', mat: 'Microesferas tipo I-A 600 g/m²' }
+        ]}
+      ],
+      notas: [
+        { titulo: 'Normatividad', texto: 'SIECA 2014, Sección 5.4. Los pasos peatonales de cebra deben tener un mínimo de 4 m de ancho (8 franjas). Siempre complementar con señal vertical P-5 y señal R-1 en zonas escolares.' }
+      ]
+    },
+    {
+      codigo: 'HOR-DIS-01', nombre: 'Botón Reflectivo Blanco (OJO DE GATO)', cat: 'Dispositivos sobre pavimento',
+      dims: { largo: '0.10 m', ancho: '0.10 m', alto: '0.015 m', espaciado: '12 m (tramo recto) / 6 m (curva)', material: 'ABS con lentes acrílicos' },
+      proceso: [
+        { etapa: 'Limpieza de punto de fijación', pasos: [
+          { desc: 'Marcar punto de instalación y limpiar 15×15 cm', mat: 'Cinta métrica + brocha + solvente' }
+        ]},
+        { etapa: 'Pegado', pasos: [
+          { desc: 'Aplicar epoxi bicomponente en la base del botón', mat: 'Epoxi bicomponente de alto rendimiento' },
+          { desc: 'Colocar botón y presionar firmemente 60 segundos', mat: 'Guantes de seguridad' }
+        ]}
+      ],
+      notas: [
+        { titulo: 'Normatividad', texto: 'SIECA 2014. Los botones reflectivos complementan las líneas de carril. Color: blanco entre carriles del mismo sentido, amarillo en línea de centro, rojo en bordes peligrosos.' }
+      ]
+    }
+  ],
+
+  /* ── DISPOSITIVOS DE CONTENCIÓN ─────────────────────────────────────────── */
+  DIS: [
+    {
+      codigo: 'DIS-FLX-01', nombre: 'Barrera New Jersey (Flexible — EPDM)', cat: 'Flexible',
+      dims: { largo: '2.00 m / módulo', alto: '0.81 m', ancho_base: '0.60 m', peso: '180 kg/módulo', material: 'EPDM relleno con agua/arena' },
+      proceso: [
+        { etapa: 'Planificación y trazo', pasos: [
+          { desc: 'Marcar línea de instalación con pintura vial temporal', mat: 'Pintura en spray roja + cinta métrica' }
+        ]},
+        { etapa: 'Instalación', pasos: [
+          { desc: 'Colocar módulos consecutivos con conector macho-hembra', mat: 'Módulos EPDM New Jersey + conectores de acero' },
+          { desc: 'Rellenar con agua si es temporal, arena si es permanente', mat: 'Agua / arena limpia certificada' },
+          { desc: 'Instalar delineadores reflectivos sobre la barrera', mat: 'Delineadores tipo I retroreflectivos' }
+        ]}
+      ],
+      notas: [
+        { titulo: 'Normatividad', texto: 'SIECA 2014, Cap. 7, Barreras de Contención. La barrera flexible absorbe impacto por deformación. Uso recomendado en trabajos temporales de corta duración (días–semanas).' },
+        { titulo: 'Capacidad de contención', texto: 'Nivel de contención P1 (bajo) según EN 1317. Apta para vehículos livianos a velocidades ≤ 60 KPH.' }
+      ]
+    },
+    {
+      codigo: 'DIS-SEM-01', nombre: 'Barrera New Jersey de Concreto (Semirrígida)', cat: 'Semirrígido',
+      dims: { largo: '6.00 m / módulo', alto: '0.81 m', ancho_base: '0.61 m', peso: '1,800 kg/módulo', material: 'Concreto f\'c = 280 kg/cm²' },
+      proceso: [
+        { etapa: 'Preparación de superficie', pasos: [
+          { desc: 'Nivelar superficie base ±5 mm sobre área de instalación', mat: 'Nivel de manguera + mortero de nivelación' }
+        ]},
+        { etapa: 'Izado y colocación', pasos: [
+          { desc: 'Izar módulo con grúa hidráulica por punto de elevación', mat: 'Grúa hidráulica min. 5 Ton + grilletes' },
+          { desc: 'Alinear módulos con cordel y conectar con pasadores de acero', mat: 'Cordel + pasadores acero inox ø 25 mm' }
+        ]},
+        { etapa: 'Señalización', pasos: [
+          { desc: 'Pintar módulos con rayas alternadas naranja/blanco cada 60 cm', mat: 'Pintura retroreflectiva naranja + blanca' },
+          { desc: 'Instalar delineadores tipo I sobre módulos cada 6 m', mat: 'Delineadores retroreflectivos tipo I' }
+        ]}
+      ],
+      notas: [
+        { titulo: 'Normatividad', texto: 'SIECA 2014. Barrera semirrígida para separación de carriles en obras de larga duración. Nivel de contención H1 (medio). Uso en vías con velocidades de 60–100 KPH.' },
+        { titulo: 'Mantenimiento', texto: 'Inspección semanal de pasadores y alineamiento. Reparar cualquier módulo con daño estructural visible antes de continuar en servicio.' }
+      ]
+    },
+    {
+      codigo: 'DIS-RIG-01', nombre: 'Barrera New Jersey de Concreto In Situ (Rígida)', cat: 'Rígido',
+      dims: { longitud: 'continua', alto: '0.81 m', ancho_base: '0.61 m', acero: 'No. 4 @ 0.30 m', concreto: 'f\'c = 280 kg/cm²' },
+      proceso: [
+        { etapa: 'Armado de acero', pasos: [
+          { desc: 'Armar jaula de acero No. 4 @ 30 cm longitudinal y transversal', mat: 'Varilla corrugada No. 4 + alambre recocido' }
+        ]},
+        { etapa: 'Cimbrado', pasos: [
+          { desc: 'Instalar cimbra metálica tipo New Jersey y fijarla al pavimento', mat: 'Cimbra metálica reutilizable NJ + taquetes' }
+        ]},
+        { etapa: 'Colado', pasos: [
+          { desc: 'Colar concreto 280 kg/cm² y vibrar para eliminar oquedades', mat: 'Concreto premezclado 280 kg/cm² + vibrador' },
+          { desc: 'Curar con membrana de curado 72 horas mínimo', mat: 'Membrana de curado tipo losa + agua' }
+        ]},
+        { etapa: 'Desmolde y señalización', pasos: [
+          { desc: 'Retirar cimbra a las 72 h y pintar rayas retroreflectivas', mat: 'Pintura retroreflectiva naranja + blanca' }
+        ]}
+      ],
+      notas: [
+        { titulo: 'Normatividad', texto: 'SIECA 2014. Barrera rígida permanente. Máximo nivel de contención H4b. Uso en separadores de autopistas y pasos elevados con velocidades de diseño > 100 KPH.' }
+      ]
+    },
+    {
+      codigo: 'DIS-DEF-01', nombre: 'Guarda-Vía Metálico (W-Beam)', cat: 'Deformable',
+      dims: { longitud: '4.00 m / sección', alto: '0.68 m (desde suelo)', separacion_postes: '2.00 m', material: 'Acero galvanizado ASTM A36' },
+      proceso: [
+        { etapa: 'Instalación de postes', pasos: [
+          { desc: 'Clavar postes U o C cada 2.0 m con hinca mecánica', mat: 'Postes U-150 acero galvanizado + hinca neumática' }
+        ]},
+        { etapa: 'Instalación de riel', pasos: [
+          { desc: 'Fijar secciones de riel W-Beam con solapas de 0.60 m', mat: 'Riel W-Beam galvanizado 4.0 m + pernos M16' },
+          { desc: 'Colocar separadores entre poste y riel', mat: 'Separadores bloque 200 mm + tornillos galvanizados' }
+        ]},
+        { etapa: 'Terminales', pasos: [
+          { desc: 'Instalar terminal abatida o tipo FLEAT en inicio y fin de tramo', mat: 'Terminal abatida FLEAT + pernos de anclaje' }
+        ]}
+      ],
+      notas: [
+        { titulo: 'Normatividad', texto: 'SIECA 2014, AASHTO M-180. El guarda-vía deformable (W-Beam) es el sistema de contención más utilizado en carreteras rurales. Nivel H2 según EN 1317.' },
+        { titulo: 'Inspección', texto: 'Revisar postes y rieles después de cada impacto. Reemplazar secciones con deformaciones > 50 mm o postes con inclinación > 5°.' }
+      ]
+    }
+  ],
+
+  /* ── GLORIETA / TRABAJOS ESPECIALES ────────────────────────────────────── */
+  GLO: [
+    {
+      codigo: 'GLO-REG-01', nombre: 'Señalización Horizontal de Glorieta — Líneas de Ceda', cat: 'Glorieta',
+      dims: { ancho_linea: '0.30 m', espacio: '0.30 m', material: 'Termoplástico', microesferas: '600 g/m²' },
+      proceso: [
+        { etapa: 'Diseño y trazado', pasos: [
+          { desc: 'Trazar arco de líneas de ceda en cada ramal de ingreso', mat: 'Cinta métrica + cordel + tiza' },
+          { desc: 'Verificar ángulo de 90° respecto al carril de ingreso', mat: 'Escuadra metálica + plomada' }
+        ]},
+        { etapa: 'Aplicación', pasos: [
+          { desc: 'Aplicar termoplástico blanco en franjas discontinuas de 30 cm × 30 cm', mat: 'Termoplástico blanco + extrusora + plantilla 30cm' },
+          { desc: 'Sembrar microesferas en caliente', mat: 'Microesferas tipo I-A 600 g/m²' }
+        ]}
+      ],
+      notas: [
+        { titulo: 'Normatividad', texto: 'SIECA 2014, Sección 5.6. La línea de ceda en glorieta se traza con franjas de 30 cm espaciadas 30 cm, formando un arco en el ingreso al anillo circulatorio.' }
+      ]
+    },
+    {
+      codigo: 'GLO-VER-01', nombre: 'Señal Vertical de Glorieta — CEDA EL PASO', cat: 'Glorieta',
+      dims: { alto: '0.75 m', ancho: '0.75 m', poste: '1.80 m', seccion: '2"×2"', cimiento: '0.50 m' },
+      proceso: [
+        { etapa: 'Fabricación', pasos: [
+          { desc: 'Fabricar señal R-5 triangular con fondo blanco y orla roja', mat: 'Plancha aluminio 3mm + lámina retroreflectiva' }
+        ]},
+        { etapa: 'Instalación', pasos: [
+          { desc: 'Instalar a la derecha de cada ramal de ingreso a la glorieta, 5 m antes de la línea de ceda', mat: 'Tubo galvanizado + concreto 3000 psi' }
+        ]}
+      ],
+      notas: [
+        { titulo: 'Normatividad', texto: 'SIECA 2014. En glorietas, la señal de Ceda el Paso es obligatoria en todos los ramales de ingreso. El vehículo que circula en el anillo tiene prioridad sobre los que ingresan.' }
+      ]
+    },
+    {
+      codigo: 'GLO-DEF-01', nombre: 'Delineadores de Canalizadores en Glorieta', cat: 'Glorieta',
+      dims: { alto: '1.00 m', ancho: '0.10 m', espaciado: '6 m en tangente / 3 m en curva', material: 'PVC flexible amarillo' },
+      proceso: [
+        { etapa: 'Instalación', pasos: [
+          { desc: 'Marcar puntos de instalación en el borde del canalizador', mat: 'Cinta métrica + tiza' },
+          { desc: 'Anclar delineadores con perno de expansión o base adhesiva', mat: 'Delineadores PVC flex + perno M10 o epoxi' }
+        ]}
+      ],
+      notas: [
+        { titulo: 'Normatividad', texto: 'SIECA 2014. Los delineadores canalizadores guían visualmente el flujo vehicular alrededor de la isla central. Usar retroreflectivos con lente bicolor (blanco/amarillo).' }
+      ]
+    }
+  ]
+};
+
+/* ── ESTADO GLOBAL ──────────────────────────────────────────────────────────── */
+var catActiva    = null;
+var fichaActiva  = null;
+var sesionActual = null;
+var tabActiva    = 'dim';
+
+/* ── CONTEOS EN TARJETAS ─────────────────────────────────────────────────────── */
+function actualizarConteos() {
+  ['VER','HOR','DIS','GLO'].forEach(function(cat) {
+    var n = FICHAS[cat] ? FICHAS[cat].length : 0;
+    document.getElementById('cnt-' + cat).textContent = n + ' ficha' + (n !== 1 ? 's' : '');
+  });
+}
+
+/* ── SELECCIONAR CATEGORÍA ───────────────────────────────────────────────────── */
+function seleccionarCategoria(cat) {
+  catActiva = cat;
+
+  // Activar card
+  ['VER','HOR','DIS','GLO'].forEach(function(c) {
+    document.getElementById('card-' + c).classList.toggle('active', c === cat);
+  });
+
+  // Actualizar título
+  var titulos = { VER:'Señalización Vertical', HOR:'Señalización Horizontal', DIS:'Dispositivos de Contención', GLO:'Glorieta / Trabajos Especiales' };
+  document.getElementById('listado-titulo').textContent = titulos[cat];
+
+  // Habilitar buscador
+  var buscador = document.getElementById('buscador');
+  buscador.disabled = false;
+  buscador.value = '';
+
+  renderListado(FICHAS[cat] || []);
+}
+
+/* ── FILTRAR LISTADO ─────────────────────────────────────────────────────────── */
+function filtrarListado() {
+  if (!catActiva) return;
+  var q = document.getElementById('buscador').value.trim().toLowerCase();
+  var lista = (FICHAS[catActiva] || []).filter(function(f) {
+    return !q ||
+      f.nombre.toLowerCase().indexOf(q) !== -1 ||
+      f.codigo.toLowerCase().indexOf(q) !== -1 ||
+      f.cat.toLowerCase().indexOf(q)    !== -1;
+  });
+  renderListado(lista);
+}
+
+/* ── RENDER DE LA TABLA ──────────────────────────────────────────────────────── */
+var BADGE_MAP = {
+  'Reglamentaria':'b-reg','Preventiva':'b-pre','Informativa':'b-inf',
+  'Longitudinal':'b-lon','Transversal':'b-trans','Símbolos y Letras':'b-sim',
+  'Dispositivos sobre pavimento':'b-sim','Cruces Peatonales':'b-trans',
+  'Flexible':'b-flex','Semirrígido':'b-semi','Rígido':'b-rig','Deformable':'b-lon',
+  'Glorieta':'b-glor'
+};
+
+function badgeCls(cat) { return BADGE_MAP[cat] || 'b-glor'; }
+
+function renderListado(lista) {
+  var container = document.getElementById('tabla-container');
+  var isEditor = sesionActual && (sesionActual.rol === 'admin' || sesionActual.rol === 'costos');
+
+  if (lista.length === 0) {
+    container.innerHTML = '<div class="no-results">No se encontraron fichas con ese criterio.</div>';
+    return;
+  }
+
+  var editTh = isEditor ? '<th>Editar</th>' : '';
+
+  var rows = lista.map(function(f, i) {
+    var editTd = isEditor
+      ? '<td><button class="abtn abtn-edit" title="Editar (Fase 2)" onclick="alert(\'Edición disponible en Fase 2 — requiere backend Apps Script.\')">✎</button></td>'
+      : '';
+    return '<tr>' +
+      '<td><span class="badge ' + badgeCls(f.cat) + '">' + f.cat + '</span></td>' +
+      '<td style="font-weight:700;">' + f.nombre + '</td>' +
+      '<td><span class="reporte-id" style="font-size:11px">' + f.codigo + '</span></td>' +
+      '<td><button class="abtn abtn-ver" title="Ver ficha" onclick="verFicha(\'' + f.codigo + '\',\'' + catActiva + '\')">👁</button></td>' +
+      editTd +
+      '</tr>';
+  }).join('');
+
+  container.innerHTML =
+    '<table>' +
+    '<thead><tr>' +
+      '<th>Subcategoría</th>' +
+      '<th>Nombre</th>' +
+      '<th>Código</th>' +
+      '<th>Ver</th>' +
+      editTh +
+    '</tr></thead>' +
+    '<tbody>' + rows + '</tbody>' +
+    '</table>';
+}
+
+/* ── VER DETALLE ─────────────────────────────────────────────────────────────── */
+function verFicha(codigo, cat) {
+  var lista = FICHAS[cat] || [];
+  var ficha = lista.find(function(f) { return f.codigo === codigo; });
+  if (!ficha) return;
+  fichaActiva = ficha;
+
+  document.getElementById('mf-nombre').textContent = ficha.nombre;
+  document.getElementById('mf-codigo').textContent = ficha.codigo;
+  document.getElementById('mf-sub').textContent    = ficha.cat;
+
+  // Tab Dimensiones
+  var dims = ficha.dims;
+  var dimHTML = '<div class="dims-grid">' +
+    Object.entries(dims).map(function(pair) {
+      var lbl = pair[0].charAt(0).toUpperCase() + pair[0].slice(1).replace(/_/g,' ');
+      return '<div class="dim-box"><div class="dim-lbl">' + lbl + '</div><div class="dim-val">' + pair[1] + '</div></div>';
+    }).join('') +
+  '</div>';
+  document.getElementById('tab-dim').innerHTML = dimHTML;
+
+  // Tab Proceso
+  var procHTML = ficha.proceso.map(function(etapa) {
+    var pasos = etapa.pasos.map(function(p) {
+      return '<div class="proceso-step">' +
+        '<div class="ps-desc">' + p.desc + '</div>' +
+        '<div class="ps-mat">' + p.mat + '</div>' +
+        '</div>';
+    }).join('');
+    return '<div class="proceso-etapa">' +
+      '<div class="proceso-etapa-title">⚙️ ' + etapa.etapa + '</div>' +
+      '<div class="proceso-steps">' +
+        '<div class="proceso-thead"><span>Actividad</span><span>Material / Equipo</span></div>' +
+        pasos +
+      '</div>' +
+      '</div>';
+  }).join('');
+  document.getElementById('tab-proc').innerHTML = procHTML;
+
+  // Tab Notas
+  var notasHTML = ficha.notas.map(function(n) {
+    return '<div class="nota-item">' +
+      '<div class="nota-titulo">' + n.titulo + '</div>' +
+      '<div class="nota-texto">' + n.texto + '</div>' +
+      '</div>';
+  }).join('');
+  document.getElementById('tab-notas').innerHTML = notasHTML;
+
+  // Abrir en tab Dimensiones
+  activarTab('dim');
+  document.getElementById('modal-ficha').classList.add('open');
+}
+
+/* ── TABS ────────────────────────────────────────────────────────────────────── */
+function activarTab(tab) {
+  tabActiva = tab;
+  ['dim','proc','notas'].forEach(function(t) {
+    document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+    document.getElementById('tab-btn-' + t).classList.toggle('active', t === tab);
+  });
+}
+
+/* ── MODAL ───────────────────────────────────────────────────────────────────── */
+function cerrarModal() {
+  document.getElementById('modal-ficha').classList.remove('open');
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') cerrarModal();
+});
+document.getElementById('modal-ficha').addEventListener('click', function(e) {
+  if (e.target === this) cerrarModal();
+});
+
+/* ── CLASE reporte-id (usada en tabla) ───────────────────────────────────────── */
+// Inline style para .reporte-id en tabla de fichas
+var style = document.createElement('style');
+style.textContent = '.reporte-id { display: inline-block; font-size: 11px; font-weight: 700; color: var(--negro); border: 1px solid var(--negro); border-radius: 6px; padding: 3px 10px; white-space: nowrap; }';
+document.head.appendChild(style);
+
+/* ── AUTH ────────────────────────────────────────────────────────────────────── */
+window.addEventListener('load', function () {
+  actualizarConteos();
+
+  var authJs = document.createElement('script');
+  authJs.src = 'https://raw.githubusercontent.com/CNKVIAL2026/CNK-VIAL/main/auth.js';
+  authJs.onload = function () {
+    CNKAuth.requireAuth(['admin', 'gerencia', 'costos', 'tecnico'], function (sesion) {
+      sesionActual = sesion;
+      document.body.classList.remove('cnk-auth-pending');
+
+      document.getElementById('topbar-nombre').textContent = sesion.nombre;
+      document.getElementById('topbar-rol').textContent    = sesion.label;
+      document.getElementById('topbar-avatar').textContent =
+        sesion.nombre.split(' ').map(function (n) { return n[0]; }).join('').slice(0, 2).toUpperCase();
+
+      document.querySelectorAll('[data-roles]').forEach(function (el) {
+        var roles = el.getAttribute('data-roles').split(',');
+        if (roles.indexOf(sesion.rol) !== -1) el.classList.add('visible');
+      });
+    });
+  };
+  authJs.onerror = function () {
+    console.warn('auth.js no disponible — modo demo');
+    sesionActual = { nombre: 'Demo', label: 'Admin Demo', rol: 'admin', nivel: 4 };
+    document.body.classList.remove('cnk-auth-pending');
+    document.getElementById('topbar-nombre').textContent = 'Demo';
+    document.getElementById('topbar-rol').textContent    = 'Admin Demo';
+    document.getElementById('topbar-avatar').textContent = 'DM';
+    document.querySelectorAll('[data-roles]').forEach(function (el) {
+      el.classList.add('visible');
+    });
+  };
+  document.body.appendChild(authJs);
+});
+</script>
+
+</body>
+</html>
