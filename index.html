@@ -12,9 +12,9 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --negro:       #111111;
-      --negro-medio: #1a1a1a;
-      --negro-claro: #252525;
+      --negro:        #111111;
+      --negro-medio:  #1a1a1a;
+      --negro-claro:  #252525;
       --amarillo:    #F5A623;
       --amarillo-bg: rgba(245,166,35,.10);
       --amarillo-bd: rgba(245,166,35,.30);
@@ -91,53 +91,74 @@
       transition: background .15s, color .15s, border-color .15s;
     }
     .btn-logout:hover { background: rgba(255,255,255,.06); color: var(--blanco); border-color: rgba(255,255,255,.3); }
-    /* ── SIDEBAR ────────────────────────────────────────────────────────────────── */
-    .app-layout { display: flex; min-height: calc(100vh - 56px); }
-    .megamenu-sidebar {
-      width: 220px; background: #0f1115;
-      border-right: 1px solid rgba(255,255,255,.08);
-      display: flex; flex-direction: column;
-      padding: 16px 0; position: sticky; top: 56px;
-      height: calc(100vh - 56px); overflow-y: auto; flex-shrink: 0;
-    }
-    .megamenu-sidebar::-webkit-scrollbar { width: 0; }
-    .mm-item {
-      display: flex; align-items: center; gap: 12px;
-      color: #b9c4d0; text-decoration: none;
-      padding: 12px 20px; font-size: 13px; font-weight: 500;
-      transition: background .15s, color .15s;
-      border-left: 3px solid transparent;
-    }
-    .mm-item:hover { background: rgba(245,166,35,.08); color: #fff; }
-    .mm-item.active {
-      background: rgba(245,166,35,.12); color: var(--amarillo);
-      border-left: 3px solid var(--amarillo);
-    }
-    .mm-icon { width: 20px; text-align: center; font-size: 15px; flex-shrink: 0; }
-    .mm-divider { height: 1px; background: rgba(255,255,255,.06); margin: 8px 16px; }
-    .mm-admin-item {
-      margin: auto 12px 0; background: rgba(245,166,35,.10);
-      border: 1px solid rgba(245,166,35,.25); border-radius: 8px;
-      display: flex; align-items: center; gap: 12px;
-      color: var(--amarillo); text-decoration: none;
-      padding: 10px 16px; font-size: 13px; font-weight: 600;
-      transition: background .15s;
-    }
-    .mm-admin-item:hover { background: rgba(245,166,35,.20); }
-    .mm-item[data-roles] { display: none; }
-    .mm-item[data-roles].visible { display: flex; }
-    .mm-admin-item[data-roles] { display: none; }
-    .mm-admin-item[data-roles].visible { display: flex; }
-    .main-content { flex: 1; min-width: 0; }
-    @media(max-width:700px){
-      .app-layout { flex-direction: column; }
-      .megamenu-sidebar { width: 100%; height: auto; position: static; flex-direction: row; flex-wrap: wrap; padding: 4px 8px; top: 0; }
-      .mm-item { padding: 8px 10px; font-size: 11px; }
-      .mm-admin-item { margin: 4px 8px; }
-      .mm-divider { display: none; }
-    }
 
-    /* ── HERO ── */
+    
+/* ─────────────────────────────
+   LAYOUT
+───────────────────────────── */
+
+.app-layout{
+    display:flex;
+    min-height:calc(100vh - 64px);
+}
+
+.megamenu-sidebar{
+    width:240px;
+    background:#0f1115;
+    border-right:1px solid rgba(255,255,255,.08);
+    display:flex;
+    flex-direction:column;
+    padding:20px 0;
+    position:sticky;
+    top:64px;
+    height:calc(100vh - 64px);
+}
+
+.mm-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    color:#b9c4d0;
+    text-decoration:none;
+    padding:14px 24px;
+    font-size:14px;
+    font-weight:500;
+    transition:.2s;
+}
+
+.mm-item:hover{
+    background:rgba(245,166,35,.08);
+    color:#fff;
+}
+
+.mm-item.active{
+    background:rgba(245,166,35,.12);
+    color:#F5A623;
+    border-left:4px solid #F5A623;
+}
+
+.mm-icon{
+    width:20px;
+    text-align:center;
+    font-size:16px;
+}
+
+.mm-admin{
+    margin-top:auto;
+    margin-left:16px;
+    margin-right:16px;
+    background:rgba(245,166,35,.12);
+    border:1px solid rgba(245,166,35,.30);
+    border-radius:8px;
+}
+
+.main-content{
+    flex:1;
+    min-width:0;
+}
+
+/* ── HERO ── */
+
     .hero {
       background: var(--negro);
       padding: 48px 32px 52px;
@@ -320,51 +341,24 @@
 
     .biblioteca-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 14px;
-      margin-bottom: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px; margin-bottom: 16px;
     }
     .biblio-card {
-      background: var(--blanco);
-      border: 1px solid var(--gris-bd);
-      border-radius: 10px;
-      padding: 14px 16px;
+      background: var(--blanco); border: 1px solid var(--gris-bd);
+      border-radius: 10px; padding: 14px 16px;
       text-decoration: none; color: inherit;
       display: flex; flex-direction: column; gap: 10px;
-      transition: transform .18s, box-shadow .18s, border-color .18s;
-      cursor: pointer;
+      transition: border-color .18s; cursor: pointer;
     }
-    .biblio-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--sombra);
-      border-color: var(--amarillo);
+    .biblio-card:hover { border-color: var(--amarillo); }
+    .biblio-icon-wrap {
+      width: 34px; height: 34px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; font-size: 17px;
     }
-    .biblio-badge {
-      display: inline-block; align-self: flex-start;
-      font-size: 8px; font-weight: 800; letter-spacing: .7px;
-      padding: 2px 8px; border-radius: 4px;
-      text-transform: uppercase;
-    }
-    .biblio-body {
-      display: flex; align-items: flex-start; gap: 10px;
-    }
-    .biblio-thumb { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
-    .biblio-title {
-      font-size: 11px; font-weight: 700; color: var(--negro);
-      line-height: 1.45; margin-bottom: 4px;
-    }
-    .biblio-meta { font-size: 10px; color: #889; }
-    .biblio-footer {
-      display: flex; align-items: center; justify-content: space-between;
-      border-top: 1px solid var(--gris-bd); padding-top: 10px; margin-top: 2px;
-    }
-    .biblio-tag {
-      font-size: 9px; font-weight: 600; color: var(--texto-opaco);
-      background: var(--gris-bg); padding: 3px 8px; border-radius: 4px;
-    }
-    .biblio-open {
-      font-size: 10px; font-weight: 600; color: var(--amarillo);
-    }
+    .biblio-title { font-size: 12px; font-weight: 700; color: var(--negro); line-height: 1.4; margin-bottom: 3px; }
+    .biblio-meta { font-size: 10px; color: #889; line-height: 1.4; flex: 1; }
+    .biblio-link { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 5px; align-self: flex-start; margin-top: 2px; }
     .biblio-nota {
       display: flex; align-items: center; gap: 8px;
       font-size: 10px; color: var(--texto-opaco);
@@ -386,6 +380,7 @@
     /* ── RESPONSIVE ── */
     @media (max-width: 600px) {
       .topbar { padding: 10px 16px; }
+      .megamenu { padding: 0 16px; }
       .hero { padding: 32px 16px 36px; }
       .hero h1 { font-size: 24px; }
       .section { padding: 24px 16px; }
@@ -397,37 +392,36 @@
 
     /* ── VERIFICACIÓN DE SESIÓN ── */
     body.cnk-auth-pending #cnk-app { display: none; }
-.auth-gate {
-  position: fixed; inset: 0; background: var(--negro);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 9999; flex-direction: column; gap: 16px;
-}
-body:not(.cnk-auth-pending) .auth-gate { display: none; }
-.auth-gate .gate-logo {
-  width: 56px; height: 56px; background: var(--amarillo); border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 800; font-size: 18px; color: var(--negro); margin-bottom: 8px;
-}
-.auth-gate p { color: #aaa; font-family: 'Inter', sans-serif; font-size: 13px; }
-.auth-gate .gate-title { color: #fff; font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; }
-.auth-spinner {
-  width: 24px; height: 24px; border: 3px solid #333;
-  border-top-color: var(--amarillo); border-radius: 50%;
-  animation: spin .7s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+    .auth-gate {
+      position: fixed; inset: 0; z-index: 999;
+      background: var(--negro);
+      display: none;
+      align-items: center; justify-content: center;
+      flex-direction: column; gap: 12px;
+    }
+    body.cnk-auth-pending .auth-gate { display: flex; }
+    .auth-gate .spinner {
+      width: 22px; height: 22px;
+      border: 3px solid rgba(255,255,255,.15);
+      border-top-color: var(--amarillo);
+      border-radius: 50%;
+      animation: cnkspin .7s linear infinite;
+    }
+    .auth-gate span { color: var(--texto-claro); font-size: 12px; }
+    @keyframes cnkspin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) {
+      .auth-gate .spinner { animation: none; border-top-color: var(--amarillo); }
+    }
   </style>
 </head>
 <body class="cnk-auth-pending">
 
-<!-- ── AUTH GATE ───────────────────────────────────────────────────────────── -->
-<div class="auth-gate">
-  <div class="gate-logo">CNK</div>
-  <p class="gate-title">CNK Señalización Vial</p>
-  <div class="auth-spinner"></div>
-  <p>Verificando acceso...</p>
-</div>
-    <span>Verificando sesión…</span>
+  <!-- VERIFICACIÓN DE SESIÓN -->
+  <div class="auth-gate">
+    <div class="gate-logo">CNK</div>
+    <p class="gate-title">CNK Señalización Vial</p>
+    <div class="auth-spinner"></div>
+    <p>Verificando acceso...</p>
   </div>
 
   <div id="cnk-app">
@@ -442,7 +436,7 @@ body:not(.cnk-auth-pending) .auth-gate { display: none; }
       </div>
     </div>
     <div class="topbar-right">
-      <span class="pais">🇬🇹 Guatemala</span>
+      
       <div class="user-block">
         <div class="avatar" id="cnk-avatar">·</div>
         <div class="user-info">
@@ -454,23 +448,20 @@ body:not(.cnk-auth-pending) .auth-gate { display: none; }
     </div>
   </header>
 
-  
-  <!-- SIDEBAR -->
+  <!-- MEGAMENÚ -->
   <div class="app-layout">
-  <nav class="megamenu-sidebar">
-    <a href="index.html" class="mm-item active" data-roles="admin,gerencia,costos,tecnico"><span class="mm-icon">🏠</span>Inicio</a>
-    <a href="proyectos.html" class="mm-item" data-roles="admin,gerencia,costos"><span class="mm-icon">📁</span>Proyectos</a>
-    <a href="reportes.html" class="mm-item" data-roles="admin,gerencia,costos,tecnico"><span class="mm-icon">📋</span>Reportes</a>
-    <a href="fichas-tecnicas.html" class="mm-item" data-roles="admin,gerencia,costos,tecnico"><span class="mm-icon">📐</span>Fichas Técnicas</a>
-    <a href="apu.html" class="mm-item" data-roles="admin,gerencia,costos"><span class="mm-icon">💰</span>APU</a>
-    <a href="catalogo-materiales.html" class="mm-item" data-roles="admin,gerencia,costos,tecnico"><span class="mm-icon">📦</span>Catálogo de Materiales</a>
-    <a href="cotizaciones.html" class="mm-item" data-roles="admin,gerencia"><span class="mm-icon">💼</span>Cotizaciones</a>
-    <a href="gantt.html" class="mm-item" data-roles="admin,gerencia,costos"><span class="mm-icon">📊</span>Gantt</a>
-    <a href="dashboard.html" class="mm-item" data-roles="admin,gerencia,costos,tecnico"><span class="mm-icon">📈</span>Dashboard</a>
-    <div class="mm-divider"></div>
-    <a href="configuracion.html" class="mm-admin-item" data-roles="admin"><span class="mm-icon">⚙️</span>Administración</a>
+
+<nav class="megamenu-sidebar">
+    <a href="https://cnkvial2026.github.io/CNK-VIAL/index.html" class="mm-item active" data-roles="admin,gerencia,costos,tecnico"><span class="mm-icon">🏠</span> Inicio</a>
+    <a href="https://cnkvial2026.github.io/CNK-VIAL/proyectos.html" class="mm-item" data-roles="admin,gerencia,costos"><span class="mm-icon">📁</span> Proyectos</a>
+    <a href="https://cnkvial2026.github.io/CNK-VIAL/reportes.html" class="mm-item" data-roles="admin,gerencia,costos,tecnico"><span class="mm-icon">📋</span> Reportes</a>
+    <a href="https://cnkvial2026.github.io/CNK-VIAL/fichas-tecnicas.html" class="mm-item" data-roles="admin,gerencia,costos,tecnico"><span class="mm-icon">📐</span> Fichas Técnicas</a>
+    <a href="https://cnkvial2026.github.io/CNK-VIAL/apu.html" class="mm-item" data-roles="admin,gerencia,costos"><span class="mm-icon">💰</span> APU</a>
+    <a href="https://cnkvial2026.github.io/CNK-VIAL/catalogo-materiales.html" class="mm-item" data-roles="admin,gerencia,costos,tecnico"><span class="mm-icon">📦</span> Catálogo de Materiales</a>
+    <a href="https://cnkvial2026.github.io/CNK-VIAL/configuracion.html" class="mm-item mm-admin" data-roles="admin"><span class="mm-icon">⚙</span> Administración</a>
   </nav>
-  <div class="main-content">
+
+<div class="main-content">
 
   <!-- HERO -->
   <section class="hero">
@@ -594,76 +585,38 @@ body:not(.cnk-auth-pending) .auth-gate { display: none; }
     </div>
 
     <div class="biblioteca-grid">
-
-      <a href="#" class="biblio-card" title="Próximamente disponible">
-        <div class="biblio-badge" style="background:#E6F1FB; color:#0C447C;">SIECA</div>
-        <div class="biblio-body">
-          <div class="biblio-thumb">📘</div>
-          <div>
-            <div class="biblio-title">Manual Centroamericano de Señalización Vial</div>
-            <div class="biblio-meta">SIECA · 2014 · Edición vigente</div>
-          </div>
-        </div>
-        <div class="biblio-footer">
-          <span class="biblio-tag">Señalización general</span>
-          <span class="biblio-open">📄 Abrir PDF</span>
-        </div>
+      <a href="https://drive.google.com/file/d/1QfNEbK3xxONTL57Gvc5FpGnY6_PiqXvB/view?usp=drive_link" class="biblio-card" target="_blank">
+        <div class="biblio-icon-wrap" style="background:#E6F1FB">📘</div>
+        <div class="biblio-title">Manual Centroamericano de Señalización Vial</div>
+        <div class="biblio-meta">SIECA · 2014 · Edición vigente</div>
+        <span class="biblio-link" style="background:#E6F1FB;color:#0C447C">Ver documento →</span>
       </a>
 
-      <a href="#" class="biblio-card" title="Próximamente disponible">
-        <div class="biblio-badge" style="background:#EAF3DE; color:#3B6D11;">SIECA</div>
-        <div class="biblio-body">
-          <div class="biblio-thumb">📗</div>
-          <div>
-            <div class="biblio-title">Manual Centroamericano de Dispositivos Uniformes</div>
-            <div class="biblio-meta">SIECA · 2014 · Control del tránsito</div>
-          </div>
-        </div>
-        <div class="biblio-footer">
-          <span class="biblio-tag">Dispositivos preventivos</span>
-          <span class="biblio-open">📄 Abrir PDF</span>
-        </div>
+      <a href="https://drive.google.com/file/d/1zopWTju30uo6JZ5i6z7_9B0u2oY-OAtd/view?usp=drive_link" class="biblio-card" target="_blank">
+        <div class="biblio-icon-wrap" style="background:#EAF3DE">📗</div>
+        <div class="biblio-title">Manual Centroamericano de Dispositivos Uniformes</div>
+        <div class="biblio-meta">SIECA · 2014 · Control del tránsito</div>
+        <span class="biblio-link" style="background:#EAF3DE;color:#3B6D11">Ver documento →</span>
       </a>
 
-      <a href="#" class="biblio-card" title="Próximamente disponible">
-        <div class="biblio-badge" style="background:#FEF3E2; color:#854F0B;">MINTRANS</div>
-        <div class="biblio-body">
-          <div class="biblio-thumb">📙</div>
-          <div>
-            <div class="biblio-title">Reglamento de Señalización Vial — Guatemala</div>
-            <div class="biblio-meta">Ministerio de Transportes · Vigente</div>
-          </div>
-        </div>
-        <div class="biblio-footer">
-          <span class="biblio-tag">Normativa nacional</span>
-          <span class="biblio-open">📄 Abrir PDF</span>
-        </div>
+      <a href="https://drive.google.com/file/d/1Uz2C8ePjeg0epdY9wPTDnF_SXNG8IJh_/view?usp=drive_link" class="biblio-card" target="_blank">
+        <div class="biblio-icon-wrap" style="background:#FEF3E2">📙</div>
+        <div class="biblio-title">Reglamento de Señalización Vial — Guatemala</div>
+        <div class="biblio-meta">Ministerio de Transportes · Vigente</div>
+        <span class="biblio-link" style="background:#FEF3E2;color:#854F0B">Ver documento →</span>
       </a>
 
-      <a href="#" class="biblio-card" title="Próximamente disponible">
-        <div class="biblio-badge" style="background:#F3EFFE; color:#3C3489;">OPS</div>
-        <div class="biblio-body">
-          <div class="biblio-thumb">📓</div>
-          <div>
-            <div class="biblio-title">Manual de Seguridad Vial para Zonas de Trabajo</div>
-            <div class="biblio-meta">OPS/OMS · Edición Latinoamérica</div>
-          </div>
-        </div>
-        <div class="biblio-footer">
-          <span class="biblio-tag">Seguridad en obra</span>
-          <span class="biblio-open">📄 Abrir PDF</span>
-        </div>
+      <a href="https://drive.google.com/file/d/1IUjgcjxIJtBx_ZWGFuCk0v8sMnC1XtcA/view?usp=drive_link" class="biblio-card" target="_blank">
+        <div class="biblio-icon-wrap" style="background:#F3EFFE">📓</div>
+        <div class="biblio-title">Manual de Seguridad Vial para Zonas de Trabajo</div>
+        <div class="biblio-meta">OPS/OMS · Edición Latinoamérica</div>
+        <span class="biblio-link" style="background:#F3EFFE;color:#3C3489">Ver documento →</span>
       </a>
-
-    </div>
-
-    <div class="biblio-nota">
-      <span>🔒</span>
-      <span>Los documentos se habilitarán próximamente. Cada enlace abrirá el PDF oficial en una nueva pestaña.</span>
     </div>
   </section>
-  </div><!-- /main-content -->
-  </div><!-- /app-layout -->
+
+</div>
+</div>
 
   <!-- FOOTER -->
   <footer class="footer">
