@@ -106,6 +106,15 @@ body { font-family: 'Inter', sans-serif; background: var(--gris-bg); color: var(
 .mm-item:hover { color: var(--blanco); }
 .mm-item.active { color: var(--amarillo); border-bottom: 2px solid var(--amarillo); background: var(--amarillo-bg); }
 
+.app-layout { display:flex; min-height:calc(100vh - 64px); }
+.megamenu-sidebar { width:240px; background:#0f1115; border-right:1px solid rgba(255,255,255,.08); display:flex; flex-direction:column; padding:20px 0; position:sticky; top:64px; height:calc(100vh - 64px); }
+.mm-item-sb { display:flex; align-items:center; gap:12px; color:#b9c4d0; text-decoration:none; padding:14px 24px; font-size:14px; font-weight:500; transition:.2s; }
+.mm-item-sb:hover { background:rgba(245,166,35,.08); color:#fff; }
+.mm-item-sb.active { background:rgba(245,166,35,.12); color:#F5A623; border-left:4px solid #F5A623; }
+.mm-icon-sb { width:20px; text-align:center; font-size:16px; }
+.mm-admin-sb { margin-top:auto; margin-left:16px; margin-right:16px; background:rgba(245,166,35,.12); border:1px solid rgba(245,166,35,.30); border-radius:8px; }
+.main-content { flex:1; min-width:0; }
+
 /* ── HERO ───────────────────────────────────────────────────────────────────── */
 .hero-sm {
   background: var(--negro); padding: 18px 28px 22px;
@@ -242,16 +251,19 @@ body { font-family: 'Inter', sans-serif; background: var(--gris-bg); color: var(
     </div>
   </header>
 
-  <!-- MEGAMENÚ -->
-  <nav class="megamenu">
-    <a href="index.html"              class="mm-item" data-roles="admin,gerencia,costos,tecnico">🏠 Inicio</a>
-    <a href="reportes.html"           class="mm-item active" data-roles="admin,gerencia,costos,tecnico">📋 Reportes</a>
-    <a href="proyectos.html"          class="mm-item" data-roles="admin,gerencia,costos">📁 Proyectos</a>
-    <a href="gantt.html"              class="mm-item" data-roles="admin,gerencia,costos">📊 Gantt</a>
-    <a href="fichas-tecnicas.html"    class="mm-item" data-roles="admin,gerencia,costos,tecnico">📐 Fichas Técnicas</a>
-    <a href="apu.html"                class="mm-item" data-roles="admin,gerencia,costos">💰 APU</a>
-    <a href="dashboard.html"          class="mm-item" data-roles="admin,gerencia,costos">📈 Dashboard</a>
+  <!-- SIDEBAR -->
+  <div class="app-layout">
+  <nav class="megamenu-sidebar">
+    <a href="https://cnkvial2026.github.io/CNK-VIAL/index.html"             class="mm-item-sb" data-roles="admin,gerencia,costos,tecnico"><span class="mm-icon-sb">🏠</span> Inicio</a>
+    <a href="https://cnkvial2026.github.io/CNK-VIAL/reportes.html"          class="mm-item-sb active" data-roles="admin,gerencia,costos,tecnico"><span class="mm-icon-sb">📋</span> Reportes</a>
+    <a href="https://cnkvial2026.github.io/CNK-VIAL/proyectos.html"         class="mm-item-sb" data-roles="admin,gerencia,costos"><span class="mm-icon-sb">📁</span> Proyectos</a>
+    <a href="https://cnkvial2026.github.io/CNK-VIAL/fichas-tecnicas.html"   class="mm-item-sb" data-roles="admin,gerencia,costos,tecnico"><span class="mm-icon-sb">📐</span> Fichas Técnicas</a>
+    <a href="https://cnkvial2026.github.io/CNK-VIAL/apu.html"               class="mm-item-sb" data-roles="admin,gerencia,costos"><span class="mm-icon-sb">💰</span> APU</a>
+    <a href="https://cnkvial2026.github.io/CNK-VIAL/bitacora-horizontal.html" class="mm-item-sb" data-roles="admin,gerencia,tecnico"><span class="mm-icon-sb">📋</span> Formularios</a>
+    <a href="https://cnkvial2026.github.io/CNK-VIAL/dashboard.html"         class="mm-item-sb" data-roles="admin,gerencia,costos,tecnico"><span class="mm-icon-sb">📊</span> Dashboard</a>
+    <a href="https://cnkvial2026.github.io/CNK-VIAL/configuracion.html" class="mm-item-sb mm-admin-sb" data-roles="admin"><span class="mm-icon-sb">⚙</span> Administración</a>
   </nav>
+  <div class="main-content">
 
   <!-- HERO -->
   <div class="hero-sm">
@@ -373,6 +385,8 @@ body { font-family: 'Inter', sans-serif; background: var(--gris-bg); color: var(
     <span>Guatemala · Operaciones &amp; Costos · v2.0</span>
   </footer>
 
+  </div><!-- /main-content -->
+  </div><!-- /app-layout -->
 </div><!-- /cnk-app -->
 
 <script>
