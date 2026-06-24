@@ -111,6 +111,19 @@ textarea { resize:vertical; min-height:60px; }
 /* SEÑALES */
 .senales-wrap { margin-top:8px; }
 .sublbl { font-size:10px; font-weight:700; color:var(--opaco); text-transform:uppercase; letter-spacing:.5px; margin:8px 0 6px; }
+.act-block { background:var(--blanco); border:1px solid var(--grisBd); border-radius:8px; padding:12px; margin-bottom:8px; }
+.act-num { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; padding:2px 9px; border-radius:4px; }
+.act-num.lon { background:#EFF6FF; color:#2563EB; }
+.act-num.tra { background:#F0FDF4; color:#16A34A; }
+.act-num.dis { background:#FFF7ED; color:#C2410C; }
+.act-num.mar { background:#F5F3FF; color:#7C3AED; }
+.act-num.gen { background:var(--gris); color:var(--textoOpaco); }
+.unidad-auto { display:flex; align-items:center; justify-content:center; background:#E6F1FB; color:#185FA5; border-radius:6px; font-size:12px; font-weight:700; padding:8px 10px; min-width:52px; border:1px solid #B5D4F4; }
+.cat-row { display:grid; grid-template-columns:1fr auto 1fr; gap:10px; align-items:end; margin-bottom:10px; }
+.cat-row .unidad-wrap { display:flex; flex-direction:column; gap:4px; align-items:center; }
+.mat-sublabel { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; margin:8px 0 6px; }
+.mat-row { display:grid; grid-template-columns:minmax(0,1fr) 80px 68px 28px; gap:6px; align-items:center; margin-bottom:5px; }
+.mat-row select, .mat-row input { padding:5px 7px; font-size:12px; }
 .senal-block { background:var(--blanco); border:1px solid var(--grisBd); border-radius:8px; padding:12px; margin-bottom:8px; }
 .senal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
 .senal-badge { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; padding:2px 9px; border-radius:4px; }
@@ -198,24 +211,6 @@ textarea { resize:vertical; min-height:60px; }
 .mm-icon{width:20px;text-align:center;font-size:16px;}
 .mm-admin{margin-top:auto;margin-left:16px;margin-right:16px;background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.30);border-radius:8px;}
 .main-content{flex:1;min-width:0;background:var(--gris);}
-.actividades-wrap { margin-top: 8px; }
-.act-block { background: var(--blanco); border: 1px solid var(--gris-bd); border-radius: 8px; padding: 12px; margin-bottom: 8px; }
-.act-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-.act-num { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; padding: 2px 9px; border-radius: 4px; }
-.act-num.lon { background: #EFF6FF; color: #2563EB; }
-.act-num.tra { background: #F0FDF4; color: #16A34A; }
-.act-num.dis { background: #FFF7ED; color: #C2410C; }
-.act-num.mar { background: #F5F3FF; color: #7C3AED; }
-.act-num.gen { background: var(--gris-bg); color: var(--texto-opaco); }
-.unidad-auto { display: flex; align-items: center; justify-content: center; background: #E6F1FB; color: #185FA5; border-radius: 6px; font-size: 12px; font-weight: 700; padding: 8px 10px; min-width: 52px; letter-spacing: .5px; border: 1px solid #B5D4F4; }
-.cat-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: end; margin-bottom: 10px; }
-.cat-row .unidad-wrap { display: flex; flex-direction: column; gap: 4px; align-items: center; }
-.mat-sublabel { font-size: 10px; font-weight: 700; color: var(--texto-opaco); text-transform: uppercase; letter-spacing: .5px; margin: 8px 0 6px; }
-.mat-row { display: grid; grid-template-columns: minmax(0,1fr) 80px 68px 28px; gap: 6px; align-items: center; margin-bottom: 5px; }
-.mat-row select, .mat-row input { padding: 5px 7px; font-size: 12px; }
-.step-bar { display:flex; gap:4px; margin-bottom:1.5rem; }
-.step-dot { height:4px; border-radius:2px; background:var(--gris-bd); flex:1; transition:background .2s; }
-.step-dot.done { background:var(--verde); }
 </style>
 </head>
 <body class="cnk-auth-pending">
@@ -438,33 +433,46 @@ var WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzR0tgcV1vCV1-Ca91WUTA
 
 var climasSel  = [];
 var frenteCnt  = 0;
-var actCnt     = {};
+var senalCnt   = {};
 var novedadCnt = 0;
 
 // FIX 1: fotosData guarda solo metadata, NO base64
 var fotosData  = {};
 // FIX 2: cache del HTML de materiales, se construye una sola vez
-
+var _matOptsCache = null;
 
 var ROLES_PERSONAL     = ['SSO','Supervisor','Encargado de grupo','Piloto','Operador / Técnico aplicador','Calderero','Ayudante','Señalero','Guardia de tránsito'];
 var TIPOS_INTERRUPCION = ['Lluvia ligera','Lluvia fuerte','Tormenta','Neblina','Otro'];
 var TIPOS_NOVEDAD      = ['Accidente vial','Bloqueo de vía','Fallo Maquinaria y/o Equipo','Ausencia de personal','Instrucción de supervisión','Problema con materiales','Orden de cambio','Otro'];
-var CATEGORIAS_ACT = {
-  'Longitudinal':   { unidad:'ML',  clase:'lon', campos:'lineal' },
-  'Transversal':    { unidad:'ML',  clase:'tra', campos:'lineal' },
-  'Dispositivos':   { unidad:'Und', clase:'dis', campos:'dispositivo' },
-  'Marcas/Símbolos':{ unidad:'Und', clase:'mar', campos:'marca' }
-};
-var catalogoDefault = {
-  Longitudinal:    [{n:'Pintura blanca',u:'gal'},{n:'Pintura amarilla',u:'gal'},{n:'Microesfera',u:'kg'},{n:'Thinner',u:'gal'}],
-  Transversal:     [{n:'Pintura blanca',u:'gal'},{n:'Pintura amarilla',u:'gal'},{n:'Microesfera',u:'kg'},{n:'Thinner',u:'gal'}],
-  Dispositivos:    [{n:'Vialeta blanca bidireccional',u:'unidad'},{n:'Vialeta amarilla unidireccional',u:'unidad'},{n:'Boya plástica',u:'unidad'},{n:'Adhesivo epóxico',u:'kg'}],
-  'Marcas/Símbolos':[{n:'Pintura termoplástica blanca',u:'kg'},{n:'Pintura termoplástica amarilla',u:'kg'},{n:'Microesfera',u:'kg'}]
-};
-var unidades = ['gal','kg','lt','lb','m²','unidad','ml','m'];
+var TIPOS_SENAL        = ['Reglamentaria','Preventiva','Informativa'];
+var SUBCATS            = ['Poste','Bandera','Puente','Otro'];
+var TAMANIOS           = ['Chica','Mediana','Grande','Especial'];
+var LADOS              = ['Derecho','Izquierdo','Centro','Ambos'];
 var UNIDADES_MAT       = ['unidad','kg','lb','m','m²','m³','gal','lt','saco','bolsa'];
 
-
+var CATALOGO_MATS_VER = [
+  {grupo:'Soportes', items:[
+    {n:'Poste acero galvanizado tubular',u:'unidad'},
+    {n:'Poste acero galvanizado perfil C/U',u:'unidad'},
+    {n:'Poste madera tratada',u:'unidad'}
+  ]},
+  {grupo:'Cimentación', items:[
+    {n:'Cemento / Concreto premezclado',u:'saco'},
+    {n:'Arena y grava',u:'m³'},
+    {n:'Piedra para base',u:'m³'},
+    {n:'Camisa inserción acero (anclaje)',u:'unidad'}
+  ]},
+  {grupo:'Fijación', items:[
+    {n:'Abrazadera y grapa de sujeción',u:'unidad'},
+    {n:'Tornillo, tuerca y arandela galv.',u:'unidad'},
+    {n:'Tuerca antivandálica',u:'unidad'},
+    {n:'Cinta bandeo Band-it + hebilla inox',u:'m'}
+  ]},
+  {grupo:'Acabado', items:[
+    {n:'Pintura anticorrosiva para postes',u:'gal'},
+    {n:'Agua para mezcla',u:'lt'}
+  ]}
+];
 
 var personalDefault = [
   {rol:'SSO',nombre:''},{rol:'Supervisor',nombre:''},{rol:'Encargado de grupo',nombre:''},
@@ -476,6 +484,20 @@ var personalDefault = [
    initPersonal() primero → addFrente() con
    pequeño delay para no bloquear el render
    ══════════════════════════════════════════ */
+
+var CATEGORIAS_ACT = {
+  Longitudinal:    { unidad:'ML',  clase:'lon', campos:'lineal' },
+  Transversal:     { unidad:'ML',  clase:'tra', campos:'lineal' },
+  Dispositivos:    { unidad:'Und', clase:'dis', campos:'disp'   },
+  MarcasSimbolos:  { unidad:'Und', clase:'mar', campos:'marca'  }
+};
+var catalogoHOR = {
+  Longitudinal:    [{n:'Pintura blanca',u:'gal'},{n:'Pintura amarilla',u:'gal'},{n:'Microesfera',u:'kg'},{n:'Thinner',u:'gal'}],
+  Transversal:     [{n:'Pintura blanca',u:'gal'},{n:'Pintura amarilla',u:'gal'},{n:'Microesfera',u:'kg'},{n:'Thinner',u:'gal'}],
+  Dispositivos:    [{n:'Vialeta blanca',u:'unidad'},{n:'Vialeta amarilla',u:'unidad'},{n:'Boya plastica',u:'unidad'},{n:'Adhesivo',u:'kg'}],
+  MarcasSimbolos:  [{n:'Termoplastica blanca',u:'kg'},{n:'Termoplastica amarilla',u:'kg'},{n:'Microesfera',u:'kg'}]
+};
+var UNIDADES_HOR = ['gal','kg','lt','lb','unidad','ml','m'];
 document.addEventListener('DOMContentLoaded', function(){
   initPersonal();
   document.getElementById('r-fecha').valueAsDate = new Date();
@@ -515,8 +537,8 @@ function addFrente(){
       '</div>'+
     '</div>'+
     '<div class="row r2" style="margin-bottom:12px">'+
-      '<div class="field"><label>Hora inicio frente</label><input type="time" id="f'+n+'-hinicio"></div>'+
-      '<div class="field"><label>Hora fin frente</label><input type="time" id="f'+n+'-hfin"></div>'+
+      '<div class="field"><label>Hora inicio</label><input type="time" id="f'+n+'-hinicio"></div>'+
+      '<div class="field"><label>Hora fin</label><input type="time" id="f'+n+'-hfin"></div>'+
     '</div>'+
     '<div class="sublbl">Actividades en este frente</div>'+
     '<div id="f'+n+'-acts" class="actividades-wrap"></div>'+
@@ -535,125 +557,93 @@ function removeFrente(n){
   updateBar();
 }
 
-/* ── ACTIVIDADES ── */
-function addActividad(fn){
-  actCnt[fn] = (actCnt[fn]||0)+1;
-  var an  = actCnt[fn];
-  var aid = 'f'+fn+'a'+an;
-  var catOpts = Object.keys(CATEGORIAS_ACT).map(function(cat){
-    return '<option value="'+cat+'">'+cat+'</option>';
-  }).join('');
+/* ── SEÑALES ── */
+function addSenal(fn){
+  senalCnt[fn] = (senalCnt[fn]||0)+1;
+  var sn  = senalCnt[fn];
+  var sid = 'f'+fn+'s'+sn;
+
+  var tipoOpts   = TIPOS_SENAL.map(function(t){ return '<option>'+t+'</option>'; }).join('');
+  var subcatOpts = SUBCATS.map(function(t){ return '<option>'+t+'</option>'; }).join('');
+  var tamOpts    = TAMANIOS.map(function(t){ return '<option>'+t+'</option>'; }).join('');
+  var ladoOpts   = LADOS.map(function(t){ return '<option>'+t+'</option>'; }).join('');
+
   var div = document.createElement('div');
-  div.className = 'act-block';
-  div.id = aid;
+  div.className = 'senal-block';
+  div.id = sid;
   div.innerHTML =
-    '<div class="act-header">'+
-      '<span class="act-num gen" id="'+aid+'-badge">Actividad '+an+'</span>'+
-      '<button class="btn-rm" onclick="document.getElementById(\''+aid+'\').remove()">✕</button>'+
+    '<div class="senal-header">'+
+      '<span class="senal-badge badge-gen" id="'+sid+'-badge">Señal '+sn+'</span>'+
+      '<button class="btn-rm" onclick="document.getElementById(\''+sid+'\').remove()">✕</button>'+
     '</div>'+
-    '<div class="cat-row">'+
-      '<div class="field"><label>Categoría</label>'+
-        '<select id="'+aid+'-cat" onchange="onCatChange(\''+aid+'\')">' +
-        '<option value="">Seleccionar...</option>'+catOpts+'</select>'+
-      '</div>'+
-      '<div class="unidad-wrap"><label style="font-size:11px;color:#667;font-weight:500">Unidad</label><div class="unidad-auto" id="'+aid+'-unidad">—</div></div>'+
-      '<div class="field"><label>Cantidad</label><input type="number" id="'+aid+'-qty" placeholder="0" min="0"></div>'+
+    '<div class="row r4">'+
+      '<div class="field"><label>Tipo</label>'+
+        '<select id="'+sid+'-tipo" onchange="onTipoSenal(\''+sid+'\')">'+
+          '<option value="">Seleccionar...</option>'+tipoOpts+
+        '</select></div>'+
+      '<div class="field"><label>Subcategoría</label>'+
+        '<select id="'+sid+'-subcat"><option value="">Seleccionar...</option>'+subcatOpts+'</select></div>'+
+      '<div class="field"><label>Código señal</label>'+
+        '<input type="text" id="'+sid+'-codigo" placeholder="R-1, P-3, I-5..."></div>'+
+      '<div class="field"><label>Descripción</label>'+
+        '<input type="text" id="'+sid+'-desc" placeholder="PARE, Curva peligrosa..."></div>'+
     '</div>'+
-    '<div id="'+aid+'-extra"></div>'+
-    '<div id="'+aid+'-mats-wrap" style="display:none">'+
-      '<div class="mat-sublabel">Materiales</div>'+
-      '<div id="'+aid+'-mats"></div>'+
-      '<button class="btn-add" onclick="addMatAct(\''+aid+'\')">' +
-      '+ Agregar material</button>'+
-    '</div>';
-  document.getElementById('f'+fn+'-acts').appendChild(div);
+    '<div class="row r4">'+
+      '<div class="field"><label>Alto (m)</label>'+
+        '<input type="text" id="'+sid+'-tam" placeholder="Ej. 0.75"></div>'+
+      '<div class="field"><label>Ancho (m)</label>'+
+        '<input type="text" id="'+sid+'-dim" placeholder="Ej. 0.75"></div>'+
+      '<div class="field"><label>Cantidad</label>'+
+        '<div style="display:flex;align-items:center;gap:6px">'+
+          '<input type="number" id="'+sid+'-qty" placeholder="0" min="0" style="flex:1">'+
+          '<span style="font-size:12px;color:#5a7a99;font-weight:600;white-space:nowrap">Und</span>'+
+        '</div></div>'+
+      '<div></div>'+
+    '</div>'+
+    '<div class="sep-line"></div>'+
+    '<div class="sublbl">Materiales de instalación</div>'+
+    '<div id="'+sid+'-mats"></div>'+
+    '<button class="btn-add" onclick="addMatSenal(\''+sid+'\')">+ Agregar material</button>';
+
+  document.getElementById('f'+fn+'-senales').appendChild(div);
 }
 
-function onCatChange(aid){
-  var sel   = document.getElementById(aid+'-cat');
-  var cat   = sel.value;
-  var conf  = CATEGORIAS_ACT[cat];
-  var badge = document.getElementById(aid+'-badge');
-  if(!conf) return;
-  document.getElementById(aid+'-unidad').textContent = conf.unidad;
-  badge.className  = 'act-num '+conf.clase;
-  badge.textContent = cat;
-  var extra = document.getElementById(aid+'-extra');
-  extra.innerHTML = '';
-  if(conf.campos==='lineal'){
-    extra.innerHTML =
-      '<div class="row r3" style="margin-top:8px">'+
-        '<div class="field"><label>ML premarcado</label><input type="number" id="'+aid+'-mlp" placeholder="0" min="0"></div>'+
-        '<div class="field"><label>ML aplicado</label><input type="number" id="'+aid+'-mla" placeholder="0" min="0"></div>'+
-        '<div class="field"><label>Ancho (cm)</label><input type="number" id="'+aid+'-ancho" placeholder="15" min="1"></div>'+
-      '</div>'+
-      '<div class="row r2" style="margin-top:0">'+
-        '<div class="field"><label>Tipo de línea</label>'+
-          '<select id="'+aid+'-linea">'+
-            '<option value="">— Seleccionar —</option>'+
-            '<option>Continua</option><option>Discontinua</option><option>Guión</option><option>Cebra</option><option>Doble continua</option>'+
-          '</select>'+
-        '</div>'+
-        '<div class="field"><label>Color</label>'+
-          '<select id="'+aid+'-color"><option>Blanco</option><option>Amarillo</option><option>Ambos</option></select>'+
-        '</div>'+
-      '</div>';
-  } else if(conf.campos==='dispositivo'){
-    extra.innerHTML =
-      '<div class="field" style="margin-top:8px"><label>Tipo de dispositivo / Descripción</label>'+
-        '<input type="text" id="'+aid+'-detalle" placeholder="Vialeta blanca bidireccional, boya metálica...">'+
-      '</div>';
-  } else if(conf.campos==='marca'){
-    extra.innerHTML =
-      '<div class="field" style="margin-top:8px"><label>Descripción de marcas / símbolos</label>'+
-        '<input type="text" id="'+aid+'-detalle" placeholder="ALTO/PARE 8 und. 30cm, flechas 4 und...">'+
-      '</div>';
-  }
-  document.getElementById(aid+'-mats-wrap').style.display='block';
-  var cont = document.getElementById(aid+'-mats');
-  cont.innerHTML='';
-  (catalogoDefault[cat]||[]).forEach(function(m){ addMatActEl(aid,m.n,m.u); });
+function onTipoSenal(sid){
+  var tipo  = document.getElementById(sid+'-tipo').value;
+  var badge = document.getElementById(sid+'-badge');
+  var map   = { 'Reglamentaria':'badge-reg','Preventiva':'badge-pre','Informativa':'badge-inf' };
+  badge.className  = 'senal-badge '+(map[tipo]||'badge-gen');
+  badge.textContent = tipo || 'Señal';
 }
 
-function addMatAct(aid){
-  var cat  = document.getElementById(aid+'-cat').value;
-  var mats = catalogoDefault[cat]||[];
-  var opts = '<option value="">— Material —</option>'+mats.map(function(m){
-    return '<option value="'+m.n+'|'+m.u+'">'+m.n+'</option>';
-  }).join('');
-  addMatActEl(aid,'','',opts);
+/* FIX 2: buildMatOpts construye el HTML solo una vez y lo cachea */
+function buildMatOpts(){
+  if(_matOptsCache) return _matOptsCache;
+  var opts = '<option value="">— Seleccionar material —</option>';
+  CATALOGO_MATS_VER.forEach(function(g){
+    opts += '<optgroup label="'+g.grupo+'">';
+    g.items.forEach(function(m){
+      opts += '<option value="'+m.n+'|'+m.u+'">'+m.n+'</option>';
+    });
+    opts += '</optgroup>';
+  });
+  _matOptsCache = opts;
+  return opts;
 }
 
-function addMatActEl(aid,nombre,unidad,opts){
-  var cont = document.getElementById(aid+'-mats');
+function addMatSenal(sid){
+  var cont = document.getElementById(sid+'-mats');
   if(!cont) return;
-  var cat  = document.getElementById(aid+'-cat')?document.getElementById(aid+'-cat').value:'';
-  var mats = catalogoDefault[cat]||[];
-  if(!opts){
-    opts='<option value="">— Material —</option>'+mats.map(function(m){
-      return '<option value="'+m.n+'|'+m.u+'"'+(m.n===nombre?' selected':'')+'>'+m.n+'</option>';
-    }).join('');
-  }
+  var uOpts = UNIDADES_MAT.map(function(u){ return '<option>'+u+'</option>'; }).join('');
   var row = document.createElement('div');
-  row.className='mat-row';
-  row.innerHTML=
-    '<select onchange="autoUnit(this)">'+opts+'</select>'+
+  row.className = 'mat-row';
+  row.innerHTML =
+    '<select onchange="autoUnitMat(this)" style="font-size:12px;padding:5px 7px">'+buildMatOpts()+'</select>'+
     '<input type="number" placeholder="Cant." min="0" style="font-size:12px;padding:5px 7px">'+
-    '<select style="font-size:12px;padding:5px 6px;width:68px">'+
-      unidades.map(function(u){ return '<option'+(u===unidad?' selected':'')+'>'+u+'</option>'; }).join('')+
-    '</select>'+
-    '<button onclick="this.closest('.mat-row').remove()" class="btn-rm" style="font-size:14px">✕</button>';
+    '<select style="font-size:12px;padding:5px 6px">'+uOpts+'</select>'+
+    '<button onclick="this.closest(\'.mat-row\').remove()" class="btn-rm" style="font-size:14px">✕</button>';
   cont.appendChild(row);
 }
-
-function autoUnit(sel){
-  var val=sel.value; if(!val) return;
-  var unit=val.split('|')[1]||'';
-  var us=sel.parentElement.querySelector('select:last-of-type');
-  if(us&&unit){ for(var i=0;i<us.options.length;i++){ if(us.options[i].value===unit){us.selectedIndex=i;break;} } }
-}
-
-
 
 function autoUnitMat(sel){
   var val = sel.value; if(!val) return;
@@ -891,7 +881,6 @@ function updateBar(){
 function recopilar(){
   var d = {};
   d.tipo_formulario = 'HOR';
-  d.tipo_actividad  = 'HOR';
   d.proyecto        = document.getElementById('r-proyecto').value;
   d.orden_trabajo   = document.getElementById('r-ot').value;
   d.contrato        = d.proyecto+'-HOR-'+new Date().getFullYear();
@@ -933,44 +922,36 @@ function recopilar(){
   document.querySelectorAll('.frente-block').forEach(function(fb, fi){
     var fn = fb.id.replace('frente-','');
     function gv(id){ var el=fb.querySelector('#'+id); return el?el.value:''; }
-    var actividades = [];
-    fb.querySelectorAll('.act-block').forEach(function(ab){
-      var aid  = ab.id;
-      var cat  = document.getElementById(aid+'-cat')?document.getElementById(aid+'-cat').value:'';
-      var conf = CATEGORIAS_ACT[cat]||{};
-      var act  = {
-        categoria: cat,
-        unidad:    conf.unidad||'',
-        cantidad:  gvById(aid+'-qty')
-      };
-      if(conf.campos==='lineal'){
-        act.mlp       = gvById(aid+'-mlp');
-        act.mla       = gvById(aid+'-mla');
-        act.ancho     = gvById(aid+'-ancho');
-        act.tipo_linea= gvById(aid+'-linea');
-        act.color     = gvById(aid+'-color');
-      } else {
-        act.detalle   = gvById(aid+'-detalle');
-      }
+    var senales = [];
+    fb.querySelectorAll('.senal-block').forEach(function(sb){
+      var sid  = sb.id;
       var mats = [];
-      ab.querySelectorAll('.mat-row').forEach(function(row){
-        var sel = row.querySelector('select');
-        var qty = row.querySelector('input[type=number]');
-        var uni = row.querySelector('select:last-of-type');
-        var mn  = sel&&sel.value?sel.value.split('|')[0]:'';
-        if(mn) mats.push({material:mn,cantidad:qty?qty.value:'',unidad:uni?uni.value:''});
+      sb.querySelectorAll('.mat-row').forEach(function(row){
+        var sels = row.querySelectorAll('select');
+        var qty  = row.querySelector('input[type=number]');
+        var mn   = sels[0]&&sels[0].value ? sels[0].value.split('|')[0] : '';
+        if(mn) mats.push({material:mn, cantidad:qty?qty.value:'', unidad:sels[1]?sels[1].value:''});
       });
-      act.materiales = mats;
-      actividades.push(act);
+      senales.push({
+        tipo:    gv(sid+'-tipo'),
+        subcat:  gv(sid+'-subcat'),
+        codigo:  gv(sid+'-codigo'),
+        desc:    gv(sid+'-desc'),
+        tamanio: gv(sid+'-tam'),
+        lado:    gv(sid+'-lado'),
+        cantidad:gv(sid+'-qty'),
+        unidad:  'Und',
+        materiales: mats
+      });
     });
     frentes.push({
-      num:       fi+1,
+      num:fi+1,
       tramo:     gv('f'+fn+'-tramo'),
       est_inicio:gv('f'+fn+'-einicio'),
       est_fin:   gv('f'+fn+'-efin'),
       hinicio:   gv('f'+fn+'-hinicio'),
       hfin:      gv('f'+fn+'-hfin'),
-      actividades: actividades
+      senales:   senales
     });
   });
   d.frentes = frentes;
@@ -1002,6 +983,122 @@ function gvById(id){ var el=document.getElementById(id); return el?el.value:''; 
 /* ── ENVÍO ── */
 function setMsg(html){ document.getElementById('r-msg').innerHTML=html; }
 
+
+/* ── ACTIVIDADES HOR ── */
+function addActividad(fn) {
+  actCnt[fn] = (actCnt[fn] || 0) + 1;
+  var an = actCnt[fn];
+  var aid = 'f' + fn + 'a' + an;
+  var catKeys = Object.keys(CATEGORIAS_ACT);
+  var catOpts = catKeys.map(function(k) { return '<option value="' + k + '">' + k.replace('MarcasSimbolos','Marcas/Símbolos') + '</option>'; }).join('');
+  var div = document.createElement('div');
+  div.className = 'act-block';
+  div.id = aid;
+  div.innerHTML =
+    '<div class="frente-header">' +
+      '<span class="act-num gen" id="' + aid + '-badge">Actividad ' + an + '</span>' +
+      '<button class="btn-rm" onclick="document.getElementById(\'' + aid + '\').remove()">✕</button>' +
+    '</div>' +
+    '<div class="cat-row">' +
+      '<div class="field"><label>Categoría</label>' +
+        '<select id="' + aid + '-cat" onchange="onCatChange(\'' + aid + '\')">' +
+          '<option value="">Seleccionar...</option>' + catOpts +
+        '</select>' +
+      '</div>' +
+      '<div class="unidad-wrap"><label style="font-size:11px">Unidad</label>' +
+        '<div class="unidad-auto" id="' + aid + '-unidad">—</div>' +
+      '</div>' +
+      '<div class="field"><label>Cantidad</label>' +
+        '<input type="number" id="' + aid + '-qty" placeholder="0" min="0">' +
+      '</div>' +
+    '</div>' +
+    '<div id="' + aid + '-extra"></div>' +
+    '<div id="' + aid + '-mats-wrap" style="display:none">' +
+      '<div class="mat-sublabel">Materiales</div>' +
+      '<div id="' + aid + '-mats"></div>' +
+      '<button class="btn-add" onclick="addMatAct(\'' + aid + '\')">+ Agregar material</button>' +
+    '</div>';
+  document.getElementById('f' + fn + '-acts').appendChild(div);
+}
+
+function onCatChange(aid) {
+  var cat  = document.getElementById(aid + '-cat').value;
+  var conf = CATEGORIAS_ACT[cat];
+  var badge = document.getElementById(aid + '-badge');
+  if (!conf) return;
+  document.getElementById(aid + '-unidad').textContent = conf.unidad;
+  badge.className   = 'act-num ' + conf.clase;
+  badge.textContent = cat.replace('MarcasSimbolos','Marcas/Símbolos');
+  var extra = document.getElementById(aid + '-extra');
+  extra.innerHTML = '';
+  if (conf.campos === 'lineal') {
+    extra.innerHTML =
+      '<div class="row r3" style="margin-top:8px">' +
+        '<div class="field"><label>ML premarcado</label><input type="number" id="' + aid + '-mlp" placeholder="0" min="0"></div>' +
+        '<div class="field"><label>ML aplicado</label><input type="number" id="' + aid + '-mla" placeholder="0" min="0"></div>' +
+        '<div class="field"><label>Ancho (cm)</label><input type="number" id="' + aid + '-ancho" placeholder="15" min="1"></div>' +
+      '</div>' +
+      '<div class="row r2" style="margin-top:0">' +
+        '<div class="field"><label>Tipo de línea</label>' +
+          '<select id="' + aid + '-linea">' +
+            '<option value="">— Seleccionar —</option>' +
+            '<option>Continua</option><option>Discontinua</option><option>Guion</option><option>Cebra</option><option>Doble continua</option>' +
+          '</select>' +
+        '</div>' +
+        '<div class="field"><label>Color</label>' +
+          '<select id="' + aid + '-color"><option>Blanco</option><option>Amarillo</option><option>Ambos</option></select>' +
+        '</div>' +
+      '</div>';
+  } else {
+    extra.innerHTML =
+      '<div class="field" style="margin-top:8px"><label>Descripción</label>' +
+        '<input type="text" id="' + aid + '-detalle" placeholder="Descripción de la actividad...">' +
+      '</div>';
+  }
+  document.getElementById(aid + '-mats-wrap').style.display = 'block';
+  var cont = document.getElementById(aid + '-mats');
+  cont.innerHTML = '';
+  (catalogoHOR[cat] || []).forEach(function(m) { addMatActEl(aid, m.n, m.u); });
+}
+
+function addMatAct(aid) {
+  var cat  = document.getElementById(aid + '-cat').value;
+  var mats = catalogoHOR[cat] || [];
+  var opts = '<option value="">— Material —</option>' + mats.map(function(m) {
+    return '<option value="' + m.n + '|' + m.u + '">' + m.n + '</option>';
+  }).join('');
+  addMatActEl(aid, '', '', opts);
+}
+
+function addMatActEl(aid, nombre, unidad, opts) {
+  var cont = document.getElementById(aid + '-mats');
+  if (!cont) return;
+  var cat  = document.getElementById(aid + '-cat') ? document.getElementById(aid + '-cat').value : '';
+  var mats = catalogoHOR[cat] || [];
+  if (!opts) {
+    opts = '<option value="">— Material —</option>' + mats.map(function(m) {
+      return '<option value="' + m.n + '|' + m.u + '"' + (m.n === nombre ? ' selected' : '') + '>' + m.n + '</option>';
+    }).join('');
+  }
+  var row = document.createElement('div');
+  row.className = 'mat-row';
+  row.innerHTML =
+    '<select onchange="autoUnitHOR(this)">' + opts + '</select>' +
+    '<input type="number" placeholder="Cant." min="0">' +
+    '<select style="font-size:12px;padding:5px 6px;width:68px">' +
+      UNIDADES_HOR.map(function(u) { return '<option' + (u === unidad ? ' selected' : '') + '>' + u + '</option>'; }).join('') +
+    '</select>' +
+    '<button onclick="this.closest(\'.mat-row\').remove()" class="btn-rm" style="font-size:14px">✕</button>';
+  cont.appendChild(row);
+}
+
+function autoUnitHOR(sel) {
+  var val = sel.value; if (!val) return;
+  var unit = val.split('|')[1] || '';
+  var us = sel.parentElement.querySelector('select:last-of-type');
+  if (us && unit) { for (var i = 0; i < us.options.length; i++) { if (us.options[i].value === unit) { us.selectedIndex = i; break; } } }
+}
+
 function enviar(){
   if(!document.getElementById('r-confirmado').checked){
     document.getElementById('confirm-lbl').style.outline='2px solid var(--rojo)';
@@ -1021,7 +1118,7 @@ function enviar(){
   fetch(WEBAPP_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)})
   .then(function(){
     btn.disabled = false; btn.innerHTML = '📨 Enviar reporte';
-    document.getElementById('r-numreporte').value = d.proyecto+'-VER-'+new Date().getFullYear()+'-✓';
+    document.getElementById('r-numreporte').value = d.proyecto+'-HOR-'+new Date().getFullYear()+'-✓';
     setMsg('<div class="status-box status-ok">✓ Reporte enviado correctamente. Descargando CSV de respaldo...</div>');
     exportCSV(d);
   })
@@ -1035,43 +1132,79 @@ function enviar(){
 function exportarExcel(){
   if(typeof ExcelJS==='undefined'){ alert('ExcelJS no cargó. Verifica conexión.'); return; }
   var d = recopilar();
-  var NEGRO='FF111111',AMAR='FFF5A623',BLANC='FFFFFFFF',GRIS2='FFE8ECF0';
-  var wb=new ExcelJS.Workbook(); wb.creator='CNK Señalización Vial';
-  var ws=wb.addWorksheet('Bitácora HOR',{pageSetup:{paperSize:9,orientation:'landscape',fitToPage:true}});
-  ws.columns=[{width:7},{width:20},{width:16},{width:10},{width:10},{width:10},{width:10},{width:14},{width:12}];
-  function st(bg,fg,bold,sz,align){return{font:{name:'Arial',bold:!!bold,size:sz||9,color:{argb:fg||NEGRO}},fill:bg?{type:'pattern',pattern:'solid',fgColor:{argb:bg}}:undefined,alignment:{horizontal:align||'left',vertical:'middle',wrapText:true},border:{top:{style:'thin',color:{argb:'FFD0D0D0'}},left:{style:'thin',color:{argb:'FFD0D0D0'}},bottom:{style:'thin',color:{argb:'FFD0D0D0'}},right:{style:'thin',color:{argb:'FFD0D0D0'}}}};}
-  function sec(label){var r=ws.addRow([label]);r.height=18;ws.mergeCells('A'+r.number+':I'+r.number);for(var i=1;i<=9;i++)Object.assign(r.getCell(i),st(NEGRO,BLANC,true,11,'left'));r.getCell(1).value=label;}
-  function cols(arr){var r=ws.addRow(arr);r.height=14;r.eachCell(function(c){Object.assign(c,st(GRIS2,NEGRO,true,9,'center'));});}
-  function row(arr,shade){var r=ws.addRow(arr);r.height=13;r.eachCell(function(c){Object.assign(c,st(shade?'FFFAFAFA':BLANC,NEGRO,false,9,'left'));});}
-  // TITULO
+  var NEGRO='FF111111', NEGRO2='FF1a1a1a', AMAR='FFF5A623', BLANC='FFFFFFFF', GRIS='FFF4F6F9', GRIS2='FFE8ECF0';
+
+  var wb = new ExcelJS.Workbook();
+  wb.creator='CNK Señalización Vial';
+  var ws = wb.addWorksheet('Bitácora HOR',{pageSetup:{paperSize:9,orientation:'landscape',fitToPage:true}});
+  ws.columns=[{width:7},{width:20},{width:16},{width:16},{width:10},{width:28},{width:10},{width:10},{width:10}];
+
+  function st(bg,fg,bold,sz,align){
+    return {
+      font:{name:'Arial',bold:!!bold,size:sz||9,color:{argb:fg||'FF111111'}},
+      fill:bg?{type:'pattern',pattern:'solid',fgColor:{argb:bg}}:undefined,
+      alignment:{horizontal:align||'left',vertical:'middle',wrapText:true},
+      border:{top:{style:'thin',color:{argb:'FFD0D0D0'}},left:{style:'thin',color:{argb:'FFD0D0D0'}},bottom:{style:'thin',color:{argb:'FFD0D0D0'}},right:{style:'thin',color:{argb:'FFD0D0D0'}}}
+    };
+  }
+  function sec(label){
+    var r=ws.addRow([label]); r.height=18;
+    ws.mergeCells('A'+r.number+':I'+r.number);
+    r.getCell(1).value=label;
+    for(var i=1;i<=9;i++) Object.assign(r.getCell(i),st(NEGRO,BLANC,true,11,'left'));
+  }
+  function cols(arr){
+    var r=ws.addRow(arr); r.height=14;
+    r.eachCell(function(cell){ Object.assign(cell,st(GRIS2,NEGRO,true,9,'center')); });
+  }
+  function row(arr,shade){
+    var r=ws.addRow(arr); r.height=13;
+    r.eachCell(function(cell){ Object.assign(cell,st(shade?'FFFAFAFA':BLANC,'FF111111',false,9,'left')); });
+  }
+
+  // TÍTULO
   var t1=ws.addRow(['CNK SEÑALIZACIÓN VIAL — BITÁCORA DIARIA DE SEÑALIZACIÓN HORIZONTAL']);
-  t1.height=22;ws.mergeCells('A1:I1');
-  for(var i=1;i<=9;i++)Object.assign(t1.getCell(i),st(AMAR,NEGRO,true,13,'center'));
+  t1.height=22; ws.mergeCells('A1:I1');
   t1.getCell(1).value='CNK SEÑALIZACIÓN VIAL — BITÁCORA DIARIA DE SEÑALIZACIÓN HORIZONTAL';
-  var t2=ws.addRow(['Normativa SIECA 2014 · Registro de producción de campo','','','','','','','','Fecha: '+(d.fecha||'')]);
-  t2.height=13;ws.mergeCells('A2:H2');
+  for(var i=1;i<=9;i++) Object.assign(t1.getCell(i),st(AMAR,NEGRO,true,13,'center'));
+
+  var t2=ws.addRow(['Normativa SIECA 2014 · Registro de señales instaladas en campo','','','','','','','','Fecha: '+(d.fecha||'')]);
+  t2.height=13; ws.mergeCells('A2:H2');
   Object.assign(t2.getCell(1),st(NEGRO,'FFaaaaaa',false,9,'left'));
   Object.assign(t2.getCell(9),st(NEGRO,AMAR,true,9,'right'));
   ws.addRow([]);
+
   // INFO GENERAL
   sec('INFORMACIÓN GENERAL');
   var r4=ws.addRow(['Proyecto',d.proyecto||'','Orden de trabajo',d.orden_trabajo||'','N° Reporte',d.contrato||'','Responsable',d.nombre||'','']);
-  r4.height=13;[1,3,5,7].forEach(function(i){Object.assign(r4.getCell(i),st(GRIS2,NEGRO,true,9));});[2,4,6,8].forEach(function(i){Object.assign(r4.getCell(i),st(BLANC,NEGRO,false,9));});
+  r4.height=13;
+  [1,3,5,7].forEach(function(i){ Object.assign(r4.getCell(i),st(GRIS2,NEGRO,true,9)); });
+  [2,4,6,8].forEach(function(i){ Object.assign(r4.getCell(i),st(BLANC,'FF111111',false,9)); });
   var r5=ws.addRow(['Rol',d.rol||'','Fecha',d.fecha||'','Hora inicio',d.hinicio||'','Hora fin',d.hfin||'','']);
-  r5.height=13;[1,3,5,7].forEach(function(i){Object.assign(r5.getCell(i),st(GRIS2,NEGRO,true,9));});[2,4,6,8].forEach(function(i){Object.assign(r5.getCell(i),st(BLANC,NEGRO,false,9));});
+  r5.height=13;
+  [1,3,5,7].forEach(function(i){ Object.assign(r5.getCell(i),st(GRIS2,NEGRO,true,9)); });
+  [2,4,6,8].forEach(function(i){ Object.assign(r5.getCell(i),st(BLANC,'FF111111',false,9)); });
   var r6=ws.addRow(['Clima',d.clima||'','Total personas',d.total_personas||'','','','','','']);
-  r6.height=13;[1,3].forEach(function(i){Object.assign(r6.getCell(i),st(GRIS2,NEGRO,true,9));});[2,4].forEach(function(i){Object.assign(r6.getCell(i),st(BLANC,NEGRO,false,9));});
+  r6.height=13;
+  [1,3].forEach(function(i){ Object.assign(r6.getCell(i),st(GRIS2,NEGRO,true,9)); });
+  [2,4].forEach(function(i){ Object.assign(r6.getCell(i),st(BLANC,'FF111111',false,9)); });
   ws.addRow([]);
-  // FRENTES Y ACTIVIDADES
+
+  // FRENTES Y SEÑALES
   sec('FRENTES Y ACTIVIDADES');
   cols(['Frente','Tramo','Categoría','Unidad','Cantidad','ML Prem.','ML Aplic.','Tipo línea','Ancho (cm)']);
   var shade=false;
   (d.frentes||[]).forEach(function(fr){
     (fr.actividades||[]).forEach(function(a){
-      row([fr.num,fr.tramo||'',a.categoria||'',a.unidad||'',a.cantidad||'',a.mlp||'',a.mla||'',a.tipo_linea||'',a.ancho||''],shade);shade=!shade;
+      row([fr.num,fr.tramo||'',a.categoria||'',a.unidad||'',a.cantidad||'',a.mlp||'',a.mla||'',a.tipo_linea||'',a.ancho||''],shade);
+      shade=!shade;
     });
   });
   ws.addRow([]);
+
+  // CANTIDAD POR TIPO
+
+
   // MATERIALES
   sec('MATERIALES UTILIZADOS');
   cols(['Frente','Actividad','Material','Cantidad','Unidad','','','','']);
@@ -1079,39 +1212,55 @@ function exportarExcel(){
   (d.frentes||[]).forEach(function(fr){
     (fr.actividades||[]).forEach(function(a){
       (a.materiales||[]).forEach(function(m){
-        row([fr.num,a.categoria||'',m.material||'',m.cantidad||'',m.unidad||'','','','',''],shade);shade=!shade;
+        row([fr.num,a.categoria||'',m.material||'',m.cantidad||'',m.unidad||'','','','',''],shade);
+        shade=!shade;
       });
     });
   });
   ws.addRow([]);
+
   // PERSONAL
   sec('PERSONAL EN ESTA ACTIVIDAD');
   cols(['Rol','Nombre','Presente','','','','','','']);
-  shade=false;(d.personal||[]).forEach(function(p){row([p.rol||'',p.nombre||'',p.presente?'✓':'','','','','','',''],shade);shade=!shade;});
+  shade=false;
+  (d.personal||[]).forEach(function(p){
+    row([p.rol||'',p.nombre||'',p.presente?'✓':'','','','','','',''],shade);
+    shade=!shade;
+  });
   ws.addRow([]);
+
   // INTERRUPCIONES
   if(d.interrupciones&&d.interrupciones.some(function(i){return i.causa;})){
-    sec('INTERRUPCIONES');cols(['#','Causa','Descripción','H. Inicio','H. Fin','Duración','','','']);
-    d.interrupciones.forEach(function(n,i){if(n.causa)row([i+1,n.causa||'',n.desc||'',n.inicio||'',n.fin||'',n.duracion||'','','',''],i%2===1);});
+    sec('INTERRUPCIONES');
+    cols(['#','Causa','Descripción','H. Inicio','H. Fin','Duración','','','']);
+    d.interrupciones.forEach(function(n,i){
+      if(n.causa) row([i+1,n.causa||'',n.desc||'',n.inicio||'',n.fin||'',n.duracion||'','','',''],i%2===1);
+    });
     ws.addRow([]);
   }
+
   // NOVEDADES
   if(d.novedades&&d.novedades.some(function(n){return n.tipo;})){
-    sec('NOVEDADES E IMPREVISTOS');cols(['#','Tipo','Descripción','H. Inicio','H. Fin','Duración','Fotos','','']);
-    d.novedades.forEach(function(n,i){if(n.tipo)row([i+1,n.tipo||'',n.desc||'',n.hora_ini||'',n.hora_fin||'',n.duracion||'',n.fotos||'','',''],i%2===1);});
+    sec('NOVEDADES E IMPREVISTOS');
+    cols(['#','Tipo','Descripción','H. Inicio','H. Fin','Duración','Fotos','','']);
+    d.novedades.forEach(function(n,i){
+      if(n.tipo) row([i+1,n.tipo||'',n.desc||'',n.hora_ini||'',n.hora_fin||'',n.duracion||'',n.fotos||'','',''],i%2===1);
+    });
     ws.addRow([]);
   }
+
   // FOOTER
   var rf=ws.addRow(['CNK Señalización Vial · Sistema de Gestión · Guatemala '+new Date().getFullYear()]);
   ws.mergeCells('A'+rf.number+':I'+rf.number);
   Object.assign(rf.getCell(1),{font:{name:'Arial',italic:true,size:8,color:{argb:'FF888888'}},alignment:{horizontal:'right'}});
+
   wb.xlsx.writeBuffer().then(function(buf){
     var blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
     var url=URL.createObjectURL(blob);
     var a=document.createElement('a');
     a.href=url;
     a.download='CNK_Bitacora_HOR_'+(d.proyecto||'SIN_PROYECTO').replace(/[^a-z0-9]/gi,'_')+'_'+(d.fecha||new Date().toISOString().slice(0,10))+'.xlsx';
-    document.body.appendChild(a);a.click();
+    document.body.appendChild(a); a.click();
     setTimeout(function(){URL.revokeObjectURL(url);a.remove();},1000);
   }).catch(function(e){alert('Error al generar Excel: '+e.message);});
 }
@@ -1125,7 +1274,7 @@ function soloCSV(){ exportCSV(recopilar()); }
 function exportCSV(d){
   if(!d) d = recopilar();
   var rows=[
-    ['BITÁCORA DIARIA — SEÑALIZACIÓN VERTICAL'],
+    ['BITÁCORA DIARIA — SEÑALIZACIÓN HORIZONTAL'],
     ['CNK Señalización Vial · '+d.contrato],[''],
     ['Campo','Valor'],
     ['Proyecto',d.proyecto],['Orden de trabajo',d.orden_trabajo],
