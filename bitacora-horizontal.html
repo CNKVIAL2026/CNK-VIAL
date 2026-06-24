@@ -1119,13 +1119,11 @@ function enviar(){
   .then(function(){
     btn.disabled = false; btn.innerHTML = '📨 Enviar reporte';
     document.getElementById('r-numreporte').value = d.proyecto+'-HOR-'+new Date().getFullYear()+'-✓';
-    setMsg('<div class="status-box status-ok">✓ Reporte enviado correctamente. Descargando CSV de respaldo...</div>');
-    exportCSV(d);
+    setMsg('<div class="status-box status-ok">✓ Reporte enviado correctamente.</div>');
   })
   .catch(function(){
     btn.disabled = false; btn.innerHTML = '📨 Enviar reporte';
-    setMsg('<div class="status-box status-err">⚠️ Error de conexión. CSV descargado. Intenta de nuevo.</div>');
-    exportCSV(d);
+    setMsg('<div class="status-box status-err">⚠️ Error de conexión. Intenta de nuevo.</div>');
   });
 }
 
@@ -1265,59 +1263,10 @@ function exportarExcel(){
   }).catch(function(e){alert('Error al generar Excel: '+e.message);});
 }
 
-function soloCSV(){ exportCSV(recopilar()); }
 
 
 
 
-/* ── CSV ── */
-function exportCSV(d){
-  if(!d) d = recopilar();
-  var rows=[
-    ['BITÁCORA DIARIA — SEÑALIZACIÓN HORIZONTAL'],
-    ['CNK Señalización Vial · '+d.contrato],[''],
-    ['Campo','Valor'],
-    ['Proyecto',d.proyecto],['Orden de trabajo',d.orden_trabajo],
-    ['Nombre',d.nombre],['Rol',d.rol],['Fecha',d.fecha],
-    ['Hora inicio',d.hinicio],['Hora fin',d.hfin],
-    ['Total personas',d.total_personas],['Clima',d.clima],
-    [''],['INTERRUPCIONES'],['Causa','H. Inicio','H. Fin','Duración']
-  ];
-  (d.interrupciones||[]).forEach(function(i){ rows.push([i.causa,i.inicio,i.fin,i.duracion]); });
-  rows.push([''],['FRENTES Y SEÑALES']);
-  rows.push(['Frente','Tramo','Est. Ini','Est. Fin','Tipo Señal','Subcategoría','Código','Descripción','Tamaño','Lado','Cantidad','Unidad']);
-  (d.frentes||[]).forEach(function(f){
-    (f.senales||[]).forEach(function(s){
-      rows.push([f.num,f.tramo,f.est_inicio,f.est_fin,s.tipo,s.subcat,s.codigo,s.desc,s.tamanio,s.lado,s.cantidad,'Und']);
-    });
-  });
-  rows.push([''],['MATERIALES']);
-  rows.push(['Frente','Tipo Señal','Material','Cantidad','Unidad']);
-  (d.frentes||[]).forEach(function(f){
-    (f.senales||[]).forEach(function(s){
-      (s.materiales||[]).forEach(function(m){ rows.push([f.num,s.tipo,m.material,m.cantidad,m.unidad]); });
-    });
-  });
-  rows.push([''],['PERSONAL'],['Rol','Nombre','Presente']);
-  (d.personal||[]).forEach(function(p){ rows.push([p.rol,p.nombre,p.presente?'Sí':'No']); });
-  rows.push([''],['NOVEDADES'],['#','Tipo','Descripción','H. Inicio','H. Fin','Duración','Fotos']);
-  (d.novedades||[]).forEach(function(n,i){ rows.push([i+1,n.tipo,n.desc,n.hora_ini,n.hora_fin,n.duracion,n.fotos]); });
-
-  var csv = rows.map(function(r){
-    return r.map(function(c){
-      var s=String(c||'').replace(/"/g,'""');
-      return(s.indexOf(',')>-1||s.indexOf('"')>-1)?'"'+s+'"':s;
-    }).join(',');
-  }).join('\n');
-
-  var blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
-  var url  = URL.createObjectURL(blob);
-  var a    = document.createElement('a');
-  a.href   = url;
-  a.download = 'bitacora-vertical_'+(d.fecha||'sin_fecha')+'_'+(d.nombre||'sin_nombre').replace(/\s+/g,'_')+'.csv';
-  a.click();
-  URL.revokeObjectURL(url);
-}
 
 /* ── UTILS ── */
 function toMin(t){ var p=t.split(':'); return parseInt(p[0])*60+parseInt(p[1]); }
