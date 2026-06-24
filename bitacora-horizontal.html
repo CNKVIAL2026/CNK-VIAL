@@ -1034,16 +1034,17 @@ function onCatChange(aid) {
   extra.innerHTML = '';
   if (conf.campos === 'lineal') {
     extra.innerHTML =
-      '<div class="row r3" style="margin-top:8px">' +
-        '<div class="field"><label>ML premarcado</label><input type="number" id="' + aid + '-mlp" placeholder="0" min="0"></div>' +
-        '<div class="field"><label>ML aplicado</label><input type="number" id="' + aid + '-mla" placeholder="0" min="0"></div>' +
+      '<div class="row r4" style="margin-top:8px">' +
+        '<div class="field"><label>ML premarcado</label><input type="number" id="' + aid + '-mlp" placeholder="0" min="0" oninput="calcMLTotal(\'' + aid + '\')"></div>' +
+        '<div class="field"><label>ML aplicado</label><input type="number" id="' + aid + '-mla" placeholder="0" min="0" oninput="calcMLTotal(\'' + aid + '\')"></div>' +
+        '<div class="field"><label>Cantidad (ML)</label><input type="number" id="' + aid + '-qty" placeholder="0" min="0" readonly style="background:#f4f6f9;cursor:default"></div>' +
         '<div class="field"><label>Ancho (cm)</label><input type="number" id="' + aid + '-ancho" placeholder="15" min="1"></div>' +
       '</div>' +
       '<div class="row r2" style="margin-top:0">' +
         '<div class="field"><label>Tipo de línea</label>' +
           '<select id="' + aid + '-linea">' +
             '<option value="">— Seleccionar —</option>' +
-            '<option>Continua</option><option>Discontinua</option><option>Guion</option><option>Cebra</option><option>Doble continua</option>' +
+            '<option>Continua</option><option>Discontinua</option><option>Guion</option><option>Doble continua</option>' +
           '</select>' +
         '</div>' +
         '<div class="field"><label>Color</label>' +
@@ -1091,6 +1092,12 @@ function addMatActEl(aid, nombre, unidad, opts) {
     '</select>' +
     '<button onclick="this.closest(\'.mat-row\').remove()" class="btn-rm" style="font-size:14px">✕</button>';
   cont.appendChild(row);
+}
+
+function calcMLTotal(aid) {
+  var mlp = parseFloat(document.getElementById(aid+'-mlp').value) || 0;
+  var mla = parseFloat(document.getElementById(aid+'-mla').value) || 0;
+  document.getElementById(aid+'-qty').value = mlp + mla || '';
 }
 
 function autoUnitHOR(sel) {
