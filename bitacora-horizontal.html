@@ -8,119 +8,127 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <script src="https://accounts.google.com/gsi/client" async defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --negro:        #111111;
-  --negro-medio:  #1a1a1a;
-  --amarillo:     #F5A623;
-  --amBg:         rgba(245,166,35,.10);
-  --amBd:         rgba(245,166,35,.30);
-  --claro:        #a8c0d8;
-  --opaco:        #5a7a99;
-  --blanco:       #ffffff;
-  --gris:         #f4f6f9;
-  --grisBd:       #dde3ea;
-  --verde:        #1d9e75;
-  --rojo:         #c0392b;
+  --azul:        #0B2545;
+  --azul-medio:  #0d2d56;
+  --amarillo:    #F5A623;
+  --amarillo-bg: rgba(245,166,35,.10);
+  --amarillo-bd: rgba(245,166,35,.30);
+  --texto-claro: #a8c0d8;
+  --texto-opaco: #5a7a99;
+  --blanco:      #ffffff;
+  --gris-bg:     #f4f6f9;
+  --gris-bd:     #dde3ea;
+  --verde:       #1d9e75;
+  --rojo:        #c0392b;
 }
-body { font-family: 'Inter', sans-serif; background: var(--gris); color: var(--negro); min-height: 100vh; }
+body { font-family: 'Inter', sans-serif; background: var(--gris-bg); color: var(--azul); min-height: 100vh; }
 
 /* ── TOPBAR ── */
 .topbar {
-  background: var(--negro); padding: 10px 28px;
+  background: var(--azul); padding: 10px 28px;
   display: flex; align-items: center; justify-content: space-between;
   position: sticky; top: 0; z-index: 100;
   box-shadow: 0 2px 8px rgba(0,0,0,.25);
 }
 .logo-area { display: flex; align-items: center; gap: 12px; }
-.logo-box { width: 36px; height: 36px; background: var(--amarillo); border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; color: var(--negro); }
+.logo-box { width: 36px; height: 36px; background: var(--amarillo); border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; color: var(--azul); }
 .brand-name { color: var(--blanco); font-size: 14px; font-weight: 700; }
 .brand-name span { color: var(--amarillo); }
-.brand-sub { color: var(--opaco); font-size: 8px; letter-spacing: .9px; text-transform: uppercase; margin-top: 2px; }
+.brand-sub { color: var(--texto-opaco); font-size: 8px; letter-spacing: .9px; text-transform: uppercase; margin-top: 2px; }
 .topbar-right { display: flex; align-items: center; gap: 16px; }
-.pais { color: var(--opaco); font-size: 10px; }
-.avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--amarillo); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; color: var(--negro); flex-shrink: 0; }
+.pais { color: var(--texto-opaco); font-size: 10px; }
+.avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--amarillo); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; color: var(--azul); flex-shrink: 0; }
 .user-block { display: flex; align-items: center; gap: 10px; }
 .user-info { text-align: right; line-height: 1.3; }
 .user-name { color: var(--blanco); font-size: 11px; font-weight: 600; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.user-rol { color: var(--opaco); font-size: 9px; text-transform: uppercase; letter-spacing: .4px; }
-.btn-logout { background: none; border: 1px solid rgba(255,255,255,.15); color: var(--claro); font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 6px; transition: background .15s, color .15s, border-color .15s; }
+.user-rol { color: var(--texto-opaco); font-size: 9px; text-transform: uppercase; letter-spacing: .4px; }
+.btn-logout { background: none; border: 1px solid rgba(255,255,255,.15); color: var(--texto-claro); font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 6px; transition: background .15s, color .15s, border-color .15s; }
 .btn-logout:hover { background: rgba(255,255,255,.06); color: var(--blanco); border-color: rgba(255,255,255,.3); }
 
 /* ── VERIFICACIÓN DE SESIÓN ── */
 body.cnk-auth-pending #cnk-app { display: none; }
-.auth-gate { position: fixed; inset: 0; z-index: 999; background: var(--negro); display: none; align-items: center; justify-content: center; flex-direction: column; gap: 12px; }
+.auth-gate { position: fixed; inset: 0; z-index: 999; background: var(--azul); display: none; align-items: center; justify-content: center; flex-direction: column; gap: 12px; }
 body.cnk-auth-pending .auth-gate { display: flex; }
 .auth-gate .ag-spinner { width: 22px; height: 22px; border: 3px solid rgba(255,255,255,.15); border-top-color: var(--amarillo); border-radius: 50%; animation: cnkspin .7s linear infinite; }
-.auth-gate span { color: var(--claro); font-size: 12px; }
+.auth-gate span { color: var(--texto-claro); font-size: 12px; }
 @keyframes cnkspin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .auth-gate .ag-spinner { animation: none; border-top-color: var(--amarillo); } }
 
 /* ── MEGAMENÚ ── */
-.mm-item { display: flex; align-items: center; gap: 12px; color: #b9c4d0; text-decoration: none; padding: 14px 24px; font-size: 14px; font-weight: 500; transition: .2s; }
-.mm-item:hover { background: rgba(245,166,35,.08); color: var(--blanco); }
-.mm-item.active { background: var(--amBg); color: var(--amarillo); border-bottom: 2px solid var(--amarillo); }
-.mm-icon { width: 20px; text-align: center; font-size: 16px; }
+.megamenu { background: var(--azul-medio); border-bottom: 2px solid var(--amarillo); padding: 0 28px; display: flex; overflow-x: auto; }
+.megamenu::-webkit-scrollbar { height: 0; }
+.mm-item { padding: 9px 16px; color: var(--texto-claro); font-size: 11px; font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; white-space: nowrap; display: flex; align-items: center; gap: 5px; text-decoration: none; transition: color .15s; }
+.mm-item:hover { color: var(--blanco); }
+.mm-item.active { color: var(--amarillo); border-bottom: 2px solid var(--amarillo); background: var(--amarillo-bg); }
 
 /* ── HERO COMPACTO ── */
-.hero-sm { background: var(--negro); padding: 18px 28px 22px; border-bottom: 3px solid var(--amarillo); }
+.hero-sm { background: var(--azul); padding: 18px 28px 22px; border-bottom: 3px solid var(--amarillo); }
 .breadcrumb { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
-.breadcrumb a { font-size: 9px; color: var(--opaco); text-decoration: none; }
+.breadcrumb a { font-size: 9px; color: var(--texto-opaco); text-decoration: none; }
 .breadcrumb a:hover { color: var(--amarillo); }
-.breadcrumb .sep { color: var(--opaco); font-size: 9px; }
+.breadcrumb .sep { color: var(--texto-opaco); font-size: 9px; }
 .breadcrumb .cur { font-size: 9px; color: var(--amarillo); }
 .hero-sm h1 { color: var(--blanco); font-size: 18px; font-weight: 800; }
 .hero-sm h1 em { color: var(--amarillo); font-style: normal; }
-.hero-sm p { color: var(--claro); font-size: 11px; margin-top: 5px; }
+.hero-sm p { color: var(--texto-claro); font-size: 11px; margin-top: 5px; }
+
+/* ── SELECTOR DE FORMULARIOS ── */
+.form-selector { background: var(--blanco); border-bottom: 1px solid var(--gris-bd); padding: 14px 28px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.form-selector label { font-size: 11px; font-weight: 600; color: var(--texto-opaco); white-space: nowrap; }
+.form-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.form-tab { padding: 7px 14px; border: 1px solid var(--gris-bd); border-radius: 6px; font-size: 11px; font-weight: 500; cursor: pointer; background: var(--gris-bg); color: #667; font-family: 'Inter', sans-serif; transition: all .15s; }
+.form-tab:hover { border-color: var(--azul); color: var(--azul); }
+.form-tab.active { background: var(--azul); color: var(--amarillo); border-color: var(--azul); font-weight: 700; }
 
 /* ── CONTENEDOR ── */
-.form-wrap { padding: 20px 28px; }
+.form-wrap { padding: 20px 28px; max-width: 820px; margin: 0 auto; }
 
 /* ── APP / SECCIONES ── */
 .app { background: var(--blanco); border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 6px rgba(0,0,0,.08); }
-.form-header { border-bottom: 1px solid var(--grisBd); padding-bottom: 1rem; margin-bottom: 1.5rem; }
-.form-ref { font-size: 11px; color: var(--opaco); margin-bottom: 4px; }
-.form-titulo { font-size: 18px; font-weight: 700; color: var(--negro); }
+.form-header { border-bottom: 1px solid var(--gris-bd); padding-bottom: 1rem; margin-bottom: 1.5rem; }
+.form-ref { font-size: 11px; color: var(--texto-opaco); margin-bottom: 4px; }
+.form-titulo { font-size: 18px; font-weight: 700; color: var(--azul); }
 .form-subtipo { font-size: 12px; color: #889; margin-top: 3px; }
 
-.sec { margin-bottom: 1.25rem; background: var(--blanco); border: 1px solid var(--grisBd); border-radius: 12px; padding: 1.25rem; }
-.sec-title { font-size: 11px; font-weight: 700; color: var(--opaco); text-transform: uppercase; letter-spacing: .7px; margin-bottom: 1rem; display: flex; align-items: center; gap: 6px; }
+.sec { margin-bottom: 1.25rem; background: var(--blanco); border: 1px solid var(--gris-bd); border-radius: 12px; padding: 1.25rem; }
+.sec-title { font-size: 11px; font-weight: 700; color: var(--texto-opaco); text-transform: uppercase; letter-spacing: .7px; margin-bottom: 1rem; display: flex; align-items: center; gap: 6px; }
 
 .row { display: grid; gap: 10px; margin-bottom: 10px; }
 .r2 { grid-template-columns: 1fr 1fr; }
 .r3 { grid-template-columns: 1fr 1fr 1fr; }
 .r4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
-@media(max-width:600px){ .r2,.r3,.r4 { grid-template-columns: 1fr 1fr; } }
+@media(max-width:560px){ .r2,.r3,.r4 { grid-template-columns: 1fr 1fr; } }
 @media(max-width:380px){ .r2,.r3,.r4 { grid-template-columns: 1fr; } }
 
 .field { display: flex; flex-direction: column; gap: 4px; }
 label { font-size: 12px; color: #667; font-weight: 500; }
-input, select, textarea { font-family: 'Inter', sans-serif; font-size: 13px; color: var(--negro); background: var(--gris); border: 1px solid var(--grisBd); border-radius: 8px; padding: 8px 10px; width: 100%; outline: none; transition: border-color .15s; }
-input:focus, select:focus, textarea:focus { border-color: var(--negro); background: var(--blanco); }
+input, select, textarea { font-family: 'Inter', sans-serif; font-size: 13px; color: var(--azul); background: var(--gris-bg); border: 1px solid var(--gris-bd); border-radius: 8px; padding: 8px 10px; width: 100%; outline: none; transition: border-color .15s; }
+input:focus, select:focus, textarea:focus { border-color: var(--azul); background: var(--blanco); }
 textarea { resize: vertical; min-height: 60px; }
 
 /* código auto */
-.codigo-auto { background: #e8f0f8; color: var(--negro); font-weight: 700; cursor: not-allowed; }
+.codigo-auto { background: #e8f0f8; color: var(--azul); font-weight: 700; cursor: not-allowed; }
 
 /* ── FRENTES ── */
-.frente-block { border: 1px solid var(--grisBd); border-radius: 10px; padding: 1rem; margin-bottom: 10px; background: var(--gris); }
+.frente-block { border: 1px solid var(--gris-bd); border-radius: 10px; padding: 1rem; margin-bottom: 10px; background: var(--gris-bg); }
 .frente-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-.frente-num { font-size: 11px; font-weight: 700; color: var(--opaco); text-transform: uppercase; letter-spacing: .5px; }
+.frente-num { font-size: 11px; font-weight: 700; color: var(--texto-opaco); text-transform: uppercase; letter-spacing: .5px; }
 .btn-rm { background: none; border: none; cursor: pointer; color: #aaa; font-size: 16px; padding: 2px 5px; border-radius: 4px; }
 .btn-rm:hover { color: var(--rojo); background: #fdf0ef; }
 
-/* ── ACTIVIDADES (Equivalente a Señales) ── */
+/* ── ACTIVIDADES ── */
 .actividades-wrap { margin-top: 8px; }
-.act-block { background: var(--blanco); border: 1px solid var(--grisBd); border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+.act-block { background: var(--blanco); border: 1px solid var(--gris-bd); border-radius: 8px; padding: 12px; margin-bottom: 8px; }
 .act-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .act-num { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; padding: 2px 9px; border-radius: 4px; }
 .act-num.lon { background: #EFF6FF; color: #2563EB; }
 .act-num.tra { background: #F0FDF4; color: #16A34A; }
 .act-num.dis { background: #FFF7ED; color: #C2410C; }
 .act-num.mar { background: #F5F3FF; color: #7C3AED; }
-.act-num.gen { background: var(--gris); color: var(--opaco); }
+.act-num.gen { background: var(--gris-bg); color: var(--texto-opaco); }
 
 .unidad-auto { display: flex; align-items: center; justify-content: center; background: #E6F1FB; color: #185FA5; border-radius: 6px; font-size: 12px; font-weight: 700; padding: 8px 10px; min-width: 52px; letter-spacing: .5px; border: 1px solid #B5D4F4; }
 
@@ -128,118 +136,1115 @@ textarea { resize: vertical; min-height: 60px; }
 .cat-row .unidad-wrap { display: flex; flex-direction: column; gap: 4px; align-items: center; }
 
 /* ── MATERIALES ── */
-.mat-sublabel { font-size: 10px; font-weight: 700; color: var(--opaco); text-transform: uppercase; letter-spacing: .5px; margin: 8px 0 6px; }
-.mat-row { display: grid; grid-template-columns: minmax(0,1fr) 70px 64px 26px; gap: 6px; align-items: center; margin-bottom: 5px; }
+.mat-sublabel { font-size: 10px; font-weight: 700; color: var(--texto-opaco); text-transform: uppercase; letter-spacing: .5px; margin: 8px 0 6px; }
+.mat-row { display: grid; grid-template-columns: minmax(0,1fr) 80px 68px 28px; gap: 6px; align-items: center; margin-bottom: 5px; }
 .mat-row select, .mat-row input { padding: 5px 7px; font-size: 12px; }
 
 /* ── PERSONAL ── */
 .personal-tbl { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
-.personal-tbl th { font-size: 11px; font-weight: 700; color: var(--opaco); text-transform: uppercase; letter-spacing: .4px; padding: 0 6px 8px 0; border-bottom: 1px solid var(--grisBd); text-align: left; }
+.personal-tbl th { font-size: 11px; font-weight: 700; color: var(--texto-opaco); text-transform: uppercase; letter-spacing: .4px; padding: 0 6px 8px 0; border-bottom: 1px solid var(--gris-bd); text-align: left; }
 .personal-tbl td { padding: 5px 6px 5px 0; vertical-align: middle; border-bottom: 1px solid #f0f0ec; }
 .personal-tbl input, .personal-tbl select { padding: 5px 8px; font-size: 12px; }
 
 /* ── CLIMA ── */
 .clima-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 5px; margin-bottom: 12px; }
 @media(max-width:420px){ .clima-grid { grid-template-columns: repeat(2,1fr); } }
-.clima-btn { border: 1px solid var(--grisBd); border-radius: 8px; padding: 8px 4px; font-size: 12px; cursor: pointer; text-align: center; background: var(--blanco); color: var(--negro); font-family: 'Inter', sans-serif; line-height: 1.4; transition: all .12s; }
+.clima-btn { border: 1px solid var(--gris-bd); border-radius: 8px; padding: 8px 4px; font-size: 12px; cursor: pointer; text-align: center; background: var(--blanco); color: var(--azul); font-family: 'Inter', sans-serif; line-height: 1.4; transition: all .12s; }
 .clima-btn.on { background: #e1f5ee; border-color: #1d9e75; color: #085041; font-weight: 600; }
 
 .interr-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 6px; }
-.interr-table th { font-size: 10px; font-weight: 700; color: var(--opaco); text-transform: uppercase; letter-spacing: .4px; padding: 0 6px 7px 0; border-bottom: 1px solid var(--grisBd); text-align: left; }
+.interr-table th { font-size: 10px; font-weight: 700; color: var(--texto-opaco); text-transform: uppercase; letter-spacing: .4px; padding: 0 6px 7px 0; border-bottom: 1px solid var(--gris-bd); text-align: left; }
 .interr-table td { padding: 5px 6px 5px 0; vertical-align: middle; }
 .interr-table input, .interr-table select { padding: 5px 7px; font-size: 12px; }
 .dur-cell { background: #e1f5ee; color: #085041; border-radius: 6px; padding: 5px 8px; font-size: 11px; font-weight: 700; text-align: center; min-width: 56px; }
-.interr-total { font-size: 12px; font-weight: 700; color: var(--negro); text-align: right; padding-top: 6px; }
+.interr-total { font-size: 12px; font-weight: 700; color: var(--azul); text-align: right; padding-top: 6px; }
 
 /* ── NOVEDADES ── */
-.nov-block { border: 1px solid var(--grisBd); border-radius: 10px; padding: 12px; margin-bottom: 10px; background: var(--gris); }
+.nov-block { border: 1px solid var(--gris-bd); border-radius: 10px; padding: 12px; margin-bottom: 10px; background: var(--gris-bg); }
 .nov-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .nov-num { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; padding: 2px 9px; border-radius: 4px; background: #FAEEDA; color: #633806; }
 .dur-nov { background: #e1f5ee; color: #085041; border-radius: 6px; padding: 6px 10px; font-size: 12px; font-weight: 700; text-align: center; }
 
 /* ── FOTOS ── */
 .foto-zone { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
-.foto-slot { width: 80px; height: 80px; border-radius: 8px; border: 1px dashed var(--grisBd); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 10px; color: #999; background: var(--blanco); position: relative; overflow: hidden; cursor: pointer; }
-.foto-slot:hover { border-color: var(--negro); color: var(--negro); }
+.foto-slot { width: 80px; height: 80px; border-radius: 8px; border: 1px dashed var(--gris-bd); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 10px; color: #999; background: var(--blanco); position: relative; overflow: hidden; cursor: pointer; }
+.foto-slot:hover { border-color: var(--azul); color: var(--azul); }
 .foto-slot img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; border-radius: 7px; }
 .foto-slot .foto-rm { position: absolute; top: 3px; right: 3px; background: rgba(0,0,0,.5); color: #fff; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 11px; cursor: pointer; display: none; align-items: center; justify-content: center; z-index: 2; }
 .foto-slot:hover .foto-rm { display: flex; }
 .foto-slot input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-.foto-drive-note { font-size: 10px; color: var(--opaco); margin-top: 6px; }
+.foto-drive-note { font-size: 10px; color: var(--texto-opaco); margin-top: 6px; }
 
 /* ── RESUMEN NOVEDADES ── */
-.nov-resumen { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--grisBd); }
-.nov-res-item { background: var(--gris); border-radius: 8px; padding: 10px; text-align: center; }
-.nov-res-val { font-size: 20px; font-weight: 800; color: var(--negro); }
-.nov-res-lbl { font-size: 10px; color: var(--opaco); margin-top: 2px; text-transform: uppercase; letter-spacing: .4px; }
+.nov-resumen { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--gris-bd); }
+.nov-res-item { background: var(--gris-bg); border-radius: 8px; padding: 10px; text-align: center; }
+.nov-res-val { font-size: 20px; font-weight: 800; color: var(--azul); }
+.nov-res-lbl { font-size: 10px; color: var(--texto-opaco); margin-top: 2px; text-transform: uppercase; letter-spacing: .4px; }
 
 /* ── BOTONES ── */
-.btn-add { display: flex; align-items: center; gap: 5px; font-family: 'Inter', sans-serif; font-size: 12px; color: #889; background: none; border: 1px dashed var(--grisBd); border-radius: 8px; padding: 7px 12px; cursor: pointer; width: 100%; justify-content: center; margin-top: 6px; transition: all .15s; }
-.btn-add:hover { background: var(--gris); border-color: var(--negro); color: var(--negro); }
-.btn-primary { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; background: var(--negro); color: var(--blanco); border: none; border-radius: 8px; padding: 11px 22px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: opacity .15s; }
+.btn-add { display: flex; align-items: center; gap: 5px; font-family: 'Inter', sans-serif; font-size: 12px; color: #889; background: none; border: 1px dashed var(--gris-bd); border-radius: 8px; padding: 7px 12px; cursor: pointer; width: 100%; justify-content: center; margin-top: 6px; transition: all .15s; }
+.btn-add:hover { background: var(--gris-bg); border-color: var(--azul); color: var(--azul); }
+.btn-primary { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; background: var(--azul); color: var(--blanco); border: none; border-radius: 8px; padding: 11px 22px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: opacity .15s; }
 .btn-primary:hover { opacity: .88; }
 .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
-.btn-sec { font-family: 'Inter', sans-serif; font-size: 13px; background: none; border: 1px solid var(--grisBd); border-radius: 8px; padding: 10px 16px; cursor: pointer; color: var(--negro); display: inline-flex; align-items: center; gap: 6px; transition: background .15s; }
-.btn-sec:hover { background: var(--gris); }
+.btn-sec { font-family: 'Inter', sans-serif; font-size: 13px; background: none; border: 1px solid var(--gris-bd); border-radius: 8px; padding: 10px 16px; cursor: pointer; color: var(--azul); display: inline-flex; align-items: center; gap: 6px; transition: background .15s; }
+.btn-sec:hover { background: var(--gris-bg); }
 
 /* ── MISC ── */
-.confirm-chk { display: flex; align-items: flex-start; gap: 8px; padding: 12px; background: var(--gris); border-radius: 8px; font-size: 13px; cursor: pointer; color: var(--negro); border: 1px solid transparent; }
+.confirm-chk { display: flex; align-items: flex-start; gap: 8px; padding: 12px; background: var(--gris-bg); border-radius: 8px; font-size: 13px; cursor: pointer; color: var(--azul); border: 1px solid transparent; }
 .confirm-chk input { accent-color: var(--amarillo); margin-top: 2px; flex-shrink: 0; width: 16px; height: 16px; }
+.status-box { border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-top: 12px; display: flex; align-items: center; gap: 8px; }
+.status-ok  { background: #e1f5ee; color: #085041; border: 1px solid #5dcaa5; }
+.status-err { background: #fdf0ef; color: #7b1c1c; border: 1px solid #f09595; }
+.status-loading { background: var(--gris-bg); color: #666; border: 1px solid var(--gris-bd); }
+.spinner { width: 14px; height: 14px; border: 2px solid var(--gris-bd); border-top-color: var(--amarillo); border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.msg-err { color: var(--rojo); font-size: 12px; margin-top: 6px; }
+.step-bar { display: flex; gap: 4px; margin-bottom: 1.5rem; }
+.step-dot { height: 4px; border-radius: 2px; background: var(--gris-bd); flex: 1; transition: background .2s; }
+.step-dot.done { background: var(--verde); }
+.step-dot.cur  { background: var(--amarillo); }
+.sep-line { height: 1px; background: var(--gris-bd); margin: 12px 0; }
+
+/* ── COMING SOON ── */
+.coming-soon { text-align: center; padding: 48px 24px; border: 2px dashed var(--gris-bd); border-radius: 12px; background: var(--blanco); }
+.coming-soon .cs-icon { font-size: 40px; margin-bottom: 14px; }
+.coming-soon h3 { font-size: 16px; font-weight: 700; color: var(--azul); margin-bottom: 8px; }
+.coming-soon p { font-size: 12px; color: #889; line-height: 1.6; }
+.cs-badge { display: inline-block; margin-top: 14px; font-size: 10px; font-weight: 700; padding: 4px 12px; border-radius: 20px; background: var(--amarillo-bg); color: #854F0B; border: 1px solid var(--amarillo-bd); }
+
+/* ── FOOTER ── */
+.footer { background: var(--azul); padding: 12px 28px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+.footer p { color: var(--texto-opaco); font-size: 9px; }
+.footer span { color: var(--amarillo); font-size: 9px; font-weight: 600; }
 </style>
 </head>
 <body class="cnk-auth-pending">
 
+<!-- VERIFICACIÓN DE SESIÓN -->
 <div class="auth-gate">
   <div class="ag-spinner"></div>
-  <span>Verificando credenciales...</span>
+  <span>Verificando sesión…</span>
 </div>
 
 <div id="cnk-app">
-  <header class="topbar">
-    <div class="logo-area">
-      <div class="logo-box">CNK</div>
-      <div>
-        <div class="brand-name">CNK <span>Señalización Vial</span></div>
-        <div class="brand-sub">Sistema de Control Operativo</div>
-      </div>
-    </div>
-    <div class="topbar-right">
-      <div class="pais">GT</div>
-      <div class="user-block">
-        <div class="avatar" id="cnk-avatar">?</div>
-        <div class="user-info">
-          <div class="user-name" id="cnk-user-name">...</div>
-          <div class="user-rol" id="cnk-user-rol">...</div>
-        </div>
-      </div>
-      <button class="btn-logout" id="cnk-logout-btn">Cerrar Sesión</button>
-    </div>
-  </header>
 
-  <section class="hero-sm">
-    <div class="breadcrumb">
-      <a href="index.html">Inicio</a>
-      <span class="sep">/</span>
-      <span class="cur">Bitácora Horizontal</span>
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="logo-area">
+    <div class="logo-box">CNK</div>
+    <div>
+      <div class="brand-name"><span>CNK</span> Señalización Vial</div>
+      <div class="brand-sub">Sistema de Gestión de Proyectos</div>
     </div>
-    <h1>Bitácora Diaria — <em>Señalización Horizontal</em></h1>
-    <p>Ingreso de frentes de trabajo, rendimientos químicos/termoplásticos y novedades del día.</p>
-  </section>
-
-  <main class="form-wrap">
-    <div class="app">
-      <div class="form-header">
-        <div class="form-ref">MÓDULO DE SEGUIMIENTO OPERATIVO</div>
-        <div class="form-titulo">Registro Técnico de Obra</div>
-        <div class="form-subtipo">Tipo de Marcaje: Pintura Termoplástica, Dos Componentes y Base Solvente</div>
+  </div>
+  <div class="topbar-right">
+    <span class="pais">🇬🇹 Guatemala</span>
+    <div class="user-block">
+      <div class="avatar" id="cnk-avatar">·</div>
+      <div class="user-info">
+        <div class="user-name" id="cnk-user-name">—</div>
+        <div class="user-rol" id="cnk-user-rol">—</div>
       </div>
+      <button class="btn-logout" id="cnk-logout-btn">Salir</button>
+    </div>
+  </div>
+</header>
 
-      </div>
-  </main>
+<!-- MEGAMENÚ -->
+<nav class="megamenu">
+  <a href="https://cnkvial2026.github.io/CNK-VIAL/index.html"           class="mm-item" data-roles="admin,gerencia,costos,tecnico">🏠 Inicio</a>
+  <a href="https://cnkvial2026.github.io/CNK-VIAL/fichas-tecnicas.html" class="mm-item" data-roles="admin,gerencia,costos,tecnico">📐 Fichas Técnicas</a>
+  <a href="https://cnkvial2026.github.io/CNK-VIAL/apu.html"             class="mm-item" data-roles="admin,gerencia,costos">💰 APU</a>
+  <a href="https://cnkvial2026.github.io/CNK-VIAL/bitacora-horizontal.html"     class="mm-item active" data-roles="admin,gerencia,tecnico">📋 Formularios</a>
+  <a href="https://cnkvial2026.github.io/CNK-VIAL/dashboard.html"       class="mm-item" data-roles="admin,gerencia,costos,tecnico">📊 Dashboard</a>
+</nav>
+
+
+<!-- HERO -->
+<div class="hero-sm">
+  <div class="breadcrumb">
+    <a href="https://cnkvial2026.github.io/CNK-VIAL/index.html">Inicio</a>
+    <span class="sep">›</span>
+    <span class="cur">Bitácora Horizontal</span>
+  </div>
+  <h1>Bitácora diaria — <em>Señalización Horizontal</em></h1>
+  <p>Registro diario de actividades, inspección de señales y levantamiento de inventario en sitio.</p>
 </div>
 
+<!-- SELECTOR -->
+<div class="form-selector">
+  <label>Seleccionar formulario:</label>
+  <div class="form-tabs">
+    <button class="form-tab active" onclick="switchForm('bitacora',this)">📋 Bitácora Diaria — Señ. Horizontal</button>
+    <button class="form-tab" onclick="switchForm('inspeccion',this)">🔍 Inspección de Señales</button>
+    <button class="form-tab" onclick="switchForm('inventario',this)">📦 Levantamiento de Inventario</button>
+    <button class="form-tab" onclick="switchForm('danos',this)">⚠️ Reporte de Daños</button>
+  </div>
+</div>
+
+<!-- CONTENEDOR -->
+<div class="form-wrap">
+
+  <!-- ════════════════════════════════════
+       FORMULARIO 1: BITÁCORA HORIZONTAL
+  ════════════════════════════════════ -->
+  <div id="form-bitacora" class="form-view">
+    <div class="app">
+      <div class="form-header">
+        <div class="form-ref">CNK Señalización Vial · Señalización Horizontal</div>
+        <div class="form-titulo">Bitácora diaria — Señalización horizontal</div>
+        <div class="form-subtipo">Registro de producción, materiales y personal en campo</div>
+      </div>
+
+      <div id="step-bar" class="step-bar"></div>
+
+      <!-- ── 1. PROYECTO ── -->
+      <div class="sec">
+        <div class="sec-title">🏗️ Proyecto y reporte</div>
+        <div class="row r3">
+          <div class="field">
+            <label>Proyecto</label>
+            <select id="r-proyecto" onchange="generarCodigo()">
+              <option value="">Seleccionar proyecto...</option>
+              <option value="MAD-AEPQ">MAD-AEPQ — Autopista Puerto Quetzal</option>
+              <option value="CAR-XOCHI">CAR-XOCHI — Corredor de las Flores</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Orden de trabajo</label>
+            <input type="text" id="r-ot" placeholder="OT-2026-001">
+          </div>
+          <div class="field">
+            <label>Número de reporte (auto)</label>
+            <input type="text" id="r-numreporte" class="codigo-auto" placeholder="Selecciona proyecto primero" readonly>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 2. INFORMACIÓN GENERAL ── -->
+      <div class="sec">
+        <div class="sec-title">👤 Información general</div>
+        <div class="row r2">
+          <div class="field"><label>Nombre de quien llena</label><input type="text" id="r-nombre" placeholder="Nombre completo"></div>
+          <div class="field">
+            <label>Puesto / Rol</label>
+            <select id="r-rol">
+              <option value="">Seleccionar...</option>
+              <option>Supervisor</option>
+              <option>Encargado</option>
+              <option>Técnico de campo</option>
+              <option>Inspector</option>
+            </select>
+          </div>
+        </div>
+        <div class="row r3">
+          <div class="field"><label>Fecha</label><input type="date" id="r-fecha"></div>
+          <div class="field"><label>Hora inicio</label><input type="time" id="r-hinicio"></div>
+          <div class="field"><label>Hora fin</label><input type="time" id="r-hfin"></div>
+        </div>
+      </div>
+
+      <!-- ── 3. FRENTES ── -->
+      <div class="sec">
+        <div class="sec-title">🚧 Frentes de trabajo</div>
+        <div id="frentes-wrap"></div>
+        <button class="btn-add" id="btn-add-frente" onclick="addFrente()">+ Agregar frente (máx. 6)</button>
+      </div>
+
+      <!-- ── 4. PERSONAL ── -->
+      <div class="sec">
+        <div class="sec-title">👥 Personal en esta actividad</div>
+        <div class="field" style="margin-bottom:10px;max-width:140px">
+          <label>Total personas</label>
+          <input type="number" id="r-totpers" placeholder="0" min="0">
+        </div>
+        <table class="personal-tbl">
+          <thead><tr>
+            <th style="width:38%">Rol</th>
+            <th>Nombre</th>
+            <th style="width:52px;text-align:center">Pres.</th>
+            <th style="width:28px"></th>
+          </tr></thead>
+          <tbody id="personal-body"></tbody>
+        </table>
+        <button class="btn-add" style="margin-top:8px" onclick="addPersonRow()">+ Agregar persona</button>
+      </div>
+
+      <!-- ── 5. CLIMA ── -->
+      <div class="sec">
+        <div class="sec-title">⛅ Tiempo y clima</div>
+        <label style="font-size:12px;color:#667;font-weight:500;display:block;margin-bottom:6px">Condiciones durante la jornada</label>
+        <div class="clima-grid">
+          <button class="clima-btn" onclick="toggleC(this,'Soleado')">☀️<br>Soleado</button>
+          <button class="clima-btn" onclick="toggleC(this,'Nublado')">🌁<br>Nublado</button>
+          <button class="clima-btn" onclick="toggleC(this,'Parcialmente nublado')">⛅<br>Parcial</button>
+          <button class="clima-btn" onclick="toggleC(this,'Lluvia ligera')">🌦<br>Lluvia ligera</button>
+          <button class="clima-btn" onclick="toggleC(this,'Lluvia fuerte')">🌧<br>Lluvia fuerte</button>
+          <button class="clima-btn" onclick="toggleC(this,'Neblina')">🌫<br>Neblina</button>
+          <button class="clima-btn" onclick="toggleC(this,'Viento fuerte')">💨<br>Viento fuerte</button>
+          <button class="clima-btn" onclick="toggleC(this,'Otro')">+<br>Otro</button>
+        </div>
+
+        <div class="sep-line"></div>
+        <div class="sec-title" style="margin-bottom:8px">⏱️ Registro de interrupciones</div>
+        <table class="interr-table" id="interr-table">
+          <thead><tr>
+            <th style="width:36%">Causa</th>
+            <th>H. inicio</th>
+            <th>H. fin</th>
+            <th>Duración</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="interr-body"></tbody>
+        </table>
+        <button class="btn-add" onclick="addInterrupcion()">+ Agregar interrupción</button>
+        <div class="interr-total" id="interr-total" style="display:none"></div>
+      </div>
+
+      <!-- ── 6. NOVEDADES ── -->
+      <div class="sec">
+        <div class="sec-title">⚠️ Novedades e imprevistos</div>
+        <div id="novedades-wrap"></div>
+        <button class="btn-add" onclick="addNovedad()">+ Agregar novedad</button>
+        <div id="nov-resumen" class="nov-resumen" style="display:none">
+          <div class="nov-res-item"><div class="nov-res-val" id="res-nov-count">0</div><div class="nov-res-lbl">Novedades</div></div>
+          <div class="nov-res-item"><div class="nov-res-val" id="res-nov-tiempo">0 min</div><div class="nov-res-lbl">Tiempo perdido</div></div>
+          <div class="nov-res-item"><div class="nov-res-val" id="res-nov-fotos">0</div><div class="nov-res-lbl">Fotos adjuntas</div></div>
+        </div>
+      </div>
+
+      <!-- ── 7. CONFIRMACIÓN ── -->
+      <div class="sec">
+        <div class="sec-title">✅ Confirmación y envío</div>
+        <label class="confirm-chk" id="confirm-lbl">
+          <input type="checkbox" id="r-confirmado">
+          Confirmo que la información ingresada es verídica y ha sido revisada
+        </label>
+        <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+          <button class="btn-primary" id="btn-enviar" onclick="enviar()">📨 Enviar reporte</button>
+          <button class="btn-sec" onclick="soloCSV()">📊 Solo exportar CSV</button>
+        </div>
+        <div id="r-msg"></div>
+      </div>
+
+    </div><!-- /app -->
+  </div><!-- /form-bitacora -->
+
+  <!-- COMING SOON: INSPECCIÓN -->
+  <div id="form-inspeccion" class="form-view" style="display:none">
+    <div class="coming-soon">
+      <div class="cs-icon">🔍</div>
+      <h3>Formulario de Inspección de Señales</h3>
+      <p>Registro del estado físico de señales verticales, horizontales y dispositivos en campo.<br>Incluirá checklist de condiciones, nivel de reflectividad y recomendaciones de mantenimiento.</p>
+      <span class="cs-badge">Próximamente disponible</span>
+    </div>
+  </div>
+
+  <!-- COMING SOON: INVENTARIO -->
+  <div id="form-inventario" class="form-view" style="display:none">
+    <div class="coming-soon">
+      <div class="cs-icon">📦</div>
+      <h3>Formulario de Levantamiento de Inventario</h3>
+      <p>Conteo y georreferenciación de señales existentes en campo.<br>Compatible con exportación a CSV para integración con el módulo de inventario (Fase 2).</p>
+      <span class="cs-badge">Próximamente disponible</span>
+    </div>
+  </div>
+
+  <!-- COMING SOON: DAÑOS -->
+  <div id="form-danos" class="form-view" style="display:none">
+    <div class="coming-soon">
+      <div class="cs-icon">⚠️</div>
+      <h3>Reporte de Daños y Vandalismo</h3>
+      <p>Registro fotográfico y descriptivo de señales dañadas, vandalizadas o faltantes.<br>Genera reporte PDF para trámites de reposición y seguros.</p>
+      <span class="cs-badge">Próximamente disponible</span>
+    </div>
+  </div>
+
+</div><!-- /form-wrap -->
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p>© 2026 CNK Señalización Vial — Todos los derechos reservados</p>
+  <span>Guatemala · Operaciones &amp; Costos · v2.0</span>
+</footer>
+
+</div><!-- /#cnk-app -->
+
 <script>
-// El bloque de scripts de control interno (CNKAuth, iniciales, requireAuth, etc.) permanece idéntico.
+/* ══════════════════════════════════════════════
+   CONFIGURACIÓN
+══════════════════════════════════════════════ */
+var WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzR0tgcV1vCV1-Ca91WUTA2I4JDUOnQtQxlsW5hqgVDgWZ73A03kHoLCZjs4FERWGXD/exec';
+
+var climasSel  = [];
+var frenteCnt  = 0;
+var actCnt     = {};   // { frenteId: count }
+var novedadCnt = 0;
+var fotosData  = {};   // { novedadId_slot: base64 }
+
+var ROLES_PERSONAL = ['SSO','Supervisor','Encargado de grupo','Piloto','Operador / Técnico aplicador','Calderero','Ayudante','Señalero','Guardia de tránsito'];
+var TIPOS_INTERRUPCION = ['Lluvia ligera','Lluvia fuerte','Tormenta','Neblina','Viento fuerte','Accidente vial','Bloqueo de vía','Falla de equipo','Orden PMT','Otro'];
+var TIPOS_NOVEDAD = ['Clima adverso','Accidente vial','Bloqueo de vía','Falla de equipo','Ausencia de personal','Instrucción de supervisión','Problema con materiales','Orden de cambio','Otro'];
+var CATEGORIAS_ACT = {
+  'Longitudinal':  { unidad:'ML',  clase:'lon', color:'⬜🟡', campos:'lineal' },
+  'Transversal':   { unidad:'ML',  clase:'tra', campos:'lineal' },
+  'Dispositivos':  { unidad:'Und', clase:'dis', campos:'dispositivo' },
+  'Marcas/Símbolos':{ unidad:'Und', clase:'mar', campos:'marca' }
+};
+
+var catalogoDefault = {
+  Longitudinal:   [{n:'Pintura blanca',u:'gal'},{n:'Pintura amarilla',u:'gal'},{n:'Microesfera',u:'kg'},{n:'Thinner',u:'gal'}],
+  Transversal:    [{n:'Pintura blanca',u:'gal'},{n:'Pintura amarilla',u:'gal'},{n:'Microesfera',u:'kg'},{n:'Thinner',u:'gal'}],
+  Dispositivos:   [{n:'Vialeta blanca bidireccional',u:'unidad'},{n:'Vialeta amarilla unidireccional',u:'unidad'},{n:'Boya plástica',u:'unidad'},{n:'Adhesivo epóxico',u:'kg'}],
+  'Marcas/Símbolos':[{n:'Pintura termoplástica blanca',u:'kg'},{n:'Pintura termoplástica amarilla',u:'kg'},{n:'Microesfera',u:'kg'}]
+};
+
+var personalDefault = [
+  {rol:'SSO',nombre:''},{rol:'Supervisor',nombre:''},{rol:'Encargado de grupo',nombre:''},
+  {rol:'Piloto',nombre:''},{rol:'Operador / Técnico aplicador',nombre:''},
+  {rol:'Calderero',nombre:''},{rol:'Ayudante',nombre:''}
+];
+
+var unidades = ['gal','kg','lt','lb','m²','unidad','ml','m'];
+
+/* ══════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════ */
+function loadState(){
+  try {
+    var c = localStorage.getItem('cnk_catalogo'); if(c) catalogoDefault = JSON.parse(c);
+    var p = localStorage.getItem('cnk_personal'); if(p) personalDefault = JSON.parse(p);
+  } catch(e){}
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  loadState();
+  initPersonal();
+  addFrente();
+  document.getElementById('r-fecha').valueAsDate = new Date();
+  updateBar();
+});
+
+/* ══════════════════════════════════════════════
+   SELECTOR DE FORMULARIO
+══════════════════════════════════════════════ */
+function switchForm(id, btn){
+  document.querySelectorAll('.form-view').forEach(function(v){ v.style.display='none'; });
+  document.querySelectorAll('.form-tab').forEach(function(t){ t.classList.remove('active'); });
+  document.getElementById('form-'+id).style.display = 'block';
+  btn.classList.add('active');
+}
+
+/* ══════════════════════════════════════════════
+   CÓDIGO DE REPORTE AUTO
+══════════════════════════════════════════════ */
+function generarCodigo(){
+  var proyecto = document.getElementById('r-proyecto').value;
+  var anio     = new Date().getFullYear();
+  var campo    = document.getElementById('r-numreporte');
+  if(proyecto){
+    campo.value = proyecto + '-HOR-' + anio + '-###';
+    campo.placeholder = 'Se asigna al enviar';
+  } else {
+    campo.value = '';
+    campo.placeholder = 'Selecciona proyecto primero';
+  }
+}
+
+/* ══════════════════════════════════════════════
+   FRENTES
+══════════════════════════════════════════════ */
+function addFrente(){
+  if(frenteCnt >= 6) return;
+  frenteCnt++;
+  var n = frenteCnt;
+  actCnt[n] = 0;
+
+  var div = document.createElement('div');
+  div.className = 'frente-block';
+  div.id = 'frente-' + n;
+  div.innerHTML =
+    '<div class="frente-header">' +
+      '<span class="frente-num">Frente ' + n + '</span>' +
+      (n > 1 ? '<button class="btn-rm" onclick="removeFrente('+n+')">✕</button>' : '') +
+    '</div>' +
+    '<div class="row r2" style="margin-bottom:10px">' +
+      '<div class="field"><label>Tramo / Ubicación</label><input type="text" id="f'+n+'-tramo" placeholder="Autopista km 91+100"></div>' +
+      '<div class="row r2" style="margin-bottom:0">' +
+        '<div class="field"><label>Estación inicio</label><input type="text" id="f'+n+'-einicio" placeholder="91+144"></div>' +
+        '<div class="field"><label>Estación fin</label><input type="text" id="f'+n+'-efin" placeholder="94+252"></div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="row r2" style="margin-bottom:12px">' +
+      '<div class="field"><label>Hora inicio frente</label><input type="time" id="f'+n+'-hinicio"></div>' +
+      '<div class="field"><label>Hora fin frente</label><input type="time" id="f'+n+'-hfin"></div>' +
+    '</div>' +
+    '<div style="font-size:10px;font-weight:700;color:var(--texto-opaco);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Actividades en este frente</div>' +
+    '<div id="f'+n+'-acts" class="actividades-wrap"></div>' +
+    '<button class="btn-add" onclick="addActividad('+n+')">+ Agregar actividad</button>';
+
+  document.getElementById('frentes-wrap').appendChild(div);
+  if(frenteCnt >= 6) document.getElementById('btn-add-frente').style.display = 'none';
+  updateBar();
+}
+
+function removeFrente(n){
+  var el = document.getElementById('frente-' + n);
+  if(el) el.remove();
+  frenteCnt--;
+  document.getElementById('btn-add-frente').style.display = '';
+  updateBar();
+}
+
+/* ══════════════════════════════════════════════
+   ACTIVIDADES
+══════════════════════════════════════════════ */
+function addActividad(fn){
+  actCnt[fn] = (actCnt[fn] || 0) + 1;
+  var an  = actCnt[fn];
+  var aid = 'f' + fn + 'a' + an;
+
+  var catOpts = Object.keys(CATEGORIAS_ACT).map(function(c){
+    return '<option value="'+c+'">'+c+'</option>';
+  }).join('');
+
+  var div = document.createElement('div');
+  div.className = 'act-block';
+  div.id = aid;
+  div.innerHTML =
+    '<div class="act-header">' +
+      '<span class="act-num gen" id="'+aid+'-badge">Actividad '+an+'</span>' +
+      '<button class="btn-rm" onclick="document.getElementById(\''+aid+'\').remove();actualizarResumenNov()">✕</button>' +
+    '</div>' +
+    '<div class="cat-row">' +
+      '<div class="field"><label>Categoría</label>' +
+        '<select id="'+aid+'-cat" onchange="onCatChange(\''+aid+'\')"><option value="">Seleccionar...</option>'+catOpts+'</select>' +
+      '</div>' +
+      '<div class="unidad-wrap"><label style="font-size:11px;color:#667;font-weight:500">Unidad</label><div class="unidad-auto" id="'+aid+'-unidad">—</div></div>' +
+      '<div class="field"><label>Cantidad</label><input type="number" id="'+aid+'-qty" placeholder="0" min="0"></div>' +
+    '</div>' +
+    '<div id="'+aid+'-extra"></div>' +
+    '<div id="'+aid+'-mats-wrap" style="display:none">' +
+      '<div class="mat-sublabel">Materiales</div>' +
+      '<div id="'+aid+'-mats"></div>' +
+      '<button class="btn-add" onclick="addMatAct(\''+aid+'\')">+ Agregar material</button>' +
+    '</div>';
+
+  document.getElementById('f'+fn+'-acts').appendChild(div);
+}
+
+function onCatChange(aid){
+  var sel  = document.getElementById(aid+'-cat');
+  var cat  = sel.value;
+  var conf = CATEGORIAS_ACT[cat];
+  var badge = document.getElementById(aid+'-badge');
+
+  if(!conf){ return; }
+
+  // Unidad auto
+  document.getElementById(aid+'-unidad').textContent = conf.unidad;
+
+  // Badge color
+  badge.className = 'act-num ' + conf.clase;
+  badge.textContent = cat;
+
+  // Campos extra
+  var extra = document.getElementById(aid+'-extra');
+  extra.innerHTML = '';
+
+  if(conf.campos === 'lineal'){
+    // ML con premarcado/aplicado + tipo linea + ancho + color
+    extra.innerHTML =
+      '<div class="row r3" style="margin-top:8px">' +
+        '<div class="field"><label>ML premarcado</label><input type="number" id="'+aid+'-mlp" placeholder="0" min="0"></div>' +
+        '<div class="field"><label>ML aplicado</label><input type="number" id="'+aid+'-mla" placeholder="0" min="0"></div>' +
+        '<div class="field"><label>Ancho (cm)</label><input type="number" id="'+aid+'-ancho" placeholder="15" min="1"></div>' +
+      '</div>' +
+      '<div class="row r2" style="margin-top:0">' +
+        '<div class="field"><label>Tipo de línea</label>' +
+          '<select id="'+aid+'-linea">' +
+            '<option value="">— Seleccionar —</option>' +
+            '<option>Continua</option><option>Discontinua</option><option>Guión</option><option>Cebra</option><option>Doble continua</option>' +
+          '</select>' +
+        '</div>' +
+        '<div class="field"><label>Color</label>' +
+          '<select id="'+aid+'-color"><option>Blanco</option><option>Amarillo</option><option>Ambos</option></select>' +
+        '</div>' +
+      '</div>';
+  } else if(conf.campos === 'dispositivo'){
+    extra.innerHTML =
+      '<div class="field" style="margin-top:8px"><label>Tipo de dispositivo / Descripción</label>' +
+        '<input type="text" id="'+aid+'-detalle" placeholder="Vialeta blanca bidireccional, boya metálica...">' +
+      '</div>';
+  } else if(conf.campos === 'marca'){
+    extra.innerHTML =
+      '<div class="field" style="margin-top:8px"><label>Descripción de marcas / símbolos</label>' +
+        '<input type="text" id="'+aid+'-detalle" placeholder="ALTO/PARE 8 und. 30cm, flechas 4 und...">' +
+      '</div>';
+  }
+
+  // Mostrar materiales
+  document.getElementById(aid+'-mats-wrap').style.display = 'block';
+  // Pre-cargar materiales del catálogo
+  var cont = document.getElementById(aid+'-mats');
+  cont.innerHTML = '';
+  (catalogoDefault[cat] || []).forEach(function(m){ addMatActEl(aid, m.n, m.u); });
+}
+
+function addMatAct(aid){
+  var cat  = document.getElementById(aid+'-cat').value;
+  var mats = catalogoDefault[cat] || [];
+  var opts = '<option value="">— Material —</option>' + mats.map(function(m){
+    return '<option value="'+m.n+'|'+m.u+'">'+m.n+'</option>';
+  }).join('');
+  addMatActEl(aid, '', '', opts);
+}
+
+function addMatActEl(aid, nombre, unidad, opts){
+  var cont = document.getElementById(aid+'-mats');
+  if(!cont) return;
+  var cat = document.getElementById(aid+'-cat') ? document.getElementById(aid+'-cat').value : '';
+  var mats = catalogoDefault[cat] || [];
+  if(!opts){
+    opts = '<option value="">— Material —</option>' + mats.map(function(m){
+      return '<option value="'+m.n+'|'+m.u+'"'+(m.n===nombre?' selected':'')+'>'+m.n+'</option>';
+    }).join('');
+  }
+  var row = document.createElement('div');
+  row.className = 'mat-row';
+  row.innerHTML =
+    '<select onchange="autoUnit(this)">'+opts+'</select>' +
+    '<input type="number" placeholder="Cant." min="0" style="font-size:12px;padding:5px 7px">' +
+    '<select style="font-size:12px;padding:5px 6px;width:68px">' +
+      unidades.map(function(u){ return '<option'+(u===unidad?' selected':'')+'>'+u+'</option>'; }).join('') +
+    '</select>' +
+    '<button onclick="this.closest(\'.mat-row\').remove()" class="btn-rm" style="font-size:14px">✕</button>';
+  cont.appendChild(row);
+}
+
+function autoUnit(sel){
+  var val = sel.value; if(!val) return;
+  var unit = val.split('|')[1] || '';
+  var us = sel.parentElement.querySelector('select:last-of-type');
+  if(us && unit){ for(var i=0;i<us.options.length;i++){ if(us.options[i].value===unit){ us.selectedIndex=i; break; } } }
+}
+
+/* ══════════════════════════════════════════════
+   CLIMA
+══════════════════════════════════════════════ */
+function toggleC(btn, val){
+  btn.classList.toggle('on');
+  var idx = climasSel.indexOf(val);
+  if(idx > -1) climasSel.splice(idx,1); else climasSel.push(val);
+}
+
+function addInterrupcion(){
+  var tbody = document.getElementById('interr-body');
+  var tr = document.createElement('tr');
+  var causaOpts = TIPOS_INTERRUPCION.map(function(t){ return '<option>'+t+'</option>'; }).join('');
+  tr.innerHTML =
+    '<td><select style="font-size:12px;padding:5px 7px"><option value="">— Causa —</option>'+causaOpts+'</select></td>' +
+    '<td><input type="time" style="width:90px" onchange="calcDurInterr(this)"></td>' +
+    '<td><input type="time" style="width:90px" onchange="calcDurInterr(this)"></td>' +
+    '<td><div class="dur-cell" style="min-width:54px">0 min</div></td>' +
+    '<td><button class="btn-rm" onclick="this.closest(\'tr\').remove();recalcTotalInterr()">✕</button></td>';
+  tbody.appendChild(tr);
+}
+
+function calcDurInterr(input){
+  var tr   = input.closest('tr');
+  var inputs = tr.querySelectorAll('input[type=time]');
+  var cell   = tr.querySelector('.dur-cell');
+  if(inputs[0].value && inputs[1].value){
+    var ini = toMin(inputs[0].value);
+    var fin = toMin(inputs[1].value);
+    var dur = fin - ini;
+    if(dur < 0) dur += 1440;
+    cell.textContent = durStr(dur);
+  }
+  recalcTotalInterr();
+}
+
+function recalcTotalInterr(){
+  var total = 0;
+  document.querySelectorAll('#interr-body .dur-cell').forEach(function(c){
+    total += parseDurCell(c.textContent);
+  });
+  var el = document.getElementById('interr-total');
+  if(total > 0){
+    el.style.display = 'block';
+    el.textContent   = 'Total interrumpido: ' + durStr(total);
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+/* ══════════════════════════════════════════════
+   NOVEDADES
+══════════════════════════════════════════════ */
+function addNovedad(){
+  novedadCnt++;
+  var n   = novedadCnt;
+  var nid = 'nov-' + n;
+  var tipoOpts = TIPOS_NOVEDAD.map(function(t){ return '<option>'+t+'</option>'; }).join('');
+
+  var div = document.createElement('div');
+  div.className = 'nov-block';
+  div.id = nid;
+  div.innerHTML =
+    '<div class="nov-header">' +
+      '<span class="nov-num" id="'+nid+'-badge">Novedad '+n+'</span>' +
+      '<button class="btn-rm" onclick="removeNovedad(\''+nid+'\')">✕</button>' +
+    '</div>' +
+    '<div class="row r2" style="margin-bottom:10px">' +
+      '<div class="field"><label>Tipo</label>' +
+        '<select id="'+nid+'-tipo" onchange="actualizarResumenNov()"><option value="">— Seleccionar —</option>'+tipoOpts+'</select>' +
+      '</div>' +
+      '<div class="field"><label>Descripción</label>' +
+        '<input type="text" id="'+nid+'-desc" placeholder="Describe el imprevisto...">' +
+      '</div>' +
+    '</div>' +
+    '<div class="row r3" style="margin-bottom:12px">' +
+      '<div class="field"><label>Hora inicio</label><input type="time" id="'+nid+'-ini" onchange="calcDurNov(\''+nid+'\')"></div>' +
+      '<div class="field"><label>Hora fin</label><input type="time" id="'+nid+'-fin" onchange="calcDurNov(\''+nid+'\')"></div>' +
+      '<div class="field"><label>Duración</label><div class="dur-nov" id="'+nid+'-dur">— min</div></div>' +
+    '</div>' +
+    '<div class="sep-line"></div>' +
+    '<label style="font-size:12px;color:#667;font-weight:500;display:block;margin-bottom:6px">Evidencia fotográfica (máx. 3 fotos — se guardan en Google Drive)</label>' +
+    '<div class="foto-zone">' +
+      fotoSlot(nid, 1) + fotoSlot(nid, 2) + fotoSlot(nid, 3) +
+    '</div>' +
+    '<div class="foto-drive-note">📁 Las fotos se guardarán en: /CNK-Evidencias/<span id="'+nid+'-drive-path">PROYECTO/FECHA</span>/</div>';
+
+  document.getElementById('novedades-wrap').appendChild(div);
+  actualizarDrivePath(nid);
+  actualizarResumenNov();
+}
+
+function fotoSlot(nid, slot){
+  var sid = nid + '-foto' + slot;
+  return '<div class="foto-slot" id="'+sid+'">' +
+    '<input type="file" accept="image/*" onchange="handleFoto(this,\''+nid+'\','+slot+')" title="Seleccionar foto">' +
+    '<span style="font-size:18px">📷</span>' +
+    '<span>Foto '+slot+'</span>' +
+  '</div>';
+}
+
+function handleFoto(input, nid, slot){
+  if(!input.files || !input.files[0]) return;
+  var file = input.files[0];
+  if(file.size > 5 * 1024 * 1024){
+    alert('La imagen supera 5 MB. Elige una foto más pequeña.');
+    input.value = '';
+    return;
+  }
+  var reader = new FileReader();
+  var sid = nid + '-foto' + slot;
+  reader.onload = function(e){
+    var base64 = e.target.result;
+    fotosData[sid] = { data: base64, name: file.name, type: file.type };
+    var slotEl = document.getElementById(sid);
+    slotEl.innerHTML =
+      '<img src="'+base64+'" alt="Foto '+slot+'">' +
+      '<button class="foto-rm" onclick="removeFoto(\''+sid+'\',event)">✕</button>';
+    actualizarResumenNov();
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeFoto(sid, evt){
+  evt.stopPropagation();
+  delete fotosData[sid];
+  var parts = sid.split('-foto');
+  var nid   = parts[0];
+  var slot  = parseInt(parts[1]);
+  var slotEl = document.getElementById(sid);
+  slotEl.innerHTML =
+    '<input type="file" accept="image/*" onchange="handleFoto(this,\''+nid+'\','+slot+')" title="Seleccionar foto">' +
+    '<span style="font-size:18px">📷</span>' +
+    '<span>Foto '+slot+'</span>';
+  actualizarResumenNov();
+}
+
+function removeNovedad(nid){
+  // limpiar fotos de esta novedad
+  [1,2,3].forEach(function(s){ delete fotosData[nid+'-foto'+s]; });
+  var el = document.getElementById(nid);
+  if(el) el.remove();
+  actualizarResumenNov();
+}
+
+function calcDurNov(nid){
+  var ini = document.getElementById(nid+'-ini').value;
+  var fin = document.getElementById(nid+'-fin').value;
+  var el  = document.getElementById(nid+'-dur');
+  if(ini && fin){
+    var d = toMin(fin) - toMin(ini);
+    if(d < 0) d += 1440;
+    el.textContent = durStr(d);
+  }
+  actualizarResumenNov();
+}
+
+function actualizarResumenNov(){
+  var bloques = document.querySelectorAll('#novedades-wrap .nov-block');
+  var totalMin = 0;
+  var totalFotos = 0;
+
+  bloques.forEach(function(b){
+    var nid = b.id;
+    var dur = document.getElementById(nid+'-dur');
+    if(dur) totalMin += parseDurCell(dur.textContent);
+    [1,2,3].forEach(function(s){ if(fotosData[nid+'-foto'+s]) totalFotos++; });
+  });
+
+  var res = document.getElementById('nov-resumen');
+  if(bloques.length > 0){
+    res.style.display = 'grid';
+    document.getElementById('res-nov-count').textContent  = bloques.length;
+    document.getElementById('res-nov-tiempo').textContent = totalMin > 0 ? durStr(totalMin) : '0 min';
+    document.getElementById('res-nov-fotos').textContent  = totalFotos;
+  } else {
+    res.style.display = 'none';
+  }
+}
+
+function actualizarDrivePath(nid){
+  var el = document.getElementById(nid+'-drive-path');
+  if(!el) return;
+  var proyecto = document.getElementById('r-proyecto').value || 'PROYECTO';
+  var fecha    = document.getElementById('r-fecha').value || 'FECHA';
+  el.textContent = proyecto + '/' + fecha;
+}
+
+/* ══════════════════════════════════════════════
+   PERSONAL
+══════════════════════════════════════════════ */
+function initPersonal(){
+  var tbody = document.getElementById('personal-body');
+  tbody.innerHTML = '';
+  personalDefault.forEach(function(p){ addPersonRowEl(p.rol, p.nombre); });
+}
+
+function addPersonRow(){ addPersonRowEl('', ''); }
+
+function addPersonRowEl(rol, nombre){
+  var tbody = document.getElementById('personal-body');
+  var tr = document.createElement('tr');
+  var rolOpts = ROLES_PERSONAL.map(function(r){
+    return '<option value="'+r+'"'+(r===rol?' selected':'')+'>'+r+'</option>';
+  }).join('');
+  tr.innerHTML =
+    '<td><select style="font-size:12px;padding:5px 8px"><option value="">— Rol —</option>'+rolOpts+'</select></td>' +
+    '<td><input type="text" placeholder="Nombre" value="'+(nombre||'')+'" style="font-size:12px;padding:5px 8px"></td>' +
+    '<td style="text-align:center"><input type="checkbox" style="width:16px;height:16px;accent-color:var(--amarillo)"></td>' +
+    '<td><button class="btn-rm" onclick="this.closest(\'tr\').remove()" style="font-size:13px">✕</button></td>';
+  tbody.appendChild(tr);
+}
+
+/* ══════════════════════════════════════════════
+   STEP BAR
+══════════════════════════════════════════════ */
+function updateBar(){
+  var bar = document.getElementById('step-bar');
+  var checks = [
+    document.getElementById('r-proyecto').value !== '',
+    document.getElementById('r-nombre').value.trim() !== '',
+    document.getElementById('r-fecha').value !== '',
+    document.querySelectorAll('.frente-block').length > 0,
+    document.querySelectorAll('#personal-body tr').length > 0
+  ];
+  bar.innerHTML = '';
+  checks.forEach(function(ok){
+    var dot = document.createElement('div');
+    dot.className = 'step-dot' + (ok ? ' done' : '');
+    bar.appendChild(dot);
+  });
+}
+
+/* ══════════════════════════════════════════════
+   RECOPILAR DATOS
+══════════════════════════════════════════════ */
+function recopilar(){
+  var d = {};
+  d.proyecto       = document.getElementById('r-proyecto').value;
+  d.orden_trabajo  = document.getElementById('r-ot').value;
+  d.tipo_actividad = 'HOR';
+  d.contrato       = d.proyecto + '-HOR-' + new Date().getFullYear();
+  d.nombre         = document.getElementById('r-nombre').value;
+  d.rol            = document.getElementById('r-rol').value;
+  d.fecha          = document.getElementById('r-fecha').value;
+  d.hinicio        = document.getElementById('r-hinicio').value;
+  d.hfin           = document.getElementById('r-hfin').value;
+  d.total_personas = document.getElementById('r-totpers').value;
+  d.clima          = climasSel.join(', ');
+
+  // Interrupciones
+  var interrupciones = [];
+  document.querySelectorAll('#interr-body tr').forEach(function(tr){
+    var sel  = tr.querySelector('select');
+    var ins  = tr.querySelectorAll('input[type=time]');
+    var dur  = tr.querySelector('.dur-cell');
+    interrupciones.push({
+      causa: sel ? sel.value : '',
+      inicio: ins[0] ? ins[0].value : '',
+      fin:    ins[1] ? ins[1].value : '',
+      duracion: dur ? dur.textContent : ''
+    });
+  });
+  d.interrupciones = interrupciones;
+
+  // Personal
+  var personal = [];
+  document.querySelectorAll('#personal-body tr').forEach(function(tr){
+    var tds = tr.querySelectorAll('td');
+    var rolEl  = tds[0].querySelector('select');
+    var nomEl  = tds[1].querySelector('input');
+    var presEl = tds[2].querySelector('input[type=checkbox]');
+    personal.push({
+      rol:     rolEl  ? rolEl.value  : '',
+      nombre:  nomEl  ? nomEl.value  : '',
+      presente: presEl ? presEl.checked : false
+    });
+  });
+  d.personal = personal;
+
+  // Frentes + actividades
+  var frentes = [];
+  document.querySelectorAll('.frente-block').forEach(function(fb, fi){
+    var fn  = fb.id.replace('frente-','');
+    function gv(id){ var el = fb.querySelector('#'+id); return el ? el.value : ''; }
+    var actividades = [];
+    fb.querySelectorAll('.act-block').forEach(function(ab){
+      var aid = ab.id;
+      var cat = document.getElementById(aid+'-cat') ? document.getElementById(aid+'-cat').value : '';
+      var conf = CATEGORIAS_ACT[cat] || {};
+      var act = {
+        categoria: cat,
+        unidad:    conf.unidad || '',
+        cantidad:  document.getElementById(aid+'-qty') ? document.getElementById(aid+'-qty').value : ''
+      };
+      if(conf.campos === 'lineal'){
+        act.ml_premarcado = gvById(aid+'-mlp');
+        act.ml_aplicado   = gvById(aid+'-mla');
+        act.ancho_cm      = gvById(aid+'-ancho');
+        act.tipo_linea    = gvById(aid+'-linea');
+        act.color         = gvById(aid+'-color');
+      } else if(conf.campos === 'dispositivo' || conf.campos === 'marca'){
+        act.detalle = gvById(aid+'-detalle');
+      }
+      // Materiales
+      var mats = [];
+      ab.querySelectorAll('.mat-row').forEach(function(row){
+        var sel = row.querySelector('select');
+        var qty = row.querySelector('input[type=number]');
+        var uni = row.querySelector('select:last-of-type');
+        var mn  = sel && sel.value ? sel.value.split('|')[0] : '';
+        if(mn) mats.push({ material: mn, cantidad: qty ? qty.value : '', unidad: uni ? uni.value : '' });
+      });
+      act.materiales = mats;
+      actividades.push(act);
+    });
+
+    frentes.push({
+      num:       fi + 1,
+      tramo:     gv('f'+fn+'-tramo'),
+      est_inicio: gv('f'+fn+'-einicio'),
+      est_fin:   gv('f'+fn+'-efin'),
+      hinicio:   gv('f'+fn+'-hinicio'),
+      hfin:      gv('f'+fn+'-hfin'),
+      actividades: actividades
+    });
+  });
+  d.frentes = frentes;
+
+  // Novedades + fotos
+  var novedades = [];
+  document.querySelectorAll('#novedades-wrap .nov-block').forEach(function(nb){
+    var nid = nb.id;
+    var nov = {
+      tipo:     gvById(nid+'-tipo'),
+      desc:     gvById(nid+'-desc'),
+      hora_ini: gvById(nid+'-ini'),
+      hora_fin: gvById(nid+'-fin'),
+      duracion: document.getElementById(nid+'-dur') ? document.getElementById(nid+'-dur').textContent : '',
+      fotos:    []
+    };
+    [1,2,3].forEach(function(s){
+      var fd = fotosData[nid+'-foto'+s];
+      if(fd) nov.fotos.push({ nombre: fd.name, tipo: fd.type, data: fd.data });
+    });
+    novedades.push(nov);
+  });
+  d.novedades = novedades;
+  return d;
+}
+
+function gvById(id){
+  var el = document.getElementById(id);
+  return el ? el.value : '';
+}
+
+/* ══════════════════════════════════════════════
+   ENVÍO
+══════════════════════════════════════════════ */
+function setMsg(html){ document.getElementById('r-msg').innerHTML = html; }
+
+function enviar(){
+  if(!document.getElementById('r-confirmado').checked){
+    document.getElementById('confirm-lbl').style.outline = '2px solid var(--rojo)';
+    setMsg('<p class="msg-err">Debes confirmar que la información es verídica.</p>');
+    return;
+  }
+  document.getElementById('confirm-lbl').style.outline = '';
+  var d = recopilar();
+  if(!d.proyecto){ setMsg('<p class="msg-err">Selecciona el proyecto antes de enviar.</p>'); return; }
+  if(!d.nombre || !d.fecha){ setMsg('<p class="msg-err">Completa al menos el nombre y la fecha.</p>'); return; }
+
+  var btn = document.getElementById('btn-enviar');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Enviando...';
+  setMsg('<div class="status-box status-loading"><div class="spinner"></div> Enviando reporte a Google Sheets...</div>');
+
+  fetch(WEBAPP_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body: JSON.stringify(d) })
+  .then(function(){
+    btn.disabled = false;
+    btn.innerHTML = '📨 Enviar reporte';
+    var anio = new Date().getFullYear();
+    document.getElementById('r-numreporte').value = d.proyecto + '-HOR-' + anio + '-✓';
+    setMsg('<div class="status-box status-ok">✓ Reporte enviado correctamente. Descargando CSV de respaldo...</div>');
+    exportCSV(d);
+  })
+  .catch(function(){
+    btn.disabled = false;
+    btn.innerHTML = '📨 Enviar reporte';
+    setMsg('<div class="status-box status-err">⚠️ Error de conexión. CSV de respaldo descargado. Intenta de nuevo.</div>');
+    exportCSV(d);
+  });
+}
+
+function soloCSV(){ exportCSV(recopilar()); }
+
+/* ══════════════════════════════════════════════
+   EXPORTAR CSV
+══════════════════════════════════════════════ */
+function exportCSV(d){
+  if(!d) d = recopilar();
+  var rows = [
+    ['BITÁCORA DIARIA — SEÑALIZACIÓN HORIZONTAL'],
+    ['CNK Señalización Vial · ' + d.contrato],
+    [''],
+    ['Campo','Valor'],
+    ['Proyecto', d.proyecto],
+    ['Orden de trabajo', d.orden_trabajo],
+    ['Nombre', d.nombre],
+    ['Rol', d.rol],
+    ['Fecha', d.fecha],
+    ['Hora inicio', d.hinicio],
+    ['Hora fin', d.hfin],
+    ['Total personas', d.total_personas],
+    ['Clima', d.clima],
+    [''],
+    ['INTERRUPCIONES'],
+    ['Causa','H. Inicio','H. Fin','Duración']
+  ];
+  (d.interrupciones || []).forEach(function(i){
+    rows.push([i.causa, i.inicio, i.fin, i.duracion]);
+  });
+  rows.push(['']);
+  rows.push(['FRENTES DE TRABAJO']);
+  rows.push(['#','Tramo','Est. Inicio','Est. Fin','H. Inicio','H. Fin','Categoría','Unidad','Cantidad','Detalle / Tipo']);
+  (d.frentes || []).forEach(function(f){
+    (f.actividades || []).forEach(function(a, ai){
+      var det = a.tipo_linea ? (a.tipo_linea + ' ' + (a.ancho_cm||'') + 'cm ' + (a.color||'')) : (a.detalle||'');
+      rows.push([f.num, f.tramo, f.est_inicio, f.est_fin, f.hinicio, f.hfin, a.categoria, a.unidad, a.cantidad, det]);
+    });
+  });
+  rows.push(['']);
+  rows.push(['MATERIALES']);
+  rows.push(['Frente','Actividad','Material','Cantidad','Unidad']);
+  (d.frentes || []).forEach(function(f){
+    (f.actividades || []).forEach(function(a){
+      (a.materiales || []).forEach(function(m){
+        rows.push([f.num, a.categoria, m.material, m.cantidad, m.unidad]);
+      });
+    });
+  });
+  rows.push(['']);
+  rows.push(['PERSONAL']);
+  rows.push(['Rol','Nombre','Presente']);
+  (d.personal || []).forEach(function(p){ rows.push([p.rol, p.nombre, p.presente ? 'Sí' : 'No']); });
+  rows.push(['']);
+  rows.push(['NOVEDADES E IMPREVISTOS']);
+  rows.push(['#','Tipo','Descripción','H. Inicio','H. Fin','Duración','Fotos']);
+  (d.novedades || []).forEach(function(n, i){
+    rows.push([i+1, n.tipo, n.desc, n.hora_ini, n.hora_fin, n.duracion, n.fotos.map(function(f){ return f.nombre; }).join('; ')]);
+  });
+
+  var csv = rows.map(function(r){
+    return r.map(function(c){
+      var s = String(c||'').replace(/"/g,'""');
+      return (s.indexOf(',')>-1||s.indexOf('"')>-1||s.indexOf('\n')>-1) ? '"'+s+'"' : s;
+    }).join(',');
+  }).join('\n');
+
+  var blob = new Blob(['\uFEFF'+csv], { type:'text/csv;charset=utf-8' });
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href   = url;
+  a.download = 'bitacora_'+(d.fecha||'sin_fecha')+'_'+(d.nombre||'sin_nombre').replace(/\s+/g,'_')+'.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ══════════════════════════════════════════════
+   UTILIDADES
+══════════════════════════════════════════════ */
+function toMin(t){
+  var p = t.split(':');
+  return parseInt(p[0])*60 + parseInt(p[1]);
+}
+
+function durStr(min){
+  if(min <= 0) return '0 min';
+  if(min < 60) return min + ' min';
+  var h = Math.floor(min/60);
+  var m = min % 60;
+  return h + ' h ' + (m > 0 ? m + ' min' : '');
+}
+
+function parseDurCell(txt){
+  if(!txt || txt === '— min' || txt === '0 min') return 0;
+  var total = 0;
+  var mh = txt.match(/(\d+)\s*h/);
+  var mm = txt.match(/(\d+)\s*min/);
+  if(mh) total += parseInt(mh[1]) * 60;
+  if(mm) total += parseInt(mm[1]);
+  return total;
+}
+
+// Actualizar drive path cuando cambia proyecto o fecha
+document.addEventListener('change', function(e){
+  if(e.target.id === 'r-proyecto' || e.target.id === 'r-fecha'){
+    document.querySelectorAll('[id$="-drive-path"]').forEach(function(el){
+      var nid = el.id.replace('-drive-path','');
+      actualizarDrivePath(nid);
+    });
+    updateBar();
+  }
+  if(e.target.id === 'r-nombre') updateBar();
+});
+</script>
+
+<!--
+  auth.js — módulo centralizado de autenticación (Google Sign-In).
+  En desarrollo, usar la URL "raw" (sin caché) en vez de jsDelivr:
+  https://raw.githubusercontent.com/CNKVIAL2026/CNK-VIAL/main/auth.js
+-->
+<script src="https://raw.githubusercontent.com/CNKVIAL2026/CNK-VIAL/main/auth.js"></script>
+
+<script>
 (function () {
   function iniciales(nombre) {
     if (!nombre) return '?';
@@ -269,14 +1274,19 @@ textarea { resize: vertical; min-height: 60px; }
     }
 
     var session = CNKAuth.requireAuth(['admin', 'gerencia', 'tecnico']);
-    if (!session) return;
+    if (!session) return; // requireAuth ya redirigió
 
     pintarUsuario(session);
     aplicarVisibilidadPorRol(session.rol);
     document.body.classList.remove('cnk-auth-pending');
+
+    document.getElementById('cnk-logout-btn').addEventListener('click', function () {
+      CNKAuth.logout();
+      window.location.href = 'login.html';
+    });
   }
 
-  window.addEventListener('DOMContentLoaded', initAuthGate);
+  window.addEventListener('load', initAuthGate);
 })();
 </script>
 </body>
