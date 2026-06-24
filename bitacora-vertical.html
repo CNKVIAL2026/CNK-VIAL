@@ -988,7 +988,7 @@ function enviar(){
 function exportarExcel(){
   if(typeof ExcelJS==='undefined'){ alert('ExcelJS no cargó. Verifica conexión.'); return; }
   var d = recopilar();
-  var AZUL='FF0B2545', AZUL2='FF1a3a6b', AMAR='FFF5A623', BLANC='FFFFFFFF', GRIS='FFF4F6F9', GRIS2='FFE8ECF0';
+  var NEGRO='FF111111', NEGRO2='FF1a1a1a', AMAR='FFF5A623', BLANC='FFFFFFFF', GRIS='FFF4F6F9', GRIS2='FFE8ECF0';
 
   var wb = new ExcelJS.Workbook();
   wb.creator='CNK Señalización Vial';
@@ -1007,11 +1007,11 @@ function exportarExcel(){
     var r=ws.addRow([label]); r.height=18;
     ws.mergeCells('A'+r.number+':I'+r.number);
     r.getCell(1).value=label;
-    for(var i=1;i<=9;i++) Object.assign(r.getCell(i),st(AZUL2,BLANC,true,11,'left'));
+    for(var i=1;i<=9;i++) Object.assign(r.getCell(i),st(NEGRO,BLANC,true,11,'left'));
   }
   function cols(arr){
     var r=ws.addRow(arr); r.height=14;
-    r.eachCell(function(cell){ Object.assign(cell,st(GRIS2,AZUL,true,9,'center')); });
+    r.eachCell(function(cell){ Object.assign(cell,st(GRIS2,NEGRO,true,9,'center')); });
   }
   function row(arr,shade){
     var r=ws.addRow(arr); r.height=13;
@@ -1022,27 +1022,27 @@ function exportarExcel(){
   var t1=ws.addRow(['CNK SEÑALIZACIÓN VIAL — BITÁCORA DIARIA DE SEÑALIZACIÓN VERTICAL']);
   t1.height=22; ws.mergeCells('A1:I1');
   t1.getCell(1).value='CNK SEÑALIZACIÓN VIAL — BITÁCORA DIARIA DE SEÑALIZACIÓN VERTICAL';
-  for(var i=1;i<=9;i++) Object.assign(t1.getCell(i),st(AZUL,BLANC,true,13,'center'));
+  for(var i=1;i<=9;i++) Object.assign(t1.getCell(i),st(AMAR,NEGRO,true,13,'center'));
 
   var t2=ws.addRow(['Normativa SIECA 2014 · Registro de señales instaladas en campo','','','','','','','','Fecha: '+(d.fecha||'')]);
   t2.height=13; ws.mergeCells('A2:H2');
-  Object.assign(t2.getCell(1),st(AZUL,'FFa8c0d8',false,9,'left'));
-  Object.assign(t2.getCell(9),st(AZUL,AMAR,true,9,'right'));
+  Object.assign(t2.getCell(1),st(NEGRO,'FFaaaaaa',false,9,'left'));
+  Object.assign(t2.getCell(9),st(NEGRO,AMAR,true,9,'right'));
   ws.addRow([]);
 
   // INFO GENERAL
   sec('INFORMACIÓN GENERAL');
   var r4=ws.addRow(['Proyecto',d.proyecto||'','Orden de trabajo',d.orden_trabajo||'','N° Reporte',d.contrato||'','Responsable',d.nombre||'','']);
   r4.height=13;
-  [1,3,5,7].forEach(function(i){ Object.assign(r4.getCell(i),st(GRIS2,AZUL,true,9)); });
+  [1,3,5,7].forEach(function(i){ Object.assign(r4.getCell(i),st(GRIS2,NEGRO,true,9)); });
   [2,4,6,8].forEach(function(i){ Object.assign(r4.getCell(i),st(BLANC,'FF111111',false,9)); });
   var r5=ws.addRow(['Rol',d.rol||'','Fecha',d.fecha||'','Hora inicio',d.hinicio||'','Hora fin',d.hfin||'','']);
   r5.height=13;
-  [1,3,5,7].forEach(function(i){ Object.assign(r5.getCell(i),st(GRIS2,AZUL,true,9)); });
+  [1,3,5,7].forEach(function(i){ Object.assign(r5.getCell(i),st(GRIS2,NEGRO,true,9)); });
   [2,4,6,8].forEach(function(i){ Object.assign(r5.getCell(i),st(BLANC,'FF111111',false,9)); });
   var r6=ws.addRow(['Clima',d.clima||'','Total personas',d.total_personas||'','','','','','']);
   r6.height=13;
-  [1,3].forEach(function(i){ Object.assign(r6.getCell(i),st(GRIS2,AZUL,true,9)); });
+  [1,3].forEach(function(i){ Object.assign(r6.getCell(i),st(GRIS2,NEGRO,true,9)); });
   [2,4].forEach(function(i){ Object.assign(r6.getCell(i),st(BLANC,'FF111111',false,9)); });
   ws.addRow([]);
 
