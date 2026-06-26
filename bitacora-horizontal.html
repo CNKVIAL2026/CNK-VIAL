@@ -923,36 +923,39 @@ function recopilar(){
   document.querySelectorAll('.frente-block').forEach(function(fb, fi){
     var fn = fb.id.replace('frente-','');
     function gv(id){ var el=fb.querySelector('#'+id); return el?el.value:''; }
-    var senales = [];
-    fb.querySelectorAll('.senal-block').forEach(function(sb){
-      var sid  = sb.id;
+    var actividades = [];
+    fb.querySelectorAll('.act-block').forEach(function(ab){
+      var aid  = ab.id;
+      var cat  = document.getElementById(aid+'-cat') ? document.getElementById(aid+'-cat').value : '';
+      var conf = CATEGORIAS_ACT[cat] || {};
+      var act  = { categoria:cat, unidad:conf.unidad||'', cantidad:gvById(aid+'-qty') };
+      if(conf.campos === 'lineal'){
+        act.mlp        = gvById(aid+'-mlp');
+        act.mla        = gvById(aid+'-mla');
+        act.ancho      = gvById(aid+'-ancho');
+        act.tipo_linea = gvById(aid+'-linea');
+        act.color      = gvById(aid+'-color');
+      } else {
+        act.detalle    = gvById(aid+'-detalle');
+      }
       var mats = [];
-      sb.querySelectorAll('.mat-row').forEach(function(row){
+      ab.querySelectorAll('.mat-row').forEach(function(row){
         var sels = row.querySelectorAll('select');
         var qty  = row.querySelector('input[type=number]');
         var mn   = sels[0]&&sels[0].value ? sels[0].value.split('|')[0] : '';
         if(mn) mats.push({material:mn, cantidad:qty?qty.value:'', unidad:sels[1]?sels[1].value:''});
       });
-      senales.push({
-        tipo:    gv(sid+'-tipo'),
-        subcat:  gv(sid+'-subcat'),
-        codigo:  gv(sid+'-codigo'),
-        desc:    gv(sid+'-desc'),
-        tamanio: gv(sid+'-tam'),
-        lado:    gv(sid+'-lado'),
-        cantidad:gv(sid+'-qty'),
-        unidad:  'Und',
-        materiales: mats
-      });
+      act.materiales = mats;
+      actividades.push(act);
     });
     frentes.push({
-      num:fi+1,
+      num:       fi+1,
       tramo:     gv('f'+fn+'-tramo'),
       est_inicio:gv('f'+fn+'-einicio'),
       est_fin:   gv('f'+fn+'-efin'),
       hinicio:   gv('f'+fn+'-hinicio'),
       hfin:      gv('f'+fn+'-hfin'),
-      senales:   senales
+      actividades: actividades
     });
   });
   d.frentes = frentes;
